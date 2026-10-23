@@ -40,3 +40,4 @@ CI (`Check plumbing` and `Test join decoding`) fails if any of these break.
 - DNS needs `benito.mikeroysoft.com CNAME mikeroysoft-org.github.io.`
 - Pages on a private repo needs a paid GitHub plan.
 - Universal links need the real Team ID. Set the repo variables `APPLE_TEAM_ID` and `BENITO_BUNDLE_ID`.
+- The app side is opt-in: builds signed by that team set `BENITO_ENTITLEMENTS = Resources/Benito-UniversalLinks.entitlements` in `apps/Benito/Config/Local.xcconfig`. Other builds still open invites: this page hands off to `benito://join?p=…`.
