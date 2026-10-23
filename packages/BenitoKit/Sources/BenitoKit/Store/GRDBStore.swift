@@ -151,6 +151,13 @@ public final class GRDBStore: BenitoStore, @unchecked Sendable {
         }
     }
 
+    public func event(id: UUID) async throws -> EventDTO? {
+        try await dbQueue.read { db in
+            try Row.fetchOne(db, sql: "SELECT * FROM events WHERE id = ?", arguments: [id.uuidString])
+                .map { try Self.event(from: $0) }
+        }
+    }
+
     public func events(childId: UUID, limit: Int) async throws -> [EventDTO] {
         try await dbQueue.read { db in
             let rows = try Row.fetchAll(
@@ -200,6 +207,13 @@ public final class GRDBStore: BenitoStore, @unchecked Sendable {
     public func removeTimer(id: UUID) async throws {
         try await dbQueue.write { db in
             try db.execute(sql: "DELETE FROM timers WHERE id = ?", arguments: [id.uuidString])
+        }
+    }
+
+    public func timer(id: UUID) async throws -> TimerDTO? {
+        try await dbQueue.read { db in
+            try Row.fetchOne(db, sql: "SELECT * FROM timers WHERE id = ?", arguments: [id.uuidString])
+                .map { try Self.timer(from: $0) }
         }
     }
 

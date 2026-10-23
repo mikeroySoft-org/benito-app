@@ -150,8 +150,11 @@ pub async fn create_event(
         if !user_can_access_child(&conn, user.id, body.child_id)? {
             return Err(AuthError::Unauthorized);
         }
+        if let Some(existing) = existing_client_event(&conn, user.id, body.id)? {
+            return Ok(Json(existing));
+        }
     }
-    let id = Uuid::new_v4();
+    let id = body.id.unwrap_or_else(Uuid::new_v4);
     let now = Utc::now();
     let started = body.started_at.unwrap_or(now);
     let payload = body
@@ -201,6 +204,32 @@ pub async fn create_event(
     };
     broadcast_event_upsert(&state.sync, &state.db, &event, client_id_from(&headers));
     Ok(Json(event))
+}
+
+/// The event already stored under a client-chosen id, if any. An id that belongs to a
+/// family this user can't see is a conflict, never a leak of that event.
+fn existing_client_event(
+    conn: &rusqlite::Connection,
+    user_id: Uuid,
+    id: Option<Uuid>,
+) -> Result<Option<Event>, AuthError> {
+    let Some(id) = id else { return Ok(None) };
+    let found = conn.query_row(
+        &format!("SELECT {EVENT_COLS} FROM events WHERE id = ?1"),
+        params![id.to_string()],
+        map_event,
+    );
+    match found {
+        Ok(event) => {
+            if user_can_access_child(conn, user_id, event.child_id)? {
+                Ok(Some(event))
+            } else {
+                Err(AuthError::Conflict("event id already in use".into()))
+            }
+        }
+        Err(rusqlite::Error::QueryReturnedNoRows) => Ok(None),
+        Err(_) => Err(AuthError::Internal),
+    }
 }
 
 pub async fn list_events(

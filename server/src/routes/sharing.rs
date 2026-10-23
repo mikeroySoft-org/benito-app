@@ -193,7 +193,7 @@ pub async fn server_info(
         "version": env!("CARGO_PKG_VERSION"),
         "server_id": server_id(&conn),
         "advertised_urls": advertised_urls(),
-        "features": ["device_auth", "invites", "caregiver_role"],
+        "features": ["device_auth", "invites", "caregiver_role", "client_event_ids"],
     })))
 }
 

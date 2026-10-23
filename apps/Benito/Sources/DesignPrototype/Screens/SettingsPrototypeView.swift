@@ -14,6 +14,8 @@ struct SettingsPrototypeView: View {
     /// `SIMCTL_CHILD_BENITO_PROTOTYPE_SHEET` = sharing | invite opens Account › Sharing (screenshots).
     @State private var showSharing = ["sharing", "invite"]
         .contains(ProcessInfo.processInfo.environment["BENITO_PROTOTYPE_SHEET"] ?? "")
+    /// `SIMCTL_CHILD_BENITO_PROTOTYPE_SHEET` = connect opens Account › Connect to a server (screenshots).
+    @State private var showConnect = ProcessInfo.processInfo.environment["BENITO_PROTOTYPE_SHEET"] == "connect"
     /// False on iPad / devices without Live Activities, or when the user turned them off in Settings.
     @State private var liveActivitiesAvailable = ActivityAuthorizationInfo().areActivitiesEnabled
 
@@ -32,6 +34,24 @@ struct SettingsPrototypeView: View {
                     .listRowBackground(BenitoGlassListRowBackground())
                 }
 
+                if model.isOnDevice {
+                    Section {
+                        LabeledContent("Saved on", value: String(localized: "This iPhone only"))
+                        NavigationLink {
+                            ConnectServerView(model: model)
+                        } label: {
+                            Label(
+                                model.pendingServerMove?.serverChildId != nil ? "Finish connecting to a server" : "Connect to a server",
+                                systemImage: "server.rack"
+                            )
+                        }
+                    } header: {
+                        Text("Storage")
+                    } footer: {
+                        Text("Works with no server or account. Connect one to share with a partner or caregiver; your history comes along.")
+                    }
+                    .listRowBackground(BenitoGlassListRowBackground())
+                } else {
                 Section("Server") {
                     ServerURLField(serverURLString: $serverURLString) { url in
                         Task { await model.applyServerURL(url) }
@@ -54,6 +74,7 @@ struct SettingsPrototypeView: View {
                         LabeledContent("Waiting to sync", value: "\(model.outboxPending)")
                     }
                 }
+                }
 
                 Section("Account") {
                     if model.isSignedIn {
@@ -70,8 +91,10 @@ struct SettingsPrototypeView: View {
                         if let until = model.accessExpiresAt {
                             LabeledContent("Access until", value: until.formatted(date: .abbreviated, time: .shortened))
                         }
-                        Button("Sign out", role: .destructive) {
-                            if model.isPasswordless { confirmSignOut = true } else { model.signOut() }
+                        if !model.isOnDevice {
+                            Button("Sign out", role: .destructive) {
+                                if model.isPasswordless { confirmSignOut = true } else { model.signOut() }
+                            }
                         }
                     } else {
                         TextField("Name", text: $model.name)
@@ -89,6 +112,12 @@ struct SettingsPrototypeView: View {
                         Text("Sign in or register to create or join a family.")
                             .foregroundStyle(.secondary)
                     }
+                } else if model.isOnDevice {
+                    Section("Family") {
+                        LabeledContent("Family", value: model.familyName)
+                        LabeledContent("Child", value: model.childName)
+                    }
+                    .listRowBackground(BenitoGlassListRowBackground())
                 } else if model.hasFamily {
                     Section("Family") {
                         LabeledContent("Family", value: model.familyName)
@@ -147,7 +176,9 @@ struct SettingsPrototypeView: View {
                             .font(.footnote)
                             .foregroundStyle(DesignTokens.textSecondary)
                     }
-                    Text("Fetches from the server, writes a temp file, then opens the share sheet (Files, Mail, Messages…).")
+                    Text(model.isOnDevice
+                        ? "Writes this iPhone's log to a temp file, then opens the share sheet (Files, Mail, Messages…)."
+                        : "Fetches from the server, writes a temp file, then opens the share sheet (Files, Mail, Messages…).")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
@@ -200,6 +231,9 @@ struct SettingsPrototypeView: View {
                     liveActivitiesAvailable = enabled
                 }
             }
+            .navigationDestination(isPresented: $showConnect) {
+                ConnectServerView(model: model)
+            }
             .navigationDestination(isPresented: $showSharing) {
                 SharingView(model: model)
             }
@@ -215,7 +249,11 @@ extension SettingsPrototypeView {
     fileprivate var accountSubtitle: String {
         var parts: [String] = []
         if model.hasFamily { parts.append(model.isParent ? "Parent" : "Caregiver") }
-        parts.append(model.isPasswordless ? "Signed in with this iPhone" : model.signedInEmail)
+        if model.isOnDevice {
+            parts.append(String(localized: "Saved on this iPhone"))
+        } else {
+            parts.append(model.isPasswordless ? "Signed in with this iPhone" : model.signedInEmail)
+        }
         return parts.joined(separator: " · ")
     }
 }

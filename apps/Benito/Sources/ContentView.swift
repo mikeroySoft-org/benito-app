@@ -67,6 +67,12 @@ final class AppModel {
 
     var api: APIClient?
     var store: any BenitoStore
+    /// Data lives only on this phone (no server, no account). Absent for server families.
+    var isOnDevice = BenitoMode.current() == .onDevice
+    /// Answers the app's data calls in on-device mode, by the server's rules.
+    @ObservationIgnored private(set) lazy var localService = LocalBenitoService(store: store)
+    /// Progress of a move from this phone to a family server (Account › Connect to a server).
+    var serverMove: ServerMoveProgress?
     private var sync: SyncClient?
     let clientId: String
     /// Last `error` envelope from the server; explains the close that follows it.
@@ -87,7 +93,7 @@ final class AppModel {
             UserDefaults.standard.set(id, forKey: "benito.clientId")
             self.clientId = id
         }
-        let created = LocalStoreFactory.makeDefault()
+        let created = LocalStoreFactory.shared
         self.store = created
         #if canImport(GRDB)
         self.storeLabel = (created is GRDBStore) ? "store: GRDB" : "store: memory"
@@ -100,6 +106,7 @@ final class AppModel {
             await restoreSession()
             didResolveLaunch = true
         }
+        observeLocalStoreChanges()
     }
 
     /// Current Server URL if it is an absolute URL with scheme + host.
@@ -132,6 +139,10 @@ final class AppModel {
     /// Rebuilds the API client from the Keychain token saved for the current server origin,
     /// then refreshes family/state, catches up on missed events and reconnects sync.
     func restoreSession() async {
+        if isOnDevice {
+            await restoreOnDevice()
+            return
+        }
         guard let url = serverBaseURL else {
             BenitoLog.ui.notice("restore skipped: no valid server URL")
             return
@@ -260,6 +271,8 @@ final class AppModel {
 
     func client() throws -> APIClient {
         if let api { return api }
+        // On-device families have no server; never build a tokenless client that would sync.
+        if isOnDevice { throw APIClientError.invalidURL }
         guard let url = serverBaseURL else {
             throw APIClientError.invalidURL
         }
@@ -423,7 +436,7 @@ final class AppModel {
 
     func refreshMe() async {
         do {
-            let c = try client()
+            let c = try service()
             let me = try await c.me()
             signedInEmail = me.user.email
             signedInName = me.user.name
@@ -455,7 +468,7 @@ final class AppModel {
         stateFetchGeneration += 1
         let generation = stateFetchGeneration
         do {
-            let c = try client()
+            let c = try service()
             let state = try await c.state(childId: childId)
             guard generation == stateFetchGeneration else {
                 BenitoLog.ui.notice("state refresh discarded (stale)")
@@ -617,7 +630,7 @@ final class AppModel {
     func updateEvent(_ event: EventDTO, changes: UpdateEventRequestDTO) async -> Bool {
         BenitoLog.ui.notice("updateEvent \(event.type, privacy: .public)")
         do {
-            let c = try client()
+            let c = try service()
             let updated = try await c.updateEvent(id: event.id, changes)
             try await store.upsertEvent(updated)
             status = "Updated \(updated.type)"
@@ -650,7 +663,7 @@ final class AppModel {
     func deleteEvent(_ event: EventDTO) async -> Bool {
         BenitoLog.ui.notice("deleteEvent \(event.type, privacy: .public)")
         do {
-            let c = try client()
+            let c = try service()
             try await c.deleteEvent(id: event.id)
             try await store.softDeleteEvent(id: event.id)
             status = "Deleted \(event.type)"
@@ -679,7 +692,7 @@ final class AppModel {
         }
         BenitoLog.ui.notice("adjustTimerStart \(timer.kind, privacy: .public)")
         do {
-            let c = try client()
+            let c = try service()
             let adjusted = try await c.adjustTimerStart(id: timer.id, startedAt: date)
             await applyLocalTimer(adjusted)
             status = "Timer start updated"
@@ -948,7 +961,7 @@ final class AppModel {
             side: side
         )
         do {
-            let c = try client()
+            let c = try service()
             let event = try await c.createEvent(request)
             try await store.upsertEvent(event)
             await refreshState()
@@ -1002,7 +1015,7 @@ final class AppModel {
         BenitoLog.ui.notice("resumeSleepFromEvent")
 
         do {
-            let c = try client()
+            let c = try service()
             let timer = try await c.startTimer(childId: childId, kind: EventType.sleep.rawValue, side: nil)
             try await store.upsertTimer(timer)
 
@@ -1050,7 +1063,7 @@ final class AppModel {
         guard let childId else { status = "No child"; return }
         BenitoLog.ui.notice("startTimer \(kind, privacy: .public)")
         do {
-            let c = try client()
+            let c = try service()
             let timer = try await c.startTimer(childId: childId, kind: kind, side: side)
             try await store.upsertTimer(timer)
             await refreshState()
@@ -1079,14 +1092,18 @@ final class AppModel {
         let snapshot = babyState
         // Drop in-flight /state responses that still show this timer as running.
         stateFetchGeneration += 1
-        var local = timer
-        local.state = "stopped"
-        local.stoppedAt = Date()
-        try? await store.upsertTimer(local)
+        // Server mode shows the stop at once; on device the stop itself is instant, and a
+        // pre-stopped row would make it skip logging the sleep / feed it timed.
+        if !isOnDevice {
+            var local = timer
+            local.state = "stopped"
+            local.stoppedAt = Date()
+            try? await store.upsertTimer(local)
+        }
         babyState?.activeTimer = nil
         var stoppedCleanly = false
         do {
-            let c = try client()
+            let c = try service()
             let stopped = try await c.stopTimer(id: timer.id)
             try await store.upsertTimer(stopped)
             stoppedCleanly = true
@@ -1126,7 +1143,7 @@ final class AppModel {
         }
         BenitoLog.ui.notice("pauseTimer \(timer.kind, privacy: .public)")
         do {
-            let c = try client()
+            let c = try service()
             let paused = try await c.pauseTimer(id: timer.id)
             try await store.upsertTimer(paused)
             await refreshState()
@@ -1162,7 +1179,7 @@ final class AppModel {
         }
         BenitoLog.ui.notice("resumeTimer \(timer.kind, privacy: .public)")
         do {
-            let c = try client()
+            let c = try service()
             let resumed = try await c.resumeTimer(id: timer.id)
             try await store.upsertTimer(resumed)
             await refreshState()
@@ -1198,7 +1215,7 @@ final class AppModel {
 
     func exportData() async {
         do {
-            let c = try client()
+            let c = try service()
             let bundle = try await c.exportBundle()
             try await store.replaceChildren(bundle.children)
             for event in bundle.events {
@@ -1222,7 +1239,7 @@ final class AppModel {
     /// Pediatrician-ready CSV (`GET /export.csv`) → temp file + share sheet.
     func exportCSV() async {
         do {
-            let c = try client()
+            let c = try service()
             let data = try await c.exportCSV()
             let url = try Self.writeExportFile(data: data, ext: "csv")
             exportShareItem = ExportShareItem(url: url)
@@ -1263,7 +1280,7 @@ final class AppModel {
     func dailySummary(from: Date, to: Date) async -> DailySummaryDTO? {
         guard let childId else { return nil }
         do {
-            let c = try client()
+            let c = try service()
             return try await c.dailySummary(childId: childId, from: from, to: to)
         } catch {
             if handleUnauthorized(error) { return nil }
@@ -1276,7 +1293,7 @@ final class AppModel {
     func refreshDailySummary() async {
         guard let childId else { return }
         do {
-            let c = try client()
+            let c = try service()
             let window = DayWindow(containing: Date())
             let summary = try await c.dailySummary(childId: childId, from: window.start, to: window.end)
             dailySummary = summary
@@ -1329,7 +1346,7 @@ final class AppModel {
             notes: notes
         )
         do {
-            let c = try client()
+            let c = try service()
             let event = try await c.createEvent(request)
             try await store.upsertEvent(event)
             status = "Logged \(type)"

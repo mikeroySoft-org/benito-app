@@ -4,6 +4,10 @@ import Foundation
 public enum LocalStoreFactory {
     public static let defaultDatabaseFileName = "benito.sqlite"
 
+    /// One on-disk store per process, so the app and its App Intents (Siri, Live Activity
+    /// buttons) share a single SQLite connection instead of racing two.
+    public static let shared: any BenitoStore = makeDefault()
+
     /// Application Support/Benito/benito.sqlite on Apple platforms; falls back to InMemoryStore.
     public static func makeDefault(stateRefetcher: (any StateRefetching)? = nil) -> any BenitoStore {
         #if canImport(GRDB)

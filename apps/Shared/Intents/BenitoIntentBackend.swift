@@ -56,7 +56,8 @@ enum IntentError: Error, LocalizedError, CustomLocalizedStringResourceConvertibl
     var localizedStringResource: LocalizedStringResource { "\(message)" }
 }
 
-/// Talks to the Benito server on behalf of App Intents (Siri, Shortcuts, Live Activity buttons).
+/// Talks to the Benito server (or, in on-device mode, this phone's store) on behalf of App Intents
+/// (Siri, Shortcuts, Live Activity buttons).
 /// Independent of the app's `AppModel`: reads the server URL the app saved, the session token
 /// from the Keychain, and resolves the child via `GET /me` (cached in `UserDefaults`). After
 /// every mutation it re-reads `/state` and refreshes the Live Activity.
@@ -65,7 +66,7 @@ struct BenitoIntentBackend: Sendable {
     static let childIdKey = "benito.intent.childId"
     static let childNameKey = "benito.intent.childName"
 
-    let client: APIClient
+    let client: any BenitoService
     let childId: UUID
     let childName: String
     /// `/state` as of `connect()`.
@@ -99,7 +100,11 @@ struct BenitoIntentBackend: Sendable {
         return BenitoIntentBackend(client: client, childId: child.id, childName: child.name, initialState: state)
     }
 
-    private static func makeClient() throws -> APIClient {
+    private static func makeClient() throws -> any BenitoService {
+        if BenitoMode.current() == .onDevice {
+            // Same store and rules as the app; the app process hears about the change below.
+            return LocalBenitoService(store: LocalStoreFactory.shared)
+        }
         let raw = UserDefaults.standard.string(forKey: serverURLKey)?
             .trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         guard let url = URL(string: raw), url.scheme != nil, url.host != nil else {
@@ -134,7 +139,7 @@ struct BenitoIntentBackend: Sendable {
     }
 
     /// Same pick as the app: the family's first child.
-    private static func fetchChild(_ client: APIClient) async throws -> (id: UUID, name: String) {
+    private static func fetchChild(_ client: any BenitoService) async throws -> (id: UUID, name: String) {
         let me = try await perform { try await client.me() }
         guard let child = me.children.first else { throw IntentError.noChild }
         let name = displayName(child.name) ?? "Baby"
@@ -240,6 +245,9 @@ struct BenitoIntentBackend: Sendable {
     /// Re-reads `/state` and pushes it to the Live Activity. Best effort: after a mutation that
     /// already succeeded, a failed refresh only leaves the activity behind until the app syncs.
     func syncLiveActivity() async {
+        if BenitoMode.current() == .onDevice {
+            NotificationCenter.default.post(name: .benitoLocalStoreDidChange, object: nil)
+        }
         #if canImport(ActivityKit)
         do {
             let fresh = try await client.state(childId: childId)
