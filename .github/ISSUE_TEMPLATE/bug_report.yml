@@ -1,0 +1,40 @@
+name: Bug report
+description: Something doesn't work as expected
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open Account > Sharing
+        2. Tap Invite to Family
+        3. ...
+  - type: input
+    id: app
+    attributes:
+      label: App version / commit
+      description: Shown at the bottom of Account.
+  - type: input
+    id: device
+    attributes:
+      label: Device and iOS version
+      placeholder: iPhone 16, iOS 18.4
+  - type: dropdown
+    id: server
+    attributes:
+      label: How do you run the server?
+      options: [macOS launchd service, Docker, Linux binary, Other]
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Server log lines or device logs. Remove names, emails, tokens and invite links first.
+      render: text

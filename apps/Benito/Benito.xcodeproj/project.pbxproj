@@ -1,0 +1,1012 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		011D20B828282A88C2281647 /* BenitoKit in Frameworks */ = {isa = PBXBuildFile; productRef = 0D9089E6A9E830E674361850 /* BenitoKit */; };
+		0236F9E21C0DEA0F610E641A /* ActivityLogSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 177F3CC7A4AB2FC8434DB38C /* ActivityLogSheet.swift */; };
+		090E8E347380D53624E3B7F4 /* TimerIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0D7B1ED3B5A9690619DC43 /* TimerIntents.swift */; };
+		09A35673932DAB9B8BD80159 /* ReadableContentWidth.swift in Sources */ = {isa = PBXBuildFile; fileRef = F60DF16A5B16B9ACB726C29B /* ReadableContentWidth.swift */; };
+		0A31EA331DD382FBB56A6FCF /* BenitoHomeSheetRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0E07293736D2C63F083C2A /* BenitoHomeSheetRequest.swift */; };
+		0D1D1DF623F43366D222C1DC /* InviteSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECB51E0A81676834E4F72B40 /* InviteSheet.swift */; };
+		0F4D272B89A9AED34B498017 /* TimelinePrototypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F10122A1854D8D0E3C64546C /* TimelinePrototypeView.swift */; };
+		0F4FCA29CE90EACFA6ACCCE0 /* ThumbActionBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9381111304C673283B7FCD /* ThumbActionBar.swift */; };
+		113D7F004CA197E7860AF6FB /* BenitoWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FA424B678A6942F3F13DD693 /* BenitoWidgets.appex */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		1805B7321B8378D06BBACB49 /* LogIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF088E66076D69803A90A9 /* LogIntents.swift */; };
+		2415208707C7108651285E5A /* EventEditorSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEA3CAB59F95C0EFC58C6958 /* EventEditorSheet.swift */; };
+		2909F2722A0808DE21BB2A9C /* AdaptiveColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76DC9031238FE56CF448BE61 /* AdaptiveColor.swift */; };
+		2A085C4885F1E18CC4056079 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9FF368C6EFA50E3FE69BBA6 /* ContentView.swift */; };
+		2BAAEAA5C4A788D5B09C717E /* LiveActivityContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6493F1458E2441A9ED4281B9 /* LiveActivityContent.swift */; };
+		2C3BB7D11B9E9B4E300851B5 /* AppModel+Sharing.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5E014BEFCF6788ECDED78B6 /* AppModel+Sharing.swift */; };
+		2F343160119E4B8EA1FD5B46 /* ServerURLField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AC9C38F592E7BD0B2B376A1 /* ServerURLField.swift */; };
+		2FA7958CD55DD20FF16A6272 /* DayWindowCaption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A54993A5244A5205EB051D4 /* DayWindowCaption.swift */; };
+		3B647E6891DFE5220AAABD1F /* LogSheets.swift in Sources */ = {isa = PBXBuildFile; fileRef = C96014CE3DBE7F21096A1204 /* LogSheets.swift */; };
+		45F39AC2381AD2E2ADD20A40 /* LogIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FBF088E66076D69803A90A9 /* LogIntents.swift */; };
+		4C14802665AB508DF3B0ED27 /* BenitoActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AB1E990795059BA4ACA4584 /* BenitoActivityAttributes.swift */; };
+		4D2B25834B923005C5B1DB69 /* StartCryingIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3154AB17B06FE3AA29124B95 /* StartCryingIntent.swift */; };
+		4EB0EDC1CFE6958AAB6F9B1C /* SharingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 80343922CB461F0EF4CA3080 /* SharingView.swift */; };
+		50DD7B2A6F9E8D137B0072F1 /* LiveActivityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54876043BA83C9BF6F9FB1DB /* LiveActivityController.swift */; };
+		53693889ECEDAEB3D59EFE52 /* FedTotalsLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AAD570961C7C852218385F2 /* FedTotalsLine.swift */; };
+		53AF47A5CA945E2AC784A9A0 /* BenitoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E49A50A8AACCEB491096E3 /* BenitoApp.swift */; };
+		5504580076A2209F2F61EE20 /* ServerBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A975D0E10215C668838A9E25 /* ServerBrowser.swift */; };
+		5A077ED421202084319F8A72 /* StartCryingIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3154AB17B06FE3AA29124B95 /* StartCryingIntent.swift */; };
+		5BB38CFF37AD92BF6E85B67A /* NursingLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F619B8BC321B9EB3C9DB2B /* NursingLabels.swift */; };
+		5CEDF8606A537301E38522D6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B0855D8DCB06983B7887B1FA /* Assets.xcassets */; };
+		5CFFCC941EF5867555218F6C /* PairingSessionSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 200D35BF5FCC6FE840207133 /* PairingSessionSheet.swift */; };
+		607F5974375DB9651A078C62 /* HomeGlanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D05D6C085268FBD7A7CFCC /* HomeGlanceView.swift */; };
+		60C3F8152B6DA8154165D578 /* TimelineDayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F88A36AFEFA9897D53C0D8 /* TimelineDayView.swift */; };
+		62854B7FA3DD3AAE955F207A /* SheetDetents.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2393C23A435CB8346828CB2 /* SheetDetents.swift */; };
+		62B11BB63CADEAF96BAC64F9 /* BenitoKit in Frameworks */ = {isa = PBXBuildFile; productRef = 35A220E5971AECA28514EA26 /* BenitoKit */; };
+		66E64CF17D07C840A514A805 /* TimerIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0D7B1ED3B5A9690619DC43 /* TimerIntents.swift */; };
+		688B29531C85C6F555401BF4 /* BenitoLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E31BB885479BEFDB9E5BAD4 /* BenitoLiveActivity.swift */; };
+		6AD19DE9DEA65FA3D1C6A738 /* OutingIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76B7E4473D4D181F72E53661 /* OutingIntents.swift */; };
+		7159112B7AFC71986780D3D7 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27F8D34C2AC993DD11565B6C /* ContentView.swift */; };
+		77E5DBE2B32E1038190A1624 /* RunningTimerBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39953A71634BF830630202F2 /* RunningTimerBar.swift */; };
+		78BDA149752E9123F30ECD62 /* AdaptiveColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76DC9031238FE56CF448BE61 /* AdaptiveColor.swift */; };
+		7A4F096C7171E691561DE9D4 /* TimelineWeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8C13084C838DEB6CCB3C6F1 /* TimelineWeekView.swift */; };
+		7E2D09E4EA5C21BFAA358B3D /* ActiveTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B15D6E3DC7BBE835BB2A7AE /* ActiveTimerView.swift */; };
+		7E6706C019F6644CCD0AFFBF /* BenitoShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 666246C21B7E5308F92ADC72 /* BenitoShortcuts.swift */; };
+		880E9470483D7612E01CC331 /* SettingsPrototypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 067B7AE557310B4A330A4222 /* SettingsPrototypeView.swift */; };
+		8D128AA17F077E86CE8B653E /* BenitoIntentBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305BB4071E1BFF84FB322527 /* BenitoIntentBackend.swift */; };
+		900B06650D9342F26071DC65 /* JoinFamilySheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D038B06391E753556BDC698 /* JoinFamilySheet.swift */; };
+		92783354A584261A842903DA /* LiveActivityContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6493F1458E2441A9ED4281B9 /* LiveActivityContent.swift */; };
+		9A7147D6F6A8EEA1821084B7 /* BenitoKit in Frameworks */ = {isa = PBXBuildFile; productRef = B557CF274A2B62A474947202 /* BenitoKit */; };
+		9C890E9E6DA22DFAF820BBE8 /* PairingActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A10F873CDF55BD8AE1B74AA /* PairingActivity.swift */; };
+		9FD664BCD685CB0F54ED1DFE /* LogActionsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA336E1335D5B0C74FAFC9AE /* LogActionsView.swift */; };
+		A13FDD35BDE2A91A4684AE1E /* DesignPrototypeRoot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7594F7BC9E6EE0CDAB4A3813 /* DesignPrototypeRoot.swift */; };
+		A4BCFE708E429E58D2AC46C5 /* BenitoActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AB1E990795059BA4ACA4584 /* BenitoActivityAttributes.swift */; };
+		A6109E949356F40DC2780E65 /* JoinFamilyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7724B6648D85BE6565091680 /* JoinFamilyView.swift */; };
+		A67E91F0291F1A5F53F42CF2 /* BenitoIntentBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305BB4071E1BFF84FB322527 /* BenitoIntentBackend.swift */; };
+		AC639A7E552174B3448201EF /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D75CCA90B6F33FA9A2EF3C /* OnboardingView.swift */; };
+		B38320EBF9502F0552B1CC0B /* BenitoTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = E406E2BC134D2CA277F5A82F /* BenitoTips.swift */; };
+		B4D4C7C39D7CC23E087E9867 /* GitSHA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1649BA8861CBC14E75077907 /* GitSHA.swift */; };
+		BA3FC74AFDF81F27FB2E5DA8 /* BenitoHomeSheetRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B0E07293736D2C63F083C2A /* BenitoHomeSheetRequest.swift */; };
+		BAA494AA2E057FA9FD5BB74B /* OutingIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76B7E4473D4D181F72E53661 /* OutingIntents.swift */; };
+		C28982EFE7BF420383517A65 /* BenitoWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2748FCF6C02D23102005293D /* BenitoWatchApp.swift */; };
+		C4DBC17D255D27E981FADFD7 /* CryingTotalLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DA6F30EA922A5BBDE4E7087 /* CryingTotalLine.swift */; };
+		CFFE258E13B36BFD13D4400C /* NursingLabels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17F619B8BC321B9EB3C9DB2B /* NursingLabels.swift */; };
+		D17BE4502B0B83D6DA8A850F /* PairingCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C445C015D7B3E0D74A4B8FBE /* PairingCoordinator.swift */; };
+		D27EE0F5DCD0534F5F689462 /* AppBuildInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44B6D686F3F4FEA9443CCA44 /* AppBuildInfo.swift */; };
+		D39FE16DD97829A669359141 /* GlassChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4F2F10B711CAF9065DBAB28 /* GlassChrome.swift */; };
+		D3F44B1D12B74FDD545CA94C /* NursingFeedPanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 833AA518A98E7F42232992E8 /* NursingFeedPanel.swift */; };
+		D81AEBD0288E9D135890DCD0 /* LogTimePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2273F41D43701DC1120EF5E4 /* LogTimePicker.swift */; };
+		EA721AE4813A671A561D49D3 /* RunningFeedSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6017B38C38C560B72C375C79 /* RunningFeedSheet.swift */; };
+		EB3355FBEEEE6387067F780F /* BenitoWidgetsBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB86EC0FBEE38D566731D624 /* BenitoWidgetsBundle.swift */; };
+		F07A0D03DCD03A383D6030DE /* PrototypeModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 830168A809B3E800C5DF4B10 /* PrototypeModels.swift */; };
+		F330A3D4046651D23D4BEB1D /* DesignTokens.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAAE6CCD116C208EA04E1CFA /* DesignTokens.swift */; };
+		FCD0D258E85BC51AD33DDECA /* ContinuousCornerCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0136493BB85C6B4E612B29F5 /* ContinuousCornerCard.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F16ED2FBC3414D21BE39DF62 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8C43A062691ACC5F9882F709 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0DEF6A34AB61992455997AA8;
+			remoteInfo = BenitoWidgets;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AB941470C54563AD8AC180FC /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				113D7F004CA197E7860AF6FB /* BenitoWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0136493BB85C6B4E612B29F5 /* ContinuousCornerCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinuousCornerCard.swift; sourceTree = "<group>"; };
+		067B7AE557310B4A330A4222 /* SettingsPrototypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsPrototypeView.swift; sourceTree = "<group>"; };
+		11ECE14988153FE3A34B65C8 /* BenitoWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BenitoWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1649BA8861CBC14E75077907 /* GitSHA.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GitSHA.swift; sourceTree = "<group>"; };
+		177F3CC7A4AB2FC8434DB38C /* ActivityLogSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityLogSheet.swift; sourceTree = "<group>"; };
+		17F619B8BC321B9EB3C9DB2B /* NursingLabels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NursingLabels.swift; sourceTree = "<group>"; };
+		1A10F873CDF55BD8AE1B74AA /* PairingActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingActivity.swift; sourceTree = "<group>"; };
+		1A9381111304C673283B7FCD /* ThumbActionBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThumbActionBar.swift; sourceTree = "<group>"; };
+		1AB1E990795059BA4ACA4584 /* BenitoActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenitoActivityAttributes.swift; sourceTree = "<group>"; };
+		1D038B06391E753556BDC698 /* JoinFamilySheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinFamilySheet.swift; sourceTree = "<group>"; };
+		200D35BF5FCC6FE840207133 /* PairingSessionSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingSessionSheet.swift; sourceTree = "<group>"; };
+		2273F41D43701DC1120EF5E4 /* LogTimePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogTimePicker.swift; sourceTree = "<group>"; };
+		24F88A36AFEFA9897D53C0D8 /* TimelineDayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineDayView.swift; sourceTree = "<group>"; };
+		2748FCF6C02D23102005293D /* BenitoWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenitoWatchApp.swift; sourceTree = "<group>"; };
+		27F8D34C2AC993DD11565B6C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		28D75CCA90B6F33FA9A2EF3C /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		2E31BB885479BEFDB9E5BAD4 /* BenitoLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenitoLiveActivity.swift; sourceTree = "<group>"; };
+		305BB4071E1BFF84FB322527 /* BenitoIntentBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenitoIntentBackend.swift; sourceTree = "<group>"; };
+		3154AB17B06FE3AA29124B95 /* StartCryingIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartCryingIntent.swift; sourceTree = "<group>"; };
+		39953A71634BF830630202F2 /* RunningTimerBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningTimerBar.swift; sourceTree = "<group>"; };
+		3DE47080F4BA9BC23807AF9A /* Benito.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Benito.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		44B6D686F3F4FEA9443CCA44 /* AppBuildInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppBuildInfo.swift; sourceTree = "<group>"; };
+		4A54993A5244A5205EB051D4 /* DayWindowCaption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayWindowCaption.swift; sourceTree = "<group>"; };
+		54876043BA83C9BF6F9FB1DB /* LiveActivityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityController.swift; sourceTree = "<group>"; };
+		6017B38C38C560B72C375C79 /* RunningFeedSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningFeedSheet.swift; sourceTree = "<group>"; };
+		6493F1458E2441A9ED4281B9 /* LiveActivityContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityContent.swift; sourceTree = "<group>"; };
+		65E49A50A8AACCEB491096E3 /* BenitoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenitoApp.swift; sourceTree = "<group>"; };
+		666246C21B7E5308F92ADC72 /* BenitoShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenitoShortcuts.swift; sourceTree = "<group>"; };
+		6AAD570961C7C852218385F2 /* FedTotalsLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FedTotalsLine.swift; sourceTree = "<group>"; };
+		6B0D7B1ED3B5A9690619DC43 /* TimerIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerIntents.swift; sourceTree = "<group>"; };
+		7594F7BC9E6EE0CDAB4A3813 /* DesignPrototypeRoot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignPrototypeRoot.swift; sourceTree = "<group>"; };
+		76B7E4473D4D181F72E53661 /* OutingIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OutingIntents.swift; sourceTree = "<group>"; };
+		76DC9031238FE56CF448BE61 /* AdaptiveColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdaptiveColor.swift; sourceTree = "<group>"; };
+		7724B6648D85BE6565091680 /* JoinFamilyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinFamilyView.swift; sourceTree = "<group>"; };
+		7B0E07293736D2C63F083C2A /* BenitoHomeSheetRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenitoHomeSheetRequest.swift; sourceTree = "<group>"; };
+		7B15D6E3DC7BBE835BB2A7AE /* ActiveTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveTimerView.swift; sourceTree = "<group>"; };
+		7DA6F30EA922A5BBDE4E7087 /* CryingTotalLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryingTotalLine.swift; sourceTree = "<group>"; };
+		80343922CB461F0EF4CA3080 /* SharingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingView.swift; sourceTree = "<group>"; };
+		830168A809B3E800C5DF4B10 /* PrototypeModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrototypeModels.swift; sourceTree = "<group>"; };
+		833AA518A98E7F42232992E8 /* NursingFeedPanel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NursingFeedPanel.swift; sourceTree = "<group>"; };
+		8AC9C38F592E7BD0B2B376A1 /* ServerURLField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerURLField.swift; sourceTree = "<group>"; };
+		9FBF088E66076D69803A90A9 /* LogIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogIntents.swift; sourceTree = "<group>"; };
+		A4F2F10B711CAF9065DBAB28 /* GlassChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassChrome.swift; sourceTree = "<group>"; };
+		A975D0E10215C668838A9E25 /* ServerBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerBrowser.swift; sourceTree = "<group>"; };
+		AAAE6CCD116C208EA04E1CFA /* DesignTokens.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignTokens.swift; sourceTree = "<group>"; };
+		B0855D8DCB06983B7887B1FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B541805E5BF384E27F4F4617 /* Base.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Base.xcconfig; sourceTree = "<group>"; };
+		C445C015D7B3E0D74A4B8FBE /* PairingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingCoordinator.swift; sourceTree = "<group>"; };
+		C96014CE3DBE7F21096A1204 /* LogSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogSheets.swift; sourceTree = "<group>"; };
+		C9FF368C6EFA50E3FE69BBA6 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		D2393C23A435CB8346828CB2 /* SheetDetents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetDetents.swift; sourceTree = "<group>"; };
+		DA336E1335D5B0C74FAFC9AE /* LogActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogActionsView.swift; sourceTree = "<group>"; };
+		DB86EC0FBEE38D566731D624 /* BenitoWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenitoWidgetsBundle.swift; sourceTree = "<group>"; };
+		DDA0E2ECD0043C8D9EB4EE6E /* BenitoKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = BenitoKit; path = ../../packages/BenitoKit; sourceTree = SOURCE_ROOT; };
+		E406E2BC134D2CA277F5A82F /* BenitoTips.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenitoTips.swift; sourceTree = "<group>"; };
+		E4D05D6C085268FBD7A7CFCC /* HomeGlanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeGlanceView.swift; sourceTree = "<group>"; };
+		E5E014BEFCF6788ECDED78B6 /* AppModel+Sharing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppModel+Sharing.swift"; sourceTree = "<group>"; };
+		ECB51E0A81676834E4F72B40 /* InviteSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteSheet.swift; sourceTree = "<group>"; };
+		EEA3CAB59F95C0EFC58C6958 /* EventEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventEditorSheet.swift; sourceTree = "<group>"; };
+		F10122A1854D8D0E3C64546C /* TimelinePrototypeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelinePrototypeView.swift; sourceTree = "<group>"; };
+		F60DF16A5B16B9ACB726C29B /* ReadableContentWidth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReadableContentWidth.swift; sourceTree = "<group>"; };
+		F8C13084C838DEB6CCB3C6F1 /* TimelineWeekView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimelineWeekView.swift; sourceTree = "<group>"; };
+		FA424B678A6942F3F13DD693 /* BenitoWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = BenitoWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		73EF5C0DC99F7BC9B15299F6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				62B11BB63CADEAF96BAC64F9 /* BenitoKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A03F324EFD89A7DEEF4A9AE2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9A7147D6F6A8EEA1821084B7 /* BenitoKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C18EA17E5E5562CE7C3EC45B /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				011D20B828282A88C2281647 /* BenitoKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		2CB8F44348E34D2CF40BE461 /* Sharing */ = {
+			isa = PBXGroup;
+			children = (
+				E5E014BEFCF6788ECDED78B6 /* AppModel+Sharing.swift */,
+				ECB51E0A81676834E4F72B40 /* InviteSheet.swift */,
+				1D038B06391E753556BDC698 /* JoinFamilySheet.swift */,
+				7724B6648D85BE6565091680 /* JoinFamilyView.swift */,
+				80343922CB461F0EF4CA3080 /* SharingView.swift */,
+			);
+			path = Sharing;
+			sourceTree = "<group>";
+		};
+		2D65500691674A903C34969C /* BenitoWatch */ = {
+			isa = PBXGroup;
+			children = (
+				42137D5A26A59DB757A49B1F /* Sources */,
+			);
+			path = BenitoWatch;
+			sourceTree = "<group>";
+		};
+		320303D7070C1CBE7CFAB36A /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				B541805E5BF384E27F4F4617 /* Base.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
+		42137D5A26A59DB757A49B1F /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				2748FCF6C02D23102005293D /* BenitoWatchApp.swift */,
+				27F8D34C2AC993DD11565B6C /* ContentView.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		4D9E4FAE8DC21D98E24E6006 = {
+			isa = PBXGroup;
+			children = (
+				67A6F4B50388A43647ECBDF4 /* apps */,
+				320303D7070C1CBE7CFAB36A /* Config */,
+				B9A088936963288DD50F7E89 /* Packages */,
+				CA26E63E19FD770134B51D09 /* Resources */,
+				77BB7CE05BE6E6713E26C7AE /* Sources */,
+				6211D809AF6FCFF25260C588 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		5973923426549FBAFDEFDEC9 /* Intents */ = {
+			isa = PBXGroup;
+			children = (
+				305BB4071E1BFF84FB322527 /* BenitoIntentBackend.swift */,
+				9FBF088E66076D69803A90A9 /* LogIntents.swift */,
+				76B7E4473D4D181F72E53661 /* OutingIntents.swift */,
+				3154AB17B06FE3AA29124B95 /* StartCryingIntent.swift */,
+				6B0D7B1ED3B5A9690619DC43 /* TimerIntents.swift */,
+			);
+			path = Intents;
+			sourceTree = "<group>";
+		};
+		5B2B93BCF258629E7C4571FE /* Screens */ = {
+			isa = PBXGroup;
+			children = (
+				7B15D6E3DC7BBE835BB2A7AE /* ActiveTimerView.swift */,
+				EEA3CAB59F95C0EFC58C6958 /* EventEditorSheet.swift */,
+				E4D05D6C085268FBD7A7CFCC /* HomeGlanceView.swift */,
+				DA336E1335D5B0C74FAFC9AE /* LogActionsView.swift */,
+				6017B38C38C560B72C375C79 /* RunningFeedSheet.swift */,
+				067B7AE557310B4A330A4222 /* SettingsPrototypeView.swift */,
+				24F88A36AFEFA9897D53C0D8 /* TimelineDayView.swift */,
+				F10122A1854D8D0E3C64546C /* TimelinePrototypeView.swift */,
+				F8C13084C838DEB6CCB3C6F1 /* TimelineWeekView.swift */,
+			);
+			path = Screens;
+			sourceTree = "<group>";
+		};
+		6211D809AF6FCFF25260C588 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				3DE47080F4BA9BC23807AF9A /* Benito.app */,
+				11ECE14988153FE3A34B65C8 /* BenitoWatch.app */,
+				FA424B678A6942F3F13DD693 /* BenitoWidgets.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		67A6F4B50388A43647ECBDF4 /* apps */ = {
+			isa = PBXGroup;
+			children = (
+				2D65500691674A903C34969C /* BenitoWatch */,
+				D1A73F499614A5C0D0AFE385 /* BenitoWidgets */,
+				C2E92DE50AE6C0CD8310A0B6 /* Shared */,
+			);
+			name = apps;
+			path = ..;
+			sourceTree = "<group>";
+		};
+		6B831F6B11955D7C39A7A9A1 /* LiveActivity */ = {
+			isa = PBXGroup;
+			children = (
+				54876043BA83C9BF6F9FB1DB /* LiveActivityController.swift */,
+			);
+			path = LiveActivity;
+			sourceTree = "<group>";
+		};
+		77BB7CE05BE6E6713E26C7AE /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				B5571B21072EA8C8A47643C1 /* DesignPrototype */,
+				C2E7A81D9C3C4A5AE563700A /* Generated */,
+				FFC2AE934F13CA1BDF3BD3CB /* Intents */,
+				6B831F6B11955D7C39A7A9A1 /* LiveActivity */,
+				A7FAF08A8EC8254B6BDD538B /* Onboarding */,
+				F67C9361B7CC9B8BC531493F /* Pairing */,
+				2CB8F44348E34D2CF40BE461 /* Sharing */,
+				44B6D686F3F4FEA9443CCA44 /* AppBuildInfo.swift */,
+				65E49A50A8AACCEB491096E3 /* BenitoApp.swift */,
+				C9FF368C6EFA50E3FE69BBA6 /* ContentView.swift */,
+				8AC9C38F592E7BD0B2B376A1 /* ServerURLField.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		A7FAF08A8EC8254B6BDD538B /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				E406E2BC134D2CA277F5A82F /* BenitoTips.swift */,
+				28D75CCA90B6F33FA9A2EF3C /* OnboardingView.swift */,
+				A975D0E10215C668838A9E25 /* ServerBrowser.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		B5571B21072EA8C8A47643C1 /* DesignPrototype */ = {
+			isa = PBXGroup;
+			children = (
+				D737A6706A363E790456E16D /* Components */,
+				5B2B93BCF258629E7C4571FE /* Screens */,
+				7594F7BC9E6EE0CDAB4A3813 /* DesignPrototypeRoot.swift */,
+				AAAE6CCD116C208EA04E1CFA /* DesignTokens.swift */,
+				830168A809B3E800C5DF4B10 /* PrototypeModels.swift */,
+			);
+			path = DesignPrototype;
+			sourceTree = "<group>";
+		};
+		B9A088936963288DD50F7E89 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				DDA0E2ECD0043C8D9EB4EE6E /* BenitoKit */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
+		C2E7A81D9C3C4A5AE563700A /* Generated */ = {
+			isa = PBXGroup;
+			children = (
+				1649BA8861CBC14E75077907 /* GitSHA.swift */,
+			);
+			path = Generated;
+			sourceTree = "<group>";
+		};
+		C2E92DE50AE6C0CD8310A0B6 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				5973923426549FBAFDEFDEC9 /* Intents */,
+				76DC9031238FE56CF448BE61 /* AdaptiveColor.swift */,
+				1AB1E990795059BA4ACA4584 /* BenitoActivityAttributes.swift */,
+				7B0E07293736D2C63F083C2A /* BenitoHomeSheetRequest.swift */,
+				6493F1458E2441A9ED4281B9 /* LiveActivityContent.swift */,
+				17F619B8BC321B9EB3C9DB2B /* NursingLabels.swift */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		CA26E63E19FD770134B51D09 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				B0855D8DCB06983B7887B1FA /* Assets.xcassets */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		D1A73F499614A5C0D0AFE385 /* BenitoWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				2E31BB885479BEFDB9E5BAD4 /* BenitoLiveActivity.swift */,
+				DB86EC0FBEE38D566731D624 /* BenitoWidgetsBundle.swift */,
+			);
+			path = BenitoWidgets;
+			sourceTree = "<group>";
+		};
+		D737A6706A363E790456E16D /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				177F3CC7A4AB2FC8434DB38C /* ActivityLogSheet.swift */,
+				0136493BB85C6B4E612B29F5 /* ContinuousCornerCard.swift */,
+				7DA6F30EA922A5BBDE4E7087 /* CryingTotalLine.swift */,
+				4A54993A5244A5205EB051D4 /* DayWindowCaption.swift */,
+				6AAD570961C7C852218385F2 /* FedTotalsLine.swift */,
+				A4F2F10B711CAF9065DBAB28 /* GlassChrome.swift */,
+				C96014CE3DBE7F21096A1204 /* LogSheets.swift */,
+				2273F41D43701DC1120EF5E4 /* LogTimePicker.swift */,
+				833AA518A98E7F42232992E8 /* NursingFeedPanel.swift */,
+				F60DF16A5B16B9ACB726C29B /* ReadableContentWidth.swift */,
+				39953A71634BF830630202F2 /* RunningTimerBar.swift */,
+				D2393C23A435CB8346828CB2 /* SheetDetents.swift */,
+				1A9381111304C673283B7FCD /* ThumbActionBar.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		F67C9361B7CC9B8BC531493F /* Pairing */ = {
+			isa = PBXGroup;
+			children = (
+				1A10F873CDF55BD8AE1B74AA /* PairingActivity.swift */,
+				C445C015D7B3E0D74A4B8FBE /* PairingCoordinator.swift */,
+				200D35BF5FCC6FE840207133 /* PairingSessionSheet.swift */,
+			);
+			path = Pairing;
+			sourceTree = "<group>";
+		};
+		FFC2AE934F13CA1BDF3BD3CB /* Intents */ = {
+			isa = PBXGroup;
+			children = (
+				666246C21B7E5308F92ADC72 /* BenitoShortcuts.swift */,
+			);
+			path = Intents;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0DEF6A34AB61992455997AA8 /* BenitoWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5CEA54549EA88ED573565471 /* Build configuration list for PBXNativeTarget "BenitoWidgets" */;
+			buildPhases = (
+				2CE18B325F02DCFCDD0BBADA /* Sources */,
+				C18EA17E5E5562CE7C3EC45B /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BenitoWidgets;
+			packageProductDependencies = (
+				0D9089E6A9E830E674361850 /* BenitoKit */,
+			);
+			productName = BenitoWidgets;
+			productReference = FA424B678A6942F3F13DD693 /* BenitoWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		84658841CDA8382635377B24 /* BenitoWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AAF78742D9555BF31BE69A69 /* Build configuration list for PBXNativeTarget "BenitoWatch" */;
+			buildPhases = (
+				5E820C4B2366026A73410DA9 /* Sources */,
+				73EF5C0DC99F7BC9B15299F6 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = BenitoWatch;
+			packageProductDependencies = (
+				35A220E5971AECA28514EA26 /* BenitoKit */,
+			);
+			productName = BenitoWatch;
+			productReference = 11ECE14988153FE3A34B65C8 /* BenitoWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DEE2B76BFDE8C36174783E17 /* Benito */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9EAD00761E1B6F8CA145EA0B /* Build configuration list for PBXNativeTarget "Benito" */;
+			buildPhases = (
+				1112F0221999A24A7B6CB990 /* Embed Git SHA */,
+				958320046839C29F47B9628C /* Check TimelineView chrome */,
+				984E68DEED4506B78C46E956 /* Sources */,
+				9F30E164EF3F9FED6EB3937B /* Resources */,
+				A03F324EFD89A7DEEF4A9AE2 /* Frameworks */,
+				AB941470C54563AD8AC180FC /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BE1C9A54925033AFAE6B440F /* PBXTargetDependency */,
+			);
+			name = Benito;
+			packageProductDependencies = (
+				B557CF274A2B62A474947202 /* BenitoKit */,
+			);
+			productName = Benito;
+			productReference = 3DE47080F4BA9BC23807AF9A /* Benito.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		8C43A062691ACC5F9882F709 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					0DEF6A34AB61992455997AA8 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					84658841CDA8382635377B24 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					DEE2B76BFDE8C36174783E17 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = F96472D791E0B66C0DA807C1 /* Build configuration list for PBXProject "Benito" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 4D9E4FAE8DC21D98E24E6006;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				73191094F06732133AF05C96 /* XCLocalSwiftPackageReference "../../packages/BenitoKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 6211D809AF6FCFF25260C588 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				DEE2B76BFDE8C36174783E17 /* Benito */,
+				0DEF6A34AB61992455997AA8 /* BenitoWidgets */,
+				84658841CDA8382635377B24 /* BenitoWatch */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9F30E164EF3F9FED6EB3937B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5CEDF8606A537301E38522D6 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		1112F0221999A24A7B6CB990 /* Embed Git SHA */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Embed Git SHA";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/Sources/Generated/GitSHA.swift",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\nROOT=\"${SRCROOT}/../..\"\nSHA=\"$(git -C \"$ROOT\" rev-parse --short HEAD 2>/dev/null || echo unknown)\"\nOUT=\"${SRCROOT}/Sources/Generated/GitSHA.swift\"\nmkdir -p \"$(dirname \"$OUT\")\"\nprintf '%s\\n' \\\n  \"/// Short git SHA embedded at build time (see project.yml pre-build script).\" \\\n  \"enum BenitoGitSHA {\" \\\n  \"    static let short = \\\"${SHA}\\\"\" \\\n  \"}\" > \"$OUT\"\n";
+		};
+		958320046839C29F47B9628C /* Check TimelineView chrome */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Check TimelineView chrome";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\n\"${SRCROOT}/../../scripts/check-timer-chrome.sh\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2CE18B325F02DCFCDD0BBADA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				78BDA149752E9123F30ECD62 /* AdaptiveColor.swift in Sources */,
+				4C14802665AB508DF3B0ED27 /* BenitoActivityAttributes.swift in Sources */,
+				BA3FC74AFDF81F27FB2E5DA8 /* BenitoHomeSheetRequest.swift in Sources */,
+				A67E91F0291F1A5F53F42CF2 /* BenitoIntentBackend.swift in Sources */,
+				688B29531C85C6F555401BF4 /* BenitoLiveActivity.swift in Sources */,
+				EB3355FBEEEE6387067F780F /* BenitoWidgetsBundle.swift in Sources */,
+				92783354A584261A842903DA /* LiveActivityContent.swift in Sources */,
+				1805B7321B8378D06BBACB49 /* LogIntents.swift in Sources */,
+				5BB38CFF37AD92BF6E85B67A /* NursingLabels.swift in Sources */,
+				BAA494AA2E057FA9FD5BB74B /* OutingIntents.swift in Sources */,
+				4D2B25834B923005C5B1DB69 /* StartCryingIntent.swift in Sources */,
+				66E64CF17D07C840A514A805 /* TimerIntents.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5E820C4B2366026A73410DA9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C28982EFE7BF420383517A65 /* BenitoWatchApp.swift in Sources */,
+				7159112B7AFC71986780D3D7 /* ContentView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		984E68DEED4506B78C46E956 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7E2D09E4EA5C21BFAA358B3D /* ActiveTimerView.swift in Sources */,
+				0236F9E21C0DEA0F610E641A /* ActivityLogSheet.swift in Sources */,
+				2909F2722A0808DE21BB2A9C /* AdaptiveColor.swift in Sources */,
+				D27EE0F5DCD0534F5F689462 /* AppBuildInfo.swift in Sources */,
+				2C3BB7D11B9E9B4E300851B5 /* AppModel+Sharing.swift in Sources */,
+				A4BCFE708E429E58D2AC46C5 /* BenitoActivityAttributes.swift in Sources */,
+				53AF47A5CA945E2AC784A9A0 /* BenitoApp.swift in Sources */,
+				0A31EA331DD382FBB56A6FCF /* BenitoHomeSheetRequest.swift in Sources */,
+				8D128AA17F077E86CE8B653E /* BenitoIntentBackend.swift in Sources */,
+				7E6706C019F6644CCD0AFFBF /* BenitoShortcuts.swift in Sources */,
+				B38320EBF9502F0552B1CC0B /* BenitoTips.swift in Sources */,
+				2A085C4885F1E18CC4056079 /* ContentView.swift in Sources */,
+				FCD0D258E85BC51AD33DDECA /* ContinuousCornerCard.swift in Sources */,
+				C4DBC17D255D27E981FADFD7 /* CryingTotalLine.swift in Sources */,
+				2FA7958CD55DD20FF16A6272 /* DayWindowCaption.swift in Sources */,
+				A13FDD35BDE2A91A4684AE1E /* DesignPrototypeRoot.swift in Sources */,
+				F330A3D4046651D23D4BEB1D /* DesignTokens.swift in Sources */,
+				2415208707C7108651285E5A /* EventEditorSheet.swift in Sources */,
+				53693889ECEDAEB3D59EFE52 /* FedTotalsLine.swift in Sources */,
+				B4D4C7C39D7CC23E087E9867 /* GitSHA.swift in Sources */,
+				D39FE16DD97829A669359141 /* GlassChrome.swift in Sources */,
+				607F5974375DB9651A078C62 /* HomeGlanceView.swift in Sources */,
+				0D1D1DF623F43366D222C1DC /* InviteSheet.swift in Sources */,
+				900B06650D9342F26071DC65 /* JoinFamilySheet.swift in Sources */,
+				A6109E949356F40DC2780E65 /* JoinFamilyView.swift in Sources */,
+				2BAAEAA5C4A788D5B09C717E /* LiveActivityContent.swift in Sources */,
+				50DD7B2A6F9E8D137B0072F1 /* LiveActivityController.swift in Sources */,
+				9FD664BCD685CB0F54ED1DFE /* LogActionsView.swift in Sources */,
+				45F39AC2381AD2E2ADD20A40 /* LogIntents.swift in Sources */,
+				3B647E6891DFE5220AAABD1F /* LogSheets.swift in Sources */,
+				D81AEBD0288E9D135890DCD0 /* LogTimePicker.swift in Sources */,
+				D3F44B1D12B74FDD545CA94C /* NursingFeedPanel.swift in Sources */,
+				CFFE258E13B36BFD13D4400C /* NursingLabels.swift in Sources */,
+				AC639A7E552174B3448201EF /* OnboardingView.swift in Sources */,
+				6AD19DE9DEA65FA3D1C6A738 /* OutingIntents.swift in Sources */,
+				9C890E9E6DA22DFAF820BBE8 /* PairingActivity.swift in Sources */,
+				D17BE4502B0B83D6DA8A850F /* PairingCoordinator.swift in Sources */,
+				5CFFCC941EF5867555218F6C /* PairingSessionSheet.swift in Sources */,
+				F07A0D03DCD03A383D6030DE /* PrototypeModels.swift in Sources */,
+				09A35673932DAB9B8BD80159 /* ReadableContentWidth.swift in Sources */,
+				EA721AE4813A671A561D49D3 /* RunningFeedSheet.swift in Sources */,
+				77E5DBE2B32E1038190A1624 /* RunningTimerBar.swift in Sources */,
+				5504580076A2209F2F61EE20 /* ServerBrowser.swift in Sources */,
+				2F343160119E4B8EA1FD5B46 /* ServerURLField.swift in Sources */,
+				880E9470483D7612E01CC331 /* SettingsPrototypeView.swift in Sources */,
+				4EB0EDC1CFE6958AAB6F9B1C /* SharingView.swift in Sources */,
+				62854B7FA3DD3AAE955F207A /* SheetDetents.swift in Sources */,
+				5A077ED421202084319F8A72 /* StartCryingIntent.swift in Sources */,
+				0F4FCA29CE90EACFA6ACCCE0 /* ThumbActionBar.swift in Sources */,
+				60C3F8152B6DA8154165D578 /* TimelineDayView.swift in Sources */,
+				0F4D272B89A9AED34B498017 /* TimelinePrototypeView.swift in Sources */,
+				7A4F096C7171E691561DE9D4 /* TimelineWeekView.swift in Sources */,
+				090E8E347380D53624E3B7F4 /* TimerIntents.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BE1C9A54925033AFAE6B440F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0DEF6A34AB61992455997AA8 /* BenitoWidgets */;
+			targetProxy = F16ED2FBC3414D21BE39DF62 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0B529C5C34371EDB7BC66EDC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Benito;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(BENITO_BUNDLE_PREFIX).benito";
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BENITO_BUNDLE_PREFIX).benito.watchkitapp";
+				PRODUCT_NAME = BenitoWatch;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		137DFC18A605EBE2D0777348 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Benito;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(BENITO_BUNDLE_PREFIX).benito";
+				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BENITO_BUNDLE_PREFIX).benito.watchkitapp";
+				PRODUCT_NAME = BenitoWatch;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+		2EDCB11DED5F004D2B0A05E0 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Resources/Benito.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BENITO_BUNDLE_PREFIX).benito";
+				PRODUCT_NAME = Benito;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5553A4EF31878C345369704C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B541805E5BF384E27F4F4617 /* Base.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.9;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		7A992088B6C2D6F28B7E733A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = ../BenitoWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BENITO_BUNDLE_PREFIX).benito.widgets";
+				PRODUCT_NAME = BenitoWidgets;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		AFD63BA89BE41A340074D84D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = ../BenitoWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BENITO_BUNDLE_PREFIX).benito.widgets";
+				PRODUCT_NAME = BenitoWidgets;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B9BDA7565C400E6575288D54 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = Resources/Benito.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = Resources/Info.plist;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 0.1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "$(BENITO_BUNDLE_PREFIX).benito";
+				PRODUCT_NAME = Benito;
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F37DE67AA4B0B6E995F5BA55 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = B541805E5BF384E27F4F4617 /* Base.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.9;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5CEA54549EA88ED573565471 /* Build configuration list for PBXNativeTarget "BenitoWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AFD63BA89BE41A340074D84D /* Debug */,
+				7A992088B6C2D6F28B7E733A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9EAD00761E1B6F8CA145EA0B /* Build configuration list for PBXNativeTarget "Benito" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2EDCB11DED5F004D2B0A05E0 /* Debug */,
+				B9BDA7565C400E6575288D54 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		AAF78742D9555BF31BE69A69 /* Build configuration list for PBXNativeTarget "BenitoWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0B529C5C34371EDB7BC66EDC /* Debug */,
+				137DFC18A605EBE2D0777348 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		F96472D791E0B66C0DA807C1 /* Build configuration list for PBXProject "Benito" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5553A4EF31878C345369704C /* Debug */,
+				F37DE67AA4B0B6E995F5BA55 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		73191094F06732133AF05C96 /* XCLocalSwiftPackageReference "../../packages/BenitoKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../packages/BenitoKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0D9089E6A9E830E674361850 /* BenitoKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BenitoKit;
+		};
+		35A220E5971AECA28514EA26 /* BenitoKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BenitoKit;
+		};
+		B557CF274A2B62A474947202 /* BenitoKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = BenitoKit;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 8C43A062691ACC5F9882F709 /* Project object */;
+}

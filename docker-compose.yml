@@ -1,0 +1,20 @@
+services:
+  benito:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    image: benito-server:local
+    ports:
+      # Loopback only: Tailscale Serve or a host reverse proxy (Caddy/nginx) provides HTTPS.
+      - "127.0.0.1:${BENITO_PORT:-8080}:8080"
+    environment:
+      BIND_ADDR: "0.0.0.0:8080"
+      DATABASE_PATH: /data/data.db
+      SESSION_SECRET: "${SESSION_SECRET:-dev-only-change-me}"
+      RUST_LOG: "${RUST_LOG:-benito_server=info,tower_http=info}"
+    volumes:
+      - benito-data:/data
+    restart: unless-stopped
+
+volumes:
+  benito-data:

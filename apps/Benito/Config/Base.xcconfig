@@ -1,0 +1,13 @@
+// Defaults for anyone building Benito. Put your own values in Config/Local.xcconfig
+// (gitignored; copy Local.xcconfig.example). Local values win.
+
+// Your Apple Developer team (Xcode › Settings › Accounts). Empty builds for the simulator only.
+DEVELOPMENT_TEAM =
+
+// Reverse-DNS prefix for every bundle id: <prefix>.benito, <prefix>.benito.widgets, ...
+BENITO_BUNDLE_PREFIX = org.example
+
+// Your child's name; Siri accepts it in place of "Benito" ("Siri, Sam started a feed").
+BENITO_SIRI_NAME = Baby
+
+#include? "Local.xcconfig"

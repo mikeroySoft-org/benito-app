@@ -1,0 +1,26 @@
+name: timer-chrome
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/**/*.swift"
+      - "packages/**/*.swift"
+      - "scripts/check-timer-chrome.sh"
+      - "scripts/timer-chrome-allowlist.txt"
+      - ".github/workflows/timer-chrome.yml"
+  pull_request:
+    paths:
+      - "apps/**/*.swift"
+      - "packages/**/*.swift"
+      - "scripts/check-timer-chrome.sh"
+      - "scripts/timer-chrome-allowlist.txt"
+      - ".github/workflows/timer-chrome.yml"
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: TimelineView must not wrap glass / Button chrome
+        run: ./scripts/check-timer-chrome.sh

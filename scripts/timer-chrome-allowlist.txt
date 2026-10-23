@@ -1,0 +1,4 @@
+# Optional allowlist for scripts/check-timer-chrome.sh
+# One entry per line: path/from/repo/root.swift:LINE
+# Prefer an inline `// timer-chrome-ok: <reason>` comment next to the TimelineView.
+# Digit-only TimelineViews do not need an entry — they already pass.

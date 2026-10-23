@@ -1,0 +1,63 @@
+# Rust
+server/target/
+**/*.rs.bk
+Cargo.lock.bak
+
+# SQLite / runtime data
+*.db
+*.db-shm
+*.db-wal
+data/
+server/data.db
+# Legacy DB renamed by scripts/macos-service.sh install (real family data; never commit)
+*.db.migrated-*
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.p8
+secrets/
+
+# Swift / Xcode
+.DS_Store
+DerivedData/
+build/
+.build/
+*.xcuserstate
+xcuserdata/
+*.xccheckout
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+.swiftpm/
+Package.resolved
+apps/**/*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
+apps/**/*.xcworkspace/xcuserdata/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*~
+
+# OS
+Thumbs.db
+
+# Logs
+*.log
+
+# Local debug captures (device log stream, etc.)
+.debug/
+
+# Local Xcode build
+.derivedData/
+
+# Per-developer Xcode settings (team id, bundle prefix, Siri name)
+apps/Benito/Config/Local.xcconfig
+
+# Written by the "Embed Git SHA" pre-build script
+apps/Benito/Sources/Generated/GitSHA.swift

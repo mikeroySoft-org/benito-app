@@ -1,0 +1,4 @@
+// Copy to Local.xcconfig (same folder) and fill in. Local.xcconfig is gitignored.
+DEVELOPMENT_TEAM = ABCDE12345
+BENITO_BUNDLE_PREFIX = com.yourname
+BENITO_SIRI_NAME = Sam
