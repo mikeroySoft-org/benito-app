@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["TEAMID.org.example.benito"],
+        "components": [
+          { "/": "/join/*", "comment": "Family invites: https://benito.mikeroysoft.com/join#p=..." },
+          { "/": "/join", "comment": "Same, without the trailing slash" }
+        ]
+      }
+    ]
+  }
+}

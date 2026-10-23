@@ -1,0 +1,83 @@
+name: Website
+
+# Builds /site and, once Pages is turned on, publishes it to benito.mikeroysoft.com.
+# Deploy runs only when the repository variable PAGES_ENABLED is "true", so this workflow
+# stays green while the repo is private on the free plan (Pages unavailable).
+#
+# Repository variables (Settings > Secrets and variables > Actions > Variables):
+#   PAGES_ENABLED    "true" to deploy
+#   APPLE_TEAM_ID    10-character Apple Developer Team ID, for apple-app-site-association
+#   BENITO_BUNDLE_ID app bundle id, e.g. com.mikeroysoft.benito (default org.example.benito)
+
+on:
+  push:
+    branches: [main]
+    paths: ["site/**", ".github/workflows/pages.yml"]
+  pull_request:
+    paths: ["site/**", ".github/workflows/pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assemble site
+        env:
+          APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
+          BENITO_BUNDLE_ID: ${{ vars.BENITO_BUNDLE_ID }}
+        run: |
+          set -euo pipefail
+          rm -rf _site && cp -R site _site
+          rm -rf _site/README.md _site/tests
+          team="${APPLE_TEAM_ID:-TEAMID}"
+          bundle="${BENITO_BUNDLE_ID:-org.example.benito}"
+          jq --arg id "$team.$bundle" '.applinks.details[0].appIDs = [$id]' \
+            site/.well-known/apple-app-site-association > _site/.well-known/apple-app-site-association
+          echo "AASA appID: $team.$bundle"
+
+      - name: Check plumbing
+        run: |
+          set -euo pipefail
+          test -f _site/.nojekyll
+          test "$(tr -d '[:space:]' < _site/CNAME)" = "benito.mikeroysoft.com"
+          jq -e '.applinks.details[0].components | map(."/") | index("/join/*")' \
+            _site/.well-known/apple-app-site-association > /dev/null
+          for page in index.html privacy/index.html support/index.html join/index.html 404.html; do
+            test -f "_site/$page" || { echo "missing $page"; exit 1; }
+          done
+          grep -q 'src="/assets/join.js"' _site/join/index.html
+          for hook in data-join-open data-join-get data-join-copy 'data-when="ready"' 'data-when="expired"' 'data-when="invalid"'; do
+            grep -q "$hook" _site/join/index.html || { echo "join page lost hook: $hook"; exit 1; }
+          done
+          node --check _site/assets/join.js
+
+      - name: Test join decoding
+        run: node site/tests/join.test.mjs
+
+      - uses: actions/upload-pages-artifact@v3
+        if: github.event_name != 'pull_request' && vars.PAGES_ENABLED == 'true'
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    if: github.event_name != 'pull_request' && vars.PAGES_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
