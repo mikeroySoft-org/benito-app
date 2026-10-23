@@ -24,6 +24,8 @@ public protocol BenitoStore: Sendable {
 
     func upsertEvent(_ event: EventDTO) async throws
     func softDeleteEvent(id: UUID) async throws
+    /// One event by id, including soft-deleted ones (nil when unknown).
+    func event(id: UUID) async throws -> EventDTO?
     func events(childId: UUID, limit: Int) async throws -> [EventDTO]
     /// Non-deleted events whose interval `startedAt ..< (endedAt ?? startedAt)` overlaps `[from, to)`.
     /// Instants (no `endedAt`) match when `from <= startedAt < to`. Sorted by `startedAt` ascending.
@@ -31,6 +33,8 @@ public protocol BenitoStore: Sendable {
 
     func upsertTimer(_ timer: TimerDTO) async throws
     func removeTimer(id: UUID) async throws
+    /// One timer by id in any state (nil when unknown).
+    func timer(id: UUID) async throws -> TimerDTO?
     func activeTimers(childId: UUID) async throws -> [TimerDTO]
 
     /// Build a home-glance snapshot from local rows (last feed / diaper / medicine + running timer).
@@ -104,6 +108,10 @@ public actor InMemoryStore: BenitoStore {
         events[id] = e
     }
 
+    public func event(id: UUID) async throws -> EventDTO? {
+        events[id]
+    }
+
     public func events(childId: UUID, limit: Int) async throws -> [EventDTO] {
         Array(
             events.values
@@ -130,6 +138,10 @@ public actor InMemoryStore: BenitoStore {
 
     public func removeTimer(id: UUID) async throws {
         timers.removeValue(forKey: id)
+    }
+
+    public func timer(id: UUID) async throws -> TimerDTO? {
+        timers[id]
     }
 
     public func activeTimers(childId: UUID) async throws -> [TimerDTO] {

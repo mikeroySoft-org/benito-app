@@ -132,6 +132,10 @@ pub struct CreateEventRequest {
     pub side: Option<String>,
     pub notes: Option<String>,
     pub payload_json: Option<serde_json::Value>,
+    /// Client-chosen id (feature `client_event_ids`). Re-sending the same id returns the
+    /// stored event instead of a duplicate, so an interrupted upload can simply retry.
+    #[serde(default)]
+    pub id: Option<Uuid>,
 }
 
 #[derive(Debug, Deserialize)]

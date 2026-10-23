@@ -15,6 +15,9 @@ enum BenitoTips {
         }
         if ProcessInfo.processInfo.environment["BENITO_SHOW_ALL_TIPS"] == "1" {
             Tips.showAllTipsForTesting()
+        } else if ProcessInfo.processInfo.environment["BENITO_HIDE_TIPS"] == "1" {
+            // Screenshot runs: a clean screen without first-run hints.
+            Tips.hideAllTipsForTesting()
         }
         do {
             try Tips.configure([.displayFrequency(.immediate), .datastoreLocation(.applicationDefault)])
@@ -36,7 +39,7 @@ enum BenitoTips {
 struct LogFeedTip: Tip {
     var title: Text { Text("Log a feed") }
     var message: Text? {
-        Text("Tap here to start a nursing timer or log a bottle. Everyone in your family sees it right away.")
+        Text("Tap here to start a nursing timer or log a bottle. A running timer stays on your Lock Screen.")
     }
     var image: Image? { Image(systemName: "drop.fill") }
 }

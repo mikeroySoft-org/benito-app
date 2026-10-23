@@ -196,11 +196,15 @@ struct HomeGlanceView: View {
             if glance.isDemo {
                 StatusChip(text: "Demo", accent: DesignTokens.textSecondary, inverted: false)
             }
-            StatusChip(
-                text: glance.syncConnected ? "Sync" : "Offline",
-                accent: glance.syncConnected ? DesignTokens.active : DesignTokens.fault,
-                inverted: glance.syncConnected
-            )
+            if glance.isOnDevice {
+                StatusChip(text: String(localized: "This iPhone"), accent: DesignTokens.textSecondary, inverted: false)
+            } else {
+                StatusChip(
+                    text: glance.syncConnected ? "Sync" : "Offline",
+                    accent: glance.syncConnected ? DesignTokens.active : DesignTokens.fault,
+                    inverted: glance.syncConnected
+                )
+            }
             Spacer()
             Text(glance.isAsleep ? "ASLEEP" : "AWAKE")
                 .font(.caption.weight(.bold))

@@ -48,6 +48,13 @@ public struct UserDTO: Codable, Identifiable, Sendable, Hashable {
     public var email: String
     public var createdAt: Date
 
+    public init(id: UUID, name: String, email: String, createdAt: Date) {
+        self.id = id
+        self.name = name
+        self.email = email
+        self.createdAt = createdAt
+    }
+
     enum CodingKeys: String, CodingKey {
         case id, name, email
         case createdAt = "created_at"
@@ -59,6 +66,13 @@ public struct FamilyDTO: Codable, Identifiable, Sendable, Hashable {
     public var name: String
     public var inviteCode: String
     public var createdAt: Date
+
+    public init(id: UUID, name: String, inviteCode: String, createdAt: Date) {
+        self.id = id
+        self.name = name
+        self.inviteCode = inviteCode
+        self.createdAt = createdAt
+    }
 
     enum CodingKeys: String, CodingKey {
         case id, name
@@ -395,6 +409,14 @@ public struct ExportBundleDTO: Codable, Sendable {
     public var events: [EventDTO]
     public var timers: [TimerDTO]
 
+    public init(exportedAt: Date, family: FamilyDTO?, children: [ChildDTO], events: [EventDTO], timers: [TimerDTO]) {
+        self.exportedAt = exportedAt
+        self.family = family
+        self.children = children
+        self.events = events
+        self.timers = timers
+    }
+
     enum CodingKeys: String, CodingKey {
         case family, children, events, timers
         case exportedAt = "exported_at"
@@ -412,6 +434,9 @@ public struct CreateEventRequestDTO: Codable, Sendable {
     public var side: String?
     public var notes: String?
     public var payloadJson: JSONValue?
+    /// Client-chosen event id. Servers with the `client_event_ids` feature keep it, which makes
+    /// re-sending the same create idempotent; older servers ignore it and mint their own.
+    public var id: UUID?
 
     public init(
         childId: UUID,
@@ -423,8 +448,10 @@ public struct CreateEventRequestDTO: Codable, Sendable {
         amountUnit: String? = nil,
         side: String? = nil,
         notes: String? = nil,
-        payloadJson: JSONValue? = nil
+        payloadJson: JSONValue? = nil,
+        id: UUID? = nil
     ) {
+        self.id = id
         self.childId = childId
         self.type = type
         self.subtype = subtype
@@ -438,7 +465,7 @@ public struct CreateEventRequestDTO: Codable, Sendable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case type, subtype, side, notes
+        case id, type, subtype, side, notes
         case childId = "child_id"
         case startedAt = "started_at"
         case endedAt = "ended_at"
@@ -597,6 +624,58 @@ public struct DailySummaryDTO: Codable, Sendable {
     public var pumpCount: Int
     public var medicineCount: Int
     public var totalEvents: Int
+
+    public init(
+        childId: UUID,
+        from: Date,
+        to: Date,
+        day: String?,
+        feedBreastCount: Int,
+        feedBreastLeft: Int,
+        feedBreastRight: Int,
+        feedBottleCount: Int,
+        bottleOzTotal: Double,
+        bottleMlTotal: Double,
+        bottleOzEquiv: Double,
+        feedSolidCount: Int,
+        feedSeconds: Double,
+        nursingSeconds: Double?,
+        cryingSeconds: Double?,
+        diaperWet: Int,
+        diaperDirty: Int,
+        diaperBoth: Int,
+        diaperOther: Int,
+        sleepEventCount: Int,
+        sleepHours: Double,
+        pumpCount: Int,
+        medicineCount: Int,
+        totalEvents: Int
+    ) {
+        self.childId = childId
+        self.from = from
+        self.to = to
+        self.day = day
+        self.feedBreastCount = feedBreastCount
+        self.feedBreastLeft = feedBreastLeft
+        self.feedBreastRight = feedBreastRight
+        self.feedBottleCount = feedBottleCount
+        self.bottleOzTotal = bottleOzTotal
+        self.bottleMlTotal = bottleMlTotal
+        self.bottleOzEquiv = bottleOzEquiv
+        self.feedSolidCount = feedSolidCount
+        self.feedSeconds = feedSeconds
+        self.nursingSeconds = nursingSeconds
+        self.cryingSeconds = cryingSeconds
+        self.diaperWet = diaperWet
+        self.diaperDirty = diaperDirty
+        self.diaperBoth = diaperBoth
+        self.diaperOther = diaperOther
+        self.sleepEventCount = sleepEventCount
+        self.sleepHours = sleepHours
+        self.pumpCount = pumpCount
+        self.medicineCount = medicineCount
+        self.totalEvents = totalEvents
+    }
 
     enum CodingKeys: String, CodingKey {
         case from, to, day

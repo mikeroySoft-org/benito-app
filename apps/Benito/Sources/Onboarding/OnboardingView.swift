@@ -32,7 +32,8 @@ struct OnboardingView: View {
     enum Step: Hashable {
         case join
         case server(Intent)
-        case details(server: URL)
+        /// `nil` server: everything stays on this iPhone.
+        case details(server: URL?)
         case signIn
     }
 
@@ -66,6 +67,7 @@ struct OnboardingView: View {
         case "join": path = [.join]
         case "server": path = [.server(.startFamily)]
         case "details": path = [.server(.startFamily), .details(server: server)]
+        case "local": path = [.details(server: nil)]
         case "signin": path = [.server(.signIn), .signIn]
         default: break
         }
@@ -114,12 +116,10 @@ private struct WelcomeStep: View {
 
                     ChoiceCard(
                         title: "This iPhone only",
-                        detail: "No server, no sharing. Coming soon.",
+                        detail: "No server, no sharing. Connect a server any time later.",
                         systemImage: "iphone",
-                        tint: DesignTokens.textTertiary
-                    ) {}
-                    .disabled(true)
-                    .opacity(0.55)
+                        tint: DesignTokens.diaper
+                    ) { path.append(.details(server: nil)) }
                 }
 
                 Button("I already have an account") { path.append(.server(.signIn)) }
@@ -377,7 +377,7 @@ private struct ServerStep: View {
 
 private struct FamilyDetailsStep: View {
     let model: AppModel
-    let server: URL
+    let server: URL?
     @State private var yourName = ""
     @State private var familyName = ""
     @State private var childName = ""
@@ -414,7 +414,7 @@ private struct FamilyDetailsStep: View {
                 .disabled(!canStart)
                 .opacity(canStart ? 1 : 0.5)
 
-                Text("No email or password. This iPhone gets its own private key, kept in the Secure Enclave.")
+                Text(footnote)
                     .font(.footnote)
                     .foregroundStyle(DesignTokens.textSecondary)
             }
@@ -469,6 +469,12 @@ private struct FamilyDetailsStep: View {
         }
     }
 
+    private var footnote: LocalizedStringKey {
+        server == nil
+            ? "Everything stays on this iPhone. To share later, connect a server in Account."
+            : "No email or password. This iPhone gets its own private key, kept in the Secure Enclave."
+    }
+
     private func trimmed(_ value: String) -> String { value.trimmingCharacters(in: .whitespacesAndNewlines) }
 
     private var canStart: Bool {
@@ -483,12 +489,20 @@ private struct FamilyDetailsStep: View {
         Task {
             defer { isWorking = false }
             do {
-                try await model.startFamily(
-                    server: server,
-                    yourName: trimmed(yourName),
-                    familyName: family,
-                    childName: trimmed(childName)
-                )
+                if let server {
+                    try await model.startFamily(
+                        server: server,
+                        yourName: trimmed(yourName),
+                        familyName: family,
+                        childName: trimmed(childName)
+                    )
+                } else {
+                    try await model.startOnDevice(
+                        yourName: trimmed(yourName),
+                        familyName: family,
+                        childName: trimmed(childName)
+                    )
+                }
             } catch {
                 errorText = error.localizedDescription
             }

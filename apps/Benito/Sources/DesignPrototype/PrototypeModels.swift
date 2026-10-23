@@ -30,6 +30,8 @@ struct PrototypeGlance: Equatable {
     var syncConnected: Bool
     var statusLine: String
     var isDemo: Bool
+    /// Saved only on this iPhone: there is no sync to be on or off.
+    var isOnDevice = false
 }
 
 /// Active (running or paused) timer as shown by prototype screens; elapsed excludes paused time.
@@ -182,6 +184,7 @@ enum PrototypeGlanceBuilder {
             // status churn (sync/outbox) was invalidating Liquid Glass docks for free.
             // Settings / Log read `model.status` directly where it is shown.
             demo.syncConnected = model.syncConnected
+            demo.isOnDevice = model.isOnDevice
             demo.childName = model.childName.isEmpty ? "Baby" : model.childName
             return demo
         }
@@ -261,7 +264,8 @@ enum PrototypeGlanceBuilder {
             todayWindow: today,
             syncConnected: model.syncConnected,
             statusLine: "",
-            isDemo: false
+            isDemo: false,
+            isOnDevice: model.isOnDevice
         )
     }
 
