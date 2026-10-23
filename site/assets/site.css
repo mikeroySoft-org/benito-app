@@ -137,12 +137,16 @@ html:not(.js) .live__toggle { display: none; }
   .band--split, .band--flip, .band--share, .band--close { grid-template-columns: minmax(0, 1fr); }
   .band--flip .split__visual { order: 2; }
   .facts, .nots { grid-template-columns: minmax(0, 1fr); }
+  .moments { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hero { grid-template-columns: minmax(0, 1fr); min-height: 0; gap: var(--space-xl); }
   .hero__visual { grid-template-columns: minmax(0, 1fr) minmax(0, 280px); }
   .nav ul { gap: var(--space-md); }
 }
 @media (max-width: 40rem) {
-  .moments { grid-template-columns: minmax(0, 1fr); gap: var(--space-xl); }
+  /* six moments: a sideways row on phones, so the section stays a short scroll */
+  .moments { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 78%; gap: var(--space-md); overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); margin-inline: calc(var(--gutter) * -1); padding: 0 var(--gutter) var(--space-sm); scrollbar-width: none; }
+  .moments::-webkit-scrollbar { display: none; }
+  .moment { scroll-snap-align: start; }
   .share__visual { gap: var(--space-sm); }
   .share__visual > :last-child { margin-top: var(--space-xl); }
   .nav { flex-wrap: wrap; gap: 0 var(--space-md); padding-block: var(--space-xs); }
