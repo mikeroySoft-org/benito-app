@@ -113,7 +113,7 @@ final class PairingCoordinator {
         phase = .working("Adding \(identity.displayName)…")
         Task {
             do {
-                try await messenger.send(PairingMessage.approvedInvite(url: link.url.absoluteString), to: .only(partner))
+                try await messenger.send(PairingMessage.approvedInvite(url: link.appURL.absoluteString), to: .only(partner))
                 guard case .working = phase else { return }
                 phase = .working("Waiting for \(identity.displayName)'s phone…")
             } catch {

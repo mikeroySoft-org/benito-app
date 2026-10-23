@@ -2,3 +2,5 @@
 DEVELOPMENT_TEAM = ABCDE12345
 BENITO_BUNDLE_PREFIX = com.yourname
 BENITO_SIRI_NAME = Sam
+// Official builds only (team in site/.well-known/apple-app-site-association):
+// BENITO_ENTITLEMENTS = Resources/Benito-UniversalLinks.entitlements

@@ -2,7 +2,7 @@ import BenitoKit
 import SwiftUI
 
 extension View {
-    /// Opens `benito://join` links (Messages, AirDrop, QR code) as a one-tap join sheet.
+    /// Opens invite links (universal https links and `benito://join`) as a one-tap join sheet.
     func benitoJoinLinks(model: AppModel) -> some View {
         modifier(JoinLinksModifier(model: model))
     }

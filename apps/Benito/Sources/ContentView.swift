@@ -50,7 +50,7 @@ final class AppModel {
     /// Account › Sharing: everyone in the family, and invites not yet used.
     var members: [FamilyMemberDTO] = []
     var pendingInvites: [FamilyInviteDTO] = []
-    /// A `benito://join` link opened from Messages / AirDrop, waiting for the join sheet.
+    /// An invite link (https or `benito://join`) opened from Messages / AirDrop, waiting for the join sheet.
     var pendingJoinLink: FamilyInviteLink?
     /// False until the launch-time session restore finishes (avoids flashing onboarding).
     var didResolveLaunch = false
