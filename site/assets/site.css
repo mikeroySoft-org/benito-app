@@ -174,21 +174,42 @@ html:not(.js) .live__toggle { display: none; }
 .links a::after { content: "→"; color: var(--color-muted); }
 .links a:hover { text-decoration: underline; text-decoration-color: var(--color-accent); }
 
-/* /join: the invite, its actions, and the app's own join screen */
-.join { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: var(--space-2xl) var(--gap-columns); align-items: center; padding-block: var(--space-2xl); }
-.join__states { display: grid; gap: var(--space-lg); }
-.join__state { gap: var(--space-lg); }
-.join h1 { font-size: var(--text-display-s); max-width: 16ch; }
+/* /join: iPhone first. The first screen is the invite on top and its actions in the thumb zone; the app's join screen sits below the fold.
+   Safe areas come from viewport-fit=cover; svh keeps the dock above Safari's toolbars; rem sizes follow Dynamic Type through -apple-system-body. */
+@supports (font: -apple-system-body) { html:has(body.joinpage) { font: -apple-system-body; } }
+.joinpage { --join-pad: max(var(--space-lg), env(safe-area-inset-left), env(safe-area-inset-right)); --jbar-h: 3.5rem; }
+.jbar { display: flex; align-items: center; min-height: var(--jbar-h); padding: env(safe-area-inset-top) var(--join-pad) 0; box-sizing: content-box; }
+.jbar .brand { min-height: 44px; font-size: var(--text-md); }
+.jbar .brand img { width: 28px; height: 28px; border-radius: 7px; }
+.join { width: 100%; max-width: 30rem; margin-inline: auto; padding-inline: var(--join-pad); }
+.join__panel { display: flex; flex-direction: column; gap: var(--space-lg); min-height: calc(100vh - var(--jbar-h) - env(safe-area-inset-top)); min-height: calc(100svh - var(--jbar-h) - env(safe-area-inset-top)); padding-block: var(--space-md) max(var(--space-lg), env(safe-area-inset-bottom)); }
+.join__invite { display: grid; gap: var(--space-lg); justify-items: start; padding-top: var(--space-md); }
+.join__icon { width: 4rem; height: 4rem; border-radius: 22.5%; box-shadow: 0 0 0 1px var(--color-rule); }
+.join h1 { font-size: clamp(2rem, 5vw + 0.9rem, 2.5rem); line-height: 1.08; max-width: 14ch; }
 .join h1 [data-join-inviter], .join h1 [data-join-family] { color: var(--color-accent); }
-.join .actions { margin-top: var(--space-xs); }
-.join .btn--quiet[data-copied="true"] { border-color: var(--color-accent); }
-.join__status { font-size: var(--text-sm); color: var(--color-muted); max-width: 48ch; }
-.join__visual { justify-self: center; width: 100%; max-width: 340px; aspect-ratio: 1206 / 1598; border-radius: var(--radius-screen); }
+.join__state { flex: 1; grid-template-rows: auto 1fr; gap: var(--space-lg); }
+.join__lead { font-size: var(--text-lead); line-height: 1.55; color: var(--color-ink-2); max-width: 34ch; }
+.join__lead b { color: var(--color-ink); font-weight: 600; }
+.join__dock { display: grid; gap: var(--space-sm); align-self: end; }
+.join__dock .btn { width: 100%; min-height: 3rem; }
+.join__dock .join__open { min-height: 3.25rem; font-size: var(--text-lead); border-radius: var(--radius-card); }
+.join__more-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-sm); }
+.join__more-actions .btn { padding-inline: var(--space-sm); }
+.join .btn--quiet[data-copied="true"] { border-color: var(--color-accent); color: var(--color-accent); }
+.join__status { font-size: var(--text-sm); line-height: 1.5; color: var(--color-muted); padding-top: var(--space-2xs); text-align: center; text-wrap: balance; }
+.join__help { display: grid; gap: var(--space-md); justify-items: center; margin: 0; padding-block: var(--space-2xl) var(--space-xl); border-top: 1px solid var(--color-rule); }
+.join__visual { width: min(100%, 280px); aspect-ratio: 1206 / 1598; border-radius: var(--radius-screen); }
+.join__help figcaption { font-size: var(--text-sm); color: var(--color-muted); text-align: center; max-width: 32ch; }
+.jfoot { max-width: 30rem; margin-inline: auto; padding-inline: var(--join-pad); padding-bottom: max(var(--space-xl), env(safe-area-inset-bottom)); justify-content: center; text-align: center; }
+/* wider screens: the same phone-width column, centred, with the actions following the text */
+@media (min-width: 48rem) {
+  .jbar { justify-content: center; }
+  .join__panel { min-height: 0; padding-block: var(--space-3xl) var(--space-2xl); }
+  .join__state { grid-template-rows: auto auto; }
+}
 
 @media (max-width: 60rem) {
   .row { grid-template-columns: minmax(0, 1fr); padding-block: var(--space-xl); }
-  .join { grid-template-columns: minmax(0, 1fr); min-height: 0; }
-  .join__visual { max-width: 260px; }
 }
 
 /* /join states (set by assets/join.js on <body data-join-state>). PLUMBING, see README.md: keep this rule. */
