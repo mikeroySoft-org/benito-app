@@ -80,12 +80,12 @@ html:not(.js) .live__toggle { display: none; }
 .band__head { display: grid; gap: var(--space-md); }
 .band p a, .foot a { color: var(--color-ink); }
 
-/* Named moments: crops of the real sheets */
+/* Named moments: crops of the real iPhone screens */
 .moments { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2xl) var(--gap-columns); margin: 0; padding: 0; list-style: none; }
 .moment { display: grid; gap: var(--space-xs); align-content: start; }
 .moment .screen { margin-bottom: var(--space-sm); }
 .moment p { color: var(--color-ink-2); max-width: 45ch; }
-.screen--crop { border-radius: var(--radius-card); aspect-ratio: 1398 / 1154; }
+.screen--crop { border-radius: var(--radius-card); aspect-ratio: 1158 / 1114; }
 .screen--wide { border-radius: var(--radius-screen); }
 
 /* Text beside one screen */
@@ -134,7 +134,6 @@ html:not(.js) .live__toggle { display: none; }
 .js .hero__text > *, .js .hero__visual > * { animation: settle 560ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 70ms); }
 
 @media (max-width: 60rem) {
-  .moments { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .band--split, .band--flip, .band--share, .band--close { grid-template-columns: minmax(0, 1fr); }
   .band--flip .split__visual { order: 2; }
   .facts, .nots { grid-template-columns: minmax(0, 1fr); }
