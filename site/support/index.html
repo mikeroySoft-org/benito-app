@@ -1,31 +1,55 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light dark">
-  <title>Support · Benito</title>
-  <meta name="description" content="Help with Benito.">
-  <link rel="icon" href="/assets/benito-icon.png">
-  <link rel="apple-touch-icon" href="/assets/benito-icon.png">
-  <link rel="stylesheet" href="/assets/site.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Support · Benito</title>
+<meta name="description" content="Get help with Benito, report a security problem, and check your server.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f1e3">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d0c0a">
+<meta property="og:title" content="Support · Benito">
+<meta property="og:description" content="Get help with Benito, report a security problem, and check your server.">
+<meta property="og:image" content="https://benito.mikeroysoft.com/assets/og.png">
+<meta property="og:url" content="https://benito.mikeroysoft.com/support/">
+<link rel="icon" href="../favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<link rel="preload" href="../assets/fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/site.css">
+<script>document.documentElement.classList.add('js');</script>
 </head>
-<body>
-  <main>
-    <h1>Support</h1>
-    <div class="card">
-      <h2>Get help</h2>
-      <p>Open an issue on <a href="https://github.com/mikeroySoft-org/benito-app/issues">GitHub</a>.</p>
-      <h2>Common questions</h2>
-      <p><strong>Do I need a server?</strong> No. Choose "This iPhone only" when you set up. You can connect a server later in Account, and your history moves with you.</p>
-      <p><strong>How do I share with my partner?</strong> Run a family server (<a href="https://github.com/mikeroySoft-org/benito-app/blob/main/docs/deploy-macos.md">guide</a>), then send an invite from Sharing.</p>
-    </div>
-    <nav>
-      <a href="/">Home</a>
-      <a href="/privacy/">Privacy</a>
-      <a href="/support/">Support</a>
-      <a href="https://github.com/mikeroySoft-org/benito-app/blob/main/docs/deploy-macos.md">Self-host</a>
-    </nav>
-  </main>
+<body data-product="benito">
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav container">
+  <a class="brand" href="../" aria-label="Benito home"><img src="../assets/icon-64.webp" width="64" height="64" alt=""><span><span class="brand__house">mikeroySoft ::</span> Benito</span></a>
+  <nav aria-label="Site"><ul><li><a href="../#sharing">Sharing</a></li><li><a href="../self-host/">Self-host</a></li><li><a href="../privacy/">Privacy</a></li><li><a href="../support/" aria-current="page">Support</a></li></ul></nav>
+</header>
+<main id="main">
+<section class="inner__head container" aria-labelledby="page-title">
+  <h1 id="page-title">Support</h1>
+  <p class="lead">Help happens in the open, on GitHub.</p>
+</section>
+<section class="inner__body container" aria-label="Support">
+  <ol class="rows">
+<li class="row" id="help"><h2>Get help</h2><div class="row__body"><p><a href="https://github.com/mikeroysoft-org/benito-app/issues">Open an issue on GitHub</a>. Include your iPhone, iOS version, and how your server is reached.</p></div></li>
+<li class="row" id="security"><h2>Security problems</h2><div class="row__body"><p>Please don’t post it publicly. <a href="https://github.com/mikeroysoft-org/benito-app/security/advisories/new">Report it privately on GitHub</a>.</p></div></li>
+<li class="row" id="health"><h2>Is the server up?</h2><div class="row__body"><p>On the server machine, this should answer:</p><pre class="code"><code>curl -s http://127.0.0.1:8080/health</code></pre></div></li>
+<li class="row" id="invite"><h2>An invite won’t open</h2><div class="row__body"><p>Invites work once and expire after three days, so ask for a new one. Or copy it and paste it on the app’s join screen.</p></div></li>
+<li class="row" id="find"><h2>The app can’t find the server</h2><div class="row__body"><p>On home Wi-Fi the app finds it. Away from home, use the Tailscale address. See <a href="../self-host/#reach">setup</a>.</p></div></li>
+<li class="row" id="data"><h2>Your data</h2><div class="row__body"><p>Export JSON or CSV in the app. Everything else is one SQLite file on your server. Developers can stream <a href="https://github.com/mikeroysoft-org/benito-app/blob/main/docs/device-logs.md">device logs</a>.</p></div></li>
+</ol>
+</section>
+</main>
+<footer class="foot container">
+  <p>Benito is free and MIT licensed. No ads, no analytics, no accounts with us.</p>
+  <ul>
+    <li><a href="../privacy/">Privacy</a></li>
+    <li><a href="../support/">Support</a></li>
+    <li><a href="https://www.mikeroysoft.com/">mikeroySoft</a></li>
+  </ul>
+</footer>
+<script src="../assets/config.js"></script>
+<script src="../assets/js/site.js"></script>
 </body>
 </html>

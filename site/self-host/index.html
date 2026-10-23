@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Set up Benito · Benito</title>
+<meta name="description" content="Run a small Benito server at home and build the app with Xcode, in about ten minutes.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f1e3">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d0c0a">
+<meta property="og:title" content="Set up Benito · Benito">
+<meta property="og:description" content="Run a small Benito server at home and build the app with Xcode, in about ten minutes.">
+<meta property="og:image" content="https://benito.mikeroysoft.com/assets/og.png">
+<meta property="og:url" content="https://benito.mikeroysoft.com/self-host/">
+<link rel="icon" href="../favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<link rel="preload" href="../assets/fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/site.css">
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body data-product="benito">
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav container">
+  <a class="brand" href="../" aria-label="Benito home"><img src="../assets/icon-64.webp" width="64" height="64" alt=""><span><span class="brand__house">mikeroySoft ::</span> Benito</span></a>
+  <nav aria-label="Site"><ul><li><a href="../#sharing">Sharing</a></li><li><a href="../self-host/" aria-current="page">Self-host</a></li><li><a href="../privacy/">Privacy</a></li><li><a href="../support/">Support</a></li></ul></nav>
+</header>
+<main id="main">
+<section class="inner__head container" aria-labelledby="page-title">
+  <h1 id="page-title">Set up Benito</h1>
+  <p class="lead">Run a small server, then build the app with Xcode.</p>
+</section>
+<section class="inner__body container" aria-label="Set up Benito">
+  <ol class="rows">
+<li class="row" id="server"><h2>Run the server</h2><div class="row__body"><p>On a Mac it starts at login and backs up nightly:</p><pre class="code"><code>git clone https://github.com/mikeroysoft-org/benito-app
+cd benito-app &amp;&amp; scripts/macos-service.sh install
+curl -s http://127.0.0.1:8080/health</code></pre><p>On Linux or a NAS, <a href="https://github.com/mikeroysoft-org/benito-app/blob/main/server/README.md">use Docker</a>.</p></div></li>
+<li class="row" id="reach"><h2>Reach it from phones</h2><div class="row__body"><ul><li><b>Tailscale</b>, recommended: an HTTPS address anywhere.</li><li><b>Home Wi-Fi</b>: a plain HTTP listener, for trusted networks only.</li><li><b>A VPS</b>, behind Caddy or nginx with TLS.</li></ul></div></li>
+<li class="row" id="install"><h2>Install the app</h2><div class="row__body"><p>Not on the App Store yet, so build it with Xcode 16 or later:</p><pre class="code"><code>brew install xcodegen
+cd apps/Benito &amp;&amp; xcodegen generate
+open Benito.xcodeproj</code></pre><p>First copy <code>Local.xcconfig.example</code> to <code>Local.xcconfig</code> and set your team.</p></div></li>
+<li class="row" id="invite"><h2>Invite your family</h2><div class="row__body"><p>Account, Sharing, <b>Invite to Family</b>. Send it by Messages, AirDrop, QR or SharePlay. Each works once, for three days.</p></div></li>
+<li class="row" id="guides"><h2>Guides</h2><div class="row__body"><ul class="links">
+<li><a href="https://github.com/mikeroysoft-org/benito-app/blob/main/docs/deploy-macos.md">Run it on a Mac</a></li>
+<li><a href="https://github.com/mikeroysoft-org/benito-app/blob/main/docs/deploy-tailscale.md">Reach it with Tailscale</a></li>
+<li><a href="https://github.com/mikeroysoft-org/benito-app/blob/main/docs/deploy-vps.md">Put it on a VPS</a></li>
+<li><a href="https://github.com/mikeroysoft-org/benito-app/blob/main/server/README.md">Server settings</a></li>
+<li><a href="https://github.com/mikeroysoft-org/benito-app/blob/main/SECURITY.md">Security model</a></li>
+</ul></div></li>
+</ol>
+</section>
+</main>
+<footer class="foot container">
+  <p>Benito is free and MIT licensed. No ads, no analytics, no accounts with us.</p>
+  <ul>
+    <li><a href="../privacy/">Privacy</a></li>
+    <li><a href="../support/">Support</a></li>
+    <li><a href="https://www.mikeroysoft.com/">mikeroySoft</a></li>
+  </ul>
+</footer>
+<script src="../assets/config.js"></script>
+<script src="../assets/js/site.js"></script>
+</body>
+</html>

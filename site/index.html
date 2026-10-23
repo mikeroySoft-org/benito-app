@@ -1,34 +1,162 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light dark">
-  <title>Benito, a baby tracker you host yourself</title>
-  <meta name="description" content="Free, open-source baby tracker. Your family's data stays on your iPhone or your own server.">
-  <link rel="icon" href="/assets/benito-icon.png">
-  <link rel="apple-touch-icon" href="/assets/benito-icon.png">
-  <link rel="stylesheet" href="/assets/site.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Benito: a shared baby log for the whole family</title>
+<meta name="description" content="Benito is a free, open-source baby tracker for iPhone, iPad and Apple Watch. Feeds, sleep and diapers stay in sync on your own server.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f1e3">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d0c0a">
+<meta property="og:title" content="Benito: a shared baby log for the whole family">
+<meta property="og:description" content="Benito is a free, open-source baby tracker for iPhone, iPad and Apple Watch. Feeds, sleep and diapers stay in sync on your own server.">
+<meta property="og:image" content="https://benito.mikeroysoft.com/assets/og.png">
+<meta property="og:url" content="https://benito.mikeroysoft.com/">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<link rel="preload" href="assets/fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/site.css">
+<script>document.documentElement.classList.add('js');</script>
 </head>
-<body>
-  <main>
-    <header>
-      <img src="/assets/benito-icon.png" alt="Benito's capybara icon">
-      <h1>Benito</h1>
-      <p>A calm baby tracker for feeds, sleep, diapers and walks. Free and open source.</p>
-    </header>
-    <div class="card">
-      <h2>Yours, not ours</h2>
-      <p>Use Benito on one iPhone with no account, or run a small family server at home so both parents and the babysitter see the same timeline. Nothing goes to us.</p>
-      <p><a class="button" href="#" data-store-url="">Get Benito</a>
-      <a class="button secondary" href="https://github.com/mikeroySoft-org/benito-app/blob/main/docs/deploy-macos.md">Host it yourself</a></p>
+<body data-product="benito">
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav container">
+  <a class="brand" href="./" aria-label="Benito home"><img src="assets/icon-64.webp" width="64" height="64" alt=""><span><span class="brand__house">mikeroySoft ::</span> Benito</span></a>
+  <nav aria-label="Site"><ul><li><a href="#sharing">Sharing</a></li><li><a href="self-host/">Self-host</a></li><li><a href="privacy/">Privacy</a></li><li><a href="support/">Support</a></li></ul></nav>
+</header>
+<main id="main">
+<section class="hero container" aria-labelledby="hero-title">
+  <div class="hero__text">
+    <h1 id="hero-title" style="--i:0">Who fed the baby last?</h1>
+    <p class="lead" style="--i:1">Benito keeps feeds, sleep and diapers in sync for everyone who helps.</p>
+    <div class="actions" style="--i:2">
+      <a class="btn" data-get-benito href="self-host/">Get Benito</a>
+      <a class="textlink" href="#moments">See what it logs</a>
     </div>
-    <nav>
-      <a href="/">Home</a>
-      <a href="/privacy/">Privacy</a>
-      <a href="/support/">Support</a>
-      <a href="https://github.com/mikeroySoft-org/benito-app/blob/main/docs/deploy-macos.md">Self-host</a>
-    </nav>
-  </main>
+    <p class="hero__note" style="--i:3">Free and open source, for iPhone, iPad and Apple Watch. Not on the App Store yet, so for now you build it from source.</p>
+  </div>
+  <div class="hero__visual">
+    <figure class="screen screen--phone" data-kind="product" style="--i:1">
+      <picture><source media="(prefers-color-scheme: dark)" srcset="assets/shots/home-dark-480.webp 480w, assets/shots/home-dark-800.webp 800w" sizes="(min-width: 60rem) 320px, (min-width: 40rem) 280px, 220px"><img src="assets/shots/home-light-800.webp" srcset="assets/shots/home-light-480.webp 480w, assets/shots/home-light-800.webp 800w" sizes="(min-width: 60rem) 320px, (min-width: 40rem) 280px, 220px" width="1206" height="2622" alt="Benito’s home screen: 1h 42m since the last feed, from the left side, with today’s feeds, diapers and sleep below" fetchpriority="high"></picture>
+    </figure>
+    <figure class="live hero__live" data-slot="live-activity" data-alt="Benito Live Activity on the Lock Screen" data-timer="447" style="--i:3">
+      <div class="live__card" data-keep>
+        <img class="live__icon" src="assets/icon-128.webp" width="128" height="128" alt="">
+        <p class="live__what"><b>Feeding <span class="live__side" aria-label="left side">L</span></b><span>Started 1:56 PM</span></p>
+        <p class="live__time" aria-live="off"><span data-timer-value>07:27</span></p>
+      </div>
+      <div class="live__foot" data-keep>
+        <figcaption>A Live Activity, drawn here as a sample. The real one sits on the Lock Screen and in the Dynamic Island.</figcaption>
+        <button class="live__toggle" type="button" data-timer-toggle aria-pressed="false">Pause</button>
+      </div>
+    </figure>
+  </div>
+</section>
+
+<section class="band container" id="moments" aria-labelledby="moments-title">
+  <div class="band__head">
+    <h2 id="moments-title">Every log is one tap.</h2>
+    <p class="lead">Start a timer on one phone and it runs on all of them within a second.</p>
+  </div>
+  <ul class="moments" role="list">
+      <li class="moment" data-reveal style="--i:0">
+        <figure class="screen screen--crop" data-kind="product"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/shots/feed-dark-560.webp 560w, assets/shots/feed-dark-840.webp 840w" sizes="(min-width: 60rem) 400px, (min-width: 40rem) 45vw, 85vw"><img src="assets/shots/feed-light-840.webp" srcset="assets/shots/feed-light-560.webp 560w, assets/shots/feed-light-840.webp 840w" sizes="(min-width: 60rem) 400px, (min-width: 40rem) 45vw, 85vw" width="1398" height="1154" alt="The feeding sheet: nursing or bottle, with a left and a right timer" loading="lazy" decoding="async"></picture></figure>
+        <h3>Feeds</h3>
+        <p>Nursing by side, left or right, or a bottle.</p>
+      </li>
+      <li class="moment" data-reveal style="--i:1">
+        <figure class="screen screen--crop" data-kind="product"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/shots/timer-dark-560.webp 560w, assets/shots/timer-dark-840.webp 840w" sizes="(min-width: 60rem) 400px, (min-width: 40rem) 45vw, 85vw"><img src="assets/shots/timer-light-840.webp" srcset="assets/shots/timer-light-560.webp 560w, assets/shots/timer-light-840.webp 840w" sizes="(min-width: 60rem) 400px, (min-width: 40rem) 45vw, 85vw" width="1398" height="1154" alt="A nursing timer at 07:27 on the left side, started at 1:56 PM" loading="lazy" decoding="async"></picture></figure>
+        <h3>Timers</h3>
+        <p>A running timer anyone in the family can stop.</p>
+      </li>
+      <li class="moment" data-reveal style="--i:2">
+        <figure class="screen screen--crop" data-kind="product"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/shots/diaper-dark-560.webp 560w, assets/shots/diaper-dark-840.webp 840w" sizes="(min-width: 60rem) 400px, (min-width: 40rem) 45vw, 85vw"><img src="assets/shots/diaper-light-840.webp" srcset="assets/shots/diaper-light-560.webp 560w, assets/shots/diaper-light-840.webp 840w" sizes="(min-width: 60rem) 400px, (min-width: 40rem) 45vw, 85vw" width="1398" height="1154" alt="The diaper sheet: now, 15m, 30m or 1h ago, then wet or dirty" loading="lazy" decoding="async"></picture></figure>
+        <h3>Diapers</h3>
+        <p>Wet, dirty or both, now or half an hour ago.</p>
+      </li>
+      <li class="moment" data-reveal style="--i:3">
+        <figure class="screen screen--crop" data-kind="product"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/shots/sleep-dark-560.webp 560w, assets/shots/sleep-dark-840.webp 840w" sizes="(min-width: 60rem) 400px, (min-width: 40rem) 45vw, 85vw"><img src="assets/shots/sleep-light-840.webp" srcset="assets/shots/sleep-light-560.webp 560w, assets/shots/sleep-light-840.webp 840w" sizes="(min-width: 60rem) 400px, (min-width: 40rem) 45vw, 85vw" width="1398" height="1154" alt="The sleep sheet with a start sleep button and a log past nap link" loading="lazy" decoding="async"></picture></figure>
+        <h3>Sleep</h3>
+        <p>A shared nap timer, or a nap logged after.</p>
+      </li>
+      <li class="moment" data-reveal style="--i:4">
+        <figure class="screen screen--crop" data-kind="product"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/shots/walk-dark-560.webp 560w, assets/shots/walk-dark-840.webp 840w" sizes="(min-width: 60rem) 400px, (min-width: 40rem) 45vw, 85vw"><img src="assets/shots/walk-light-840.webp" srcset="assets/shots/walk-light-560.webp 560w, assets/shots/walk-light-840.webp 840w" sizes="(min-width: 60rem) 400px, (min-width: 40rem) 45vw, 85vw" width="1398" height="1154" alt="The outing sheet with walk and car ride, and a start walk button" loading="lazy" decoding="async"></picture></figure>
+        <h3>Walks and car rides</h3>
+        <p>Time an outing on foot or in the car.</p>
+      </li>
+      <li class="moment" data-reveal style="--i:5">
+        <figure class="screen screen--crop" data-kind="product"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/shots/crying-dark-560.webp 560w, assets/shots/crying-dark-840.webp 840w" sizes="(min-width: 60rem) 400px, (min-width: 40rem) 45vw, 85vw"><img src="assets/shots/crying-light-840.webp" srcset="assets/shots/crying-light-560.webp 560w, assets/shots/crying-light-840.webp 840w" sizes="(min-width: 60rem) 400px, (min-width: 40rem) 45vw, 85vw" width="1398" height="1154" alt="The crying sheet with a start crying button and earlier spells below" loading="lazy" decoding="async"></picture></figure>
+        <h3>Crying</h3>
+        <p>A shared crying timer for the long evenings.</p>
+      </li>
+  </ul>
+</section>
+
+<section class="band band--split container" aria-labelledby="glance-title">
+  <div class="split__text">
+    <h2 id="glance-title">The day, at a glance.</h2>
+    <dl class="facts">
+      <div><dt>Day summaries</dt><dd>Feeds, diapers and sleep since midnight, right on the home screen.</dd></div>
+      <div><dt>Live Activities</dt><dd>Running timers on the Lock Screen, in the Dynamic Island and on Apple Watch.</dd></div>
+      <div><dt>Siri</dt><dd>“Siri, Sam started a feed.” Siri asks left, right or bottle.</dd></div>
+      <div><dt>Export</dt><dd>JSON or a CSV for the pediatrician.</dd></div>
+    </dl>
+  </div>
+  <figure class="screen screen--wide split__visual" data-kind="product" data-reveal><picture><source media="(prefers-color-scheme: dark)" srcset="assets/shots/timeline-dark-560.webp 560w, assets/shots/timeline-dark-840.webp 840w" sizes="(min-width: 60rem) 480px, 90vw"><img src="assets/shots/timeline-light-840.webp" srcset="assets/shots/timeline-light-560.webp 560w, assets/shots/timeline-light-840.webp 840w" sizes="(min-width: 60rem) 480px, 90vw" width="1398" height="1180" alt="The timeline in list view: nursing on the left for 12 minutes, a wet diaper, a 1h 10m sleep and a 3 oz bottle" loading="lazy" decoding="async"></picture></figure>
+</section>
+
+<section class="band band--share container" id="sharing" aria-labelledby="sharing-title">
+  <div class="share__text">
+    <h2 id="sharing-title">Invite family without passwords.</h2>
+    <p class="lead">Send an invite by Messages or AirDrop, show a QR code, or start SharePlay. Each phone gets its own key, kept in the Secure Enclave.</p>
+    <p class="small">Invites work once and expire after three days. A babysitter’s access can end after a few hours.</p>
+  </div>
+  <div class="share__visual">
+    <figure class="screen screen--phone" data-kind="product" data-reveal style="--i:0"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/shots/invite-dark-480.webp 480w, assets/shots/invite-dark-720.webp 720w" sizes="(min-width: 60rem) 280px, 42vw"><img src="assets/shots/invite-light-720.webp" srcset="assets/shots/invite-light-480.webp 480w, assets/shots/invite-light-720.webp 720w" sizes="(min-width: 60rem) 280px, 42vw" width="1206" height="2622" alt="The invite sheet: parent or caregiver, then Messages, AirDrop, SharePlay or a QR code" loading="lazy" decoding="async"></picture></figure>
+    <figure class="screen screen--phone" data-kind="product" data-reveal style="--i:1"><picture><source media="(prefers-color-scheme: dark)" srcset="assets/shots/family-dark-480.webp 480w, assets/shots/family-dark-720.webp 720w" sizes="(min-width: 60rem) 280px, 42vw"><img src="assets/shots/family-light-720.webp" srcset="assets/shots/family-light-480.webp 480w, assets/shots/family-light-720.webp 720w" sizes="(min-width: 60rem) 280px, 42vw" width="1206" height="2622" alt="The sharing list: two parents, a caregiver with an end date, a grandparent and a waiting invite" loading="lazy" decoding="async"></picture></figure>
+  </div>
+</section>
+
+<section class="band band--split band--flip container" id="sync" aria-labelledby="sync-title">
+  <figure class="screen screen--phone split__visual" data-kind="product" data-reveal><picture><source media="(prefers-color-scheme: dark)" srcset="assets/shots/server-dark-480.webp 480w, assets/shots/server-dark-720.webp 720w" sizes="(min-width: 60rem) 300px, 70vw"><img src="assets/shots/server-light-720.webp" srcset="assets/shots/server-light-480.webp 480w, assets/shots/server-light-720.webp 720w" sizes="(min-width: 60rem) 300px, 70vw" width="1206" height="2622" alt="Setup: find your server on this Wi-Fi or enter its address" loading="lazy" decoding="async"></picture></figure>
+  <div class="split__text">
+    <h2 id="sync-title">Your data stays at home.</h2>
+    <p class="lead">Benito syncs through one small server you run: a Mac mini, a Raspberry Pi, a NAS or a VPS.</p>
+    <pre class="code" aria-label="Install the server on a Mac"><code>scripts/macos-service.sh install</code></pre>
+    <p class="small">No server yet? Pick “This iPhone only” and connect one later.</p>
+    <p><a href="self-host/">Read the self-hosting guide</a></p>
+  </div>
+</section>
+
+<section class="band band--privacy container" aria-labelledby="privacy-title">
+  <h2 id="privacy-title">Data Not Collected.</h2>
+  <dl class="nots">
+    <div><dt>No tracking</dt><dd>No analytics, ads or crash reporting, here or in the app.</dd></div>
+    <div><dt>No account with us</dt><dd>Each phone joins with its own key. There is no company server.</dd></div>
+    <div><dt>Your server</dt><dd>What you log stays on your phones, and your own server if you add one.</dd></div>
+  </dl>
+  <p><a href="privacy/">Read the privacy policy</a></p>
+</section>
+
+<section class="band band--close container" aria-labelledby="close-title">
+  <div class="close__text">
+    <h2 id="close-title">Ready before the next feed.</h2>
+    <p class="lead">Free and MIT licensed. Not on the App Store yet, so build it with Xcode for now.</p>
+    <div class="actions"><a class="btn" data-get-benito href="self-host/">Get Benito</a></div>
+  </div>
+  <figure class="screen screen--phone close__visual" data-kind="product" data-reveal><picture><source media="(prefers-color-scheme: dark)" srcset="assets/shots/welcome-dark-480.webp 480w, assets/shots/welcome-dark-720.webp 720w" sizes="(min-width: 60rem) 280px, 60vw"><img src="assets/shots/welcome-light-720.webp" srcset="assets/shots/welcome-light-480.webp 480w, assets/shots/welcome-light-720.webp 720w" sizes="(min-width: 60rem) 280px, 60vw" width="1206" height="2622" alt="Welcome to Benito: start a family or join one" loading="lazy" decoding="async"></picture></figure>
+</section>
+</main>
+<footer class="foot container">
+  <p>Benito is free and MIT licensed. No ads, no analytics, no accounts with us.</p>
+  <ul>
+    <li><a href="privacy/">Privacy</a></li>
+    <li><a href="support/">Support</a></li>
+    <li><a href="https://www.mikeroysoft.com/">mikeroySoft</a></li>
+  </ul>
+</footer>
+<script src="assets/config.js"></script>
+<script src="assets/js/site.js"></script>
 </body>
 </html>
