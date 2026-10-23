@@ -1,0 +1,39 @@
+/* Placeholder look. Design owns this file: restyle freely.
+   Keep the [data-when] rule (or an equivalent) so the /join page shows the right state. */
+:root {
+  color-scheme: light dark;
+  --bg: #fbf6ee;
+  --fg: #2b211a;
+  --muted: #7a6a5d;
+  --accent: #c8642c;
+  --card: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #1d1714; --fg: #f3e9df; --muted: #b3a294; --accent: #ef8a4f; --card: #2a221d; }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font: 17px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+}
+main { max-width: 40rem; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+header img { width: 72px; height: 72px; border-radius: 16px; }
+a { color: var(--accent); }
+nav { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; color: var(--muted); }
+.card { background: var(--card); border-radius: 16px; padding: 1.25rem; margin: 1.5rem 0; }
+.button {
+  display: inline-block; padding: 0.7rem 1.1rem; margin: 0.25rem 0.5rem 0.25rem 0;
+  border-radius: 999px; border: 0; background: var(--accent); color: #fff;
+  font: inherit; text-decoration: none; cursor: pointer;
+}
+.button.secondary { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
+.muted { color: var(--muted); }
+
+/* /join states (set by assets/join.js on <body data-join-state>). */
+[data-when] { display: none; }
+body[data-join-state="loading"] [data-when="loading"],
+body[data-join-state="ready"] [data-when="ready"],
+body[data-join-state="expired"] [data-when="expired"],
+body[data-join-state="invalid"] [data-when="invalid"] { display: block; }

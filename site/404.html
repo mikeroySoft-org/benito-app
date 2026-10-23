@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Not found · Benito</title>
+  <meta name="description" content="Free, open-source baby tracker. Your family's data stays on your iPhone or your own server.">
+  <link rel="icon" href="/assets/benito-icon.png">
+  <link rel="apple-touch-icon" href="/assets/benito-icon.png">
+  <link rel="stylesheet" href="/assets/site.css">
+  <script>
+    // PLUMBING: any /join/... path (universal-link shape) lands on the join page, keeping the #invite.
+    if (/^\/join(\/|$)/.test(location.pathname)) location.replace("/join/" + location.hash);
+  </script>
+</head>
+<body>
+  <main>
+    <header>
+      <img src="/assets/benito-icon.png" alt="Benito's capybara icon">
+      <h1>Page not found</h1>
+      <p>That page isn't here. Try the links below.</p>
+    </header>
+        <nav>
+      <a href="/">Home</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="/support/">Support</a>
+      <a href="https://github.com/mikeroySoft-org/benito-app/blob/main/docs/deploy-macos.md">Self-host</a>
+    </nav>
+  </main>
+</body>
+</html>
