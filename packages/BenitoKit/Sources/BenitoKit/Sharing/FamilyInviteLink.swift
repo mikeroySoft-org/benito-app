@@ -1,12 +1,19 @@
 import Foundation
 
 /// Everything a new phone needs to join a family, carried in one link:
-/// `benito://join?p=<base64url JSON>`. Sent by Messages, AirDrop, QR or SharePlay.
+/// `https://benito.mikeroysoft.com/join#p=<base64url JSON>`. Sent by Messages, AirDrop, QR or SharePlay.
+///
+/// With Benito installed the https link opens the app (universal link). Without it, the web page
+/// (site/join) shows the invite and hands off to `benito://join?p=…`, which the app also accepts.
+/// The payload sits after `#`, so it never reaches the web server.
 ///
 /// The secret is single use and expires (72 h by default); the server only stores its hash.
 public struct FamilyInviteLink: Codable, Sendable, Hashable {
     public static let scheme = "benito"
     public static let host = "join"
+    /// Web home of invite links (site/ in this repo, served by GitHub Pages).
+    public static let webHost = "benito.mikeroysoft.com"
+    public static let webPath = "/join"
     public static let currentVersion = 1
 
     public var version: Int
@@ -71,7 +78,19 @@ public struct FamilyInviteLink: Codable, Sendable, Hashable {
 
     public var isExpired: Bool { expiresAt <= .now }
 
+    /// The link people share: `https://benito.mikeroysoft.com/join#p=…`.
     public var url: URL {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = Self.webHost
+        components.path = Self.webPath
+        components.fragment = "p=" + Self.encodePayload(self)
+        return components.url ?? appURL
+    }
+
+    /// `benito://join?p=…`: opens the app directly. Used between two phones that both run
+    /// Benito (pairing), and by the web page's "Open in Benito" button.
+    public var appURL: URL {
         var components = URLComponents()
         components.scheme = Self.scheme
         components.host = Self.host
@@ -79,20 +98,34 @@ public struct FamilyInviteLink: Codable, Sendable, Hashable {
         return components.url!
     }
 
-    /// Accepts the `benito://join?p=…` URL, or text containing one (pasted from Messages).
+    /// Accepts the https link, the `benito://join?p=…` URL, or text containing either.
     public init?(url: URL) {
-        guard
-            url.scheme?.lowercased() == Self.scheme,
-            url.host?.lowercased() == Self.host,
-            let p = URLComponents(url: url, resolvingAgainstBaseURL: false)?
-                .queryItems?.first(where: { $0.name == "p" })?.value,
-            let decoded = Self.decodePayload(p)
-        else { return nil }
+        guard let p = Self.payload(in: url), let decoded = Self.decodePayload(p) else { return nil }
         self = decoded
     }
 
+    private static func payload(in url: URL) -> String? {
+        guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { return nil }
+        let queryP = components.queryItems?.first(where: { $0.name == "p" })?.value
+        switch url.scheme?.lowercased() {
+        case scheme?:
+            return url.host?.lowercased() == host ? queryP : nil
+        case "https":
+            let path = components.path.hasSuffix("/") ? String(components.path.dropLast()) : components.path
+            guard url.host?.lowercased() == webHost, path == webPath else { return nil }
+            if let fragment = components.fragment, !fragment.isEmpty {
+                var fragmentParts = URLComponents()
+                fragmentParts.percentEncodedQuery = fragment
+                return fragmentParts.queryItems?.first(where: { $0.name == "p" })?.value ?? fragment
+            }
+            return queryP
+        default:
+            return nil
+        }
+    }
+
     public init?(text: String) {
-        let pattern = #"benito://join\?p=[A-Za-z0-9_\-]+"#
+        let pattern = #"(benito://join\?p=|https://benito\.mikeroysoft\.com/join/?#p=)[A-Za-z0-9_\-]+"#
         guard
             let range = text.range(of: pattern, options: .regularExpression),
             let url = URL(string: String(text[range]))

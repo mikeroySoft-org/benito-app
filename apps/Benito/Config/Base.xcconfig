@@ -10,4 +10,9 @@ BENITO_BUNDLE_PREFIX = org.example
 // Your child's name; Siri accepts it in place of "Benito" ("Siri, Sam started a feed").
 BENITO_SIRI_NAME = Baby
 
+// App entitlements. The default works for any team (and for unsigned simulator builds).
+// Resources/Benito-UniversalLinks.entitlements also opens https://benito.mikeroysoft.com/join
+// invite links in the app; use it only with the team listed in site/.well-known (see site/README.md).
+BENITO_ENTITLEMENTS = Resources/Benito.entitlements
+
 #include? "Local.xcconfig"

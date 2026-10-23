@@ -31,8 +31,11 @@ final class FamilyInviteLinkTests: XCTestCase {
         // LAN endpoint first, current server next, duplicates collapsed.
         XCTAssertEqual(link.endpoints.map(\.absoluteString), ["http://192.168.1.20:8081", "https://host.tailnet.ts.net"])
         let url = link.url
-        XCTAssertEqual(url.scheme, "benito")
-        XCTAssertEqual(url.host, "join")
+        XCTAssertEqual(url.scheme, "https")
+        XCTAssertEqual(url.host, "benito.mikeroysoft.com")
+        XCTAssertEqual(url.path, "/join")
+        XCTAssertTrue(url.fragment?.hasPrefix("p=") == true)
+        XCTAssertNil(url.query, "the payload stays in the fragment, out of web server logs")
         let parsed = try XCTUnwrap(FamilyInviteLink(url: url))
         XCTAssertEqual(parsed, link)
         XCTAssertEqual(parsed.role, .caregiver)
@@ -47,6 +50,40 @@ final class FamilyInviteLinkTests: XCTestCase {
         XCTAssertEqual(FamilyInviteLink(text: text), link)
         XCTAssertNil(FamilyInviteLink(text: "nothing here"))
         XCTAssertNil(FamilyInviteLink(url: URL(string: "benito://join?p=garbage")!))
+    }
+
+    func testAppSchemeFallbackStillParses() throws {
+        let link = try XCTUnwrap(
+            FamilyInviteLink(invite: invite(endpoints: []), currentServer: URL(string: "http://benito.local:8080")!)
+        )
+        let app = link.appURL
+        XCTAssertEqual(app.scheme, "benito")
+        XCTAssertEqual(app.host, "join")
+        XCTAssertEqual(FamilyInviteLink(url: app), link)
+        XCTAssertEqual(FamilyInviteLink(text: "Old build: \(app.absoluteString)"), link)
+    }
+
+    func testWebLinkVariants() throws {
+        let link = try XCTUnwrap(
+            FamilyInviteLink(invite: invite(endpoints: []), currentServer: URL(string: "http://benito.local:8080")!)
+        )
+        let p = FamilyInviteLink.encodePayload(link)
+        for raw in [
+            "https://benito.mikeroysoft.com/join#p=\(p)",
+            "https://benito.mikeroysoft.com/join/#p=\(p)",
+            "https://Benito.MikeroySoft.com/join#p=\(p)",
+            "https://benito.mikeroysoft.com/join#\(p)",
+            "https://benito.mikeroysoft.com/join?p=\(p)",
+        ] {
+            XCTAssertEqual(FamilyInviteLink(url: try XCTUnwrap(URL(string: raw))), link, raw)
+        }
+        // Other hosts and paths are not invites.
+        XCTAssertNil(FamilyInviteLink(url: try XCTUnwrap(URL(string: "https://example.com/join#p=\(p)"))))
+        XCTAssertNil(FamilyInviteLink(url: try XCTUnwrap(URL(string: "https://benito.mikeroysoft.com/privacy#p=\(p)"))))
+        XCTAssertNil(FamilyInviteLink(url: try XCTUnwrap(URL(string: "http://benito.mikeroysoft.com/join#p=\(p)"))))
+        XCTAssertNil(FamilyInviteLink(url: try XCTUnwrap(URL(string: "https://benito.mikeroysoft.com/join#p=garbage"))))
+        // Pasted from Messages, with text around it.
+        XCTAssertEqual(FamilyInviteLink(text: "Join us: https://benito.mikeroysoft.com/join#p=\(p) (expires Fri)"), link)
     }
 
     func testLooksLocal() {
