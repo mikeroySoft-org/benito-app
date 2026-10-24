@@ -35,6 +35,26 @@
     }
   }
 
+  // Friendly expiry for "The invite works once and expires ___.": "in 12 minutes", "in 5 hours",
+  // "tomorrow", "in 3 days", then "on Dec 31, 2029" from a week out. Uses the reader's locale, never seconds.
+  function formatExpiry(expires, now, locale) {
+    var ms = expires.getTime() - now.getTime();
+    if (isNaN(ms) || ms <= 0) return "";
+    var minute = 60 * 1000, hour = 60 * minute, day = 24 * hour;
+    if (ms < 7 * day) {
+      var rel = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+      if (ms < hour) return rel.format(Math.max(1, Math.round(ms / minute)), "minute");
+      if (ms < day) return rel.format(Math.round(ms / hour), "hour");
+      return rel.format(Math.round(ms / day), "day");
+    }
+    return "on " + new Intl.DateTimeFormat(locale, { dateStyle: "medium" }).format(expires);
+  }
+
+  // Exact moment for the tooltip, e.g. "Dec 31, 2029, 4:00 PM". No seconds.
+  function formatExpiryExact(expires, locale) {
+    return new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(expires);
+  }
+
   function setText(selector, value) {
     document.querySelectorAll(selector).forEach(function (el) { el.textContent = value; });
   }
@@ -45,7 +65,9 @@
 
   // Node (site/tests/join.test.mjs) gets the pure helpers; browsers run the page.
   if (typeof document === "undefined") {
-    if (typeof module !== "undefined") module.exports = { readPayload: readPayload, decodePayload: decodePayload };
+    if (typeof module !== "undefined") {
+      module.exports = { readPayload: readPayload, decodePayload: decodePayload, formatExpiry: formatExpiry, formatExpiryExact: formatExpiryExact };
+    }
     return;
   }
 
@@ -62,7 +84,13 @@
     setText("[data-join-family]", invite.f || "a family");
     setText("[data-join-inviter]", invite.by || "Someone");
     setText("[data-join-role]", invite.r === "caregiver" ? "caregiver" : "parent");
-    setText("[data-join-expires]", isNaN(expires) ? "" : expires.toLocaleString());
+    var locale = navigator.languages && navigator.languages.length ? navigator.languages : undefined;
+    var valid = !isNaN(expires.getTime());
+    setText("[data-join-expires]", valid ? formatExpiry(expires, new Date(), locale) : "");
+    document.querySelectorAll("[data-join-expires]").forEach(function (el) {
+      if (valid) el.setAttribute("title", formatExpiryExact(expires, locale));
+      else el.removeAttribute("title");
+    });
 
     document.querySelectorAll("[data-join-open]").forEach(function (a) { a.setAttribute("href", appLink); });
     document.querySelectorAll("[data-join-get]").forEach(function (a) {

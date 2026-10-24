@@ -1,47 +1,83 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light dark">
-  <title>Join a family · Benito</title>
-  <meta name="description" content="Open a Benito family invite.">
-  <link rel="icon" href="/assets/benito-icon.png">
-  <link rel="apple-touch-icon" href="/assets/benito-icon.png">
-  <link rel="stylesheet" href="/assets/site.css">
-  <meta name="robots" content="noindex">
-  <meta name="referrer" content="no-referrer">
-  <script src="/assets/join.js" defer></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Join a family · Benito</title>
+<meta name="description" content="Open a Benito family invite.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f1e3">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d0c0a">
+<meta property="og:title" content="Join a family · Benito">
+<meta property="og:description" content="Open a Benito family invite.">
+<meta property="og:image" content="https://benito.mikeroysoft.com/assets/og.png">
+<meta property="og:url" content="https://benito.mikeroysoft.com/join/">
+<link rel="icon" href="../favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<link rel="preload" href="../assets/fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/site.css">
+<script>document.documentElement.classList.add('js');</script>
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<script src="/assets/join.js" defer></script>
 </head>
-<body data-join-state="loading">
-  <main>
-    <header>
-      <img src="/assets/benito-icon.png" alt="Benito's capybara icon">
-    </header>
-
-    <section data-when="loading"><p>Opening invite…</p></section>
-
-    <section data-when="ready">
-      <h1><span data-join-inviter></span> invited you to <span data-join-family></span></h1>
-      <p>You'll join as a <span data-join-role></span>. The invite works once and expires <span data-join-expires></span>.</p>
-      <p>
-        <a class="button" data-join-open href="#">Open in Benito</a>
-        <a class="button secondary" data-join-get data-store-url="" href="/">Get Benito</a>
-        <button class="button secondary" type="button" data-join-copy>Copy invite</button>
-      </p>
-      <p class="muted" data-join-copy-status>No Benito yet? Get it, then come back and tap Open, or copy the invite and paste it in the app.</p>
+<body class="joinpage" data-product="benito" data-join-state="loading">
+<a class="skip" href="#main">Skip to content</a>
+<header class="jbar">
+  <a class="brand" href="../" aria-label="Benito home"><img src="../assets/icon-64.webp" width="64" height="64" alt=""><span>Benito</span></a>
+</header>
+<main id="main" class="join">
+  <!-- PLUMBING (site/README.md): assets/join.js owns this page's logic. Keep body[data-join-state], the four data-when states,
+       data-join-open / data-join-get (data-store-url) / data-join-copy, and the data-join-* text slots. Styling is free. -->
+  <div class="join__panel">
+    <div class="join__invite">
+      <img class="join__icon" src="../assets/icon-128.webp" width="128" height="128" alt="">
+      <h1 class="join__title" id="join-title">
+        <span data-when="loading">Opening invite…</span>
+        <span data-when="ready"><span data-join-inviter>Someone</span> invited you to <span data-join-family>a family</span></span>
+        <span data-when="expired">Invite expired</span>
+        <span data-when="invalid">Link incomplete</span>
+      </h1>
+    </div>
+    <section class="join__state" data-when="loading" aria-labelledby="join-title">
+      <noscript><p class="join__lead">Turn on JavaScript, or paste the whole link on Benito’s join screen.</p></noscript>
     </section>
-
-    <section data-when="expired">
-      <h1>This invite has expired</h1>
-      <p>Ask <span data-join-inviter></span> to send a new one from Benito's Sharing screen.</p>
+    <section class="join__state" data-when="ready" aria-labelledby="join-title">
+      <p class="join__lead">You’ll join as a <b data-join-role>parent</b>. The invite works once and expires <span data-join-expires></span>.</p>
+      <div class="join__dock">
+        <a class="btn join__open" data-join-open href="#">Open in Benito</a>
+        <div class="join__more-actions">
+          <!-- Get Benito: href and data-store-url come from GET_BENITO_URL in assets/config.js (site.js fills both). Static href is the no-script fallback. -->
+          <a class="btn btn--quiet" data-get-benito data-join-get data-store-url="" href="../self-host/">Get Benito</a>
+          <button class="btn btn--quiet" type="button" data-join-copy>Copy invite</button>
+        </div>
+        <p class="join__status" data-join-copy-status aria-live="polite">No Benito yet? Get it, then come back and tap Open, or copy the invite and paste it in the app.</p>
+      </div>
     </section>
-
-    <section data-when="invalid">
-      <h1>This invite link is incomplete</h1>
-      <p>Open the whole link from the message you got, or ask for a new invite.</p>
-      <p><a class="button secondary" href="/">About Benito</a></p>
+    <section class="join__state" data-when="expired" aria-labelledby="join-title">
+      <p class="join__lead">Ask <span data-join-inviter>them</span> to send a new one from Benito’s Sharing screen.</p>
+      <div class="join__dock"><a class="btn btn--quiet" href="../">About Benito</a></div>
     </section>
-  </main>
+    <section class="join__state" data-when="invalid" aria-labelledby="join-title">
+      <p class="join__lead">Open the whole link from the message you got, or ask for a new invite.</p>
+      <div class="join__dock"><a class="btn btn--quiet" href="../">About Benito</a></div>
+    </section>
+  </div>
+  <figure class="join__help">
+    <div class="screen join__visual" data-kind="product"><picture><source media="(prefers-color-scheme: dark)" srcset="../assets/shots/join-dark-480.webp 480w, ../assets/shots/join-dark-720.webp 720w" sizes="280px"><img src="../assets/shots/join-light-720.webp" srcset="../assets/shots/join-light-480.webp 480w, ../assets/shots/join-light-720.webp 720w" sizes="280px" width="1206" height="1598" loading="lazy" alt="Benito’s join screen: no account or password needed, three steps, and a paste box if the link didn’t open the app"></picture></div>
+    <figcaption>Link didn’t open the app? In Benito, tap Join a family and paste the invite.</figcaption>
+  </figure>
+</main>
+<footer class="foot jfoot">
+  <p>Benito is free and MIT licensed. No ads, no analytics, no accounts with us.</p>
+  <ul>
+    <li><a href="../privacy/">Privacy</a></li>
+    <li><a href="../support/">Support</a></li>
+    <li><a href="https://www.mikeroysoft.com/">mikeroySoft</a></li>
+  </ul>
+</footer>
+<script src="../assets/config.js"></script>
+<script src="../assets/js/site.js"></script>
 </body>
 </html>

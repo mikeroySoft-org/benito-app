@@ -1,39 +1,230 @@
-/* Placeholder look. Design owns this file: restyle freely.
-   Keep the [data-when] rule (or an equivalent) so the /join page shows the right state. */
-:root {
-  color-scheme: light dark;
-  --bg: #fbf6ee;
-  --fg: #2b211a;
-  --muted: #7a6a5d;
-  --accent: #c8642c;
-  --card: #ffffff;
-}
-@media (prefers-color-scheme: dark) {
-  :root { --bg: #1d1714; --fg: #f3e9df; --muted: #b3a294; --accent: #ef8a4f; --card: #2a221d; }
-}
-* { box-sizing: border-box; }
-body {
-  margin: 0;
-  font: 17px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: var(--bg);
-  color: var(--fg);
-}
-main { max-width: 40rem; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
-header img { width: 72px; height: 72px; border-radius: 16px; }
-a { color: var(--accent); }
-nav { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 2rem; color: var(--muted); }
-.card { background: var(--card); border-radius: 16px; padding: 1.25rem; margin: 1.5rem 0; }
-.button {
-  display: inline-block; padding: 0.7rem 1.1rem; margin: 0.25rem 0.5rem 0.25rem 0;
-  border-radius: 999px; border: 0; background: var(--accent); color: #fff;
-  font: inherit; text-decoration: none; cursor: pointer;
-}
-.button.secondary { background: transparent; color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); }
-.muted { color: var(--muted); }
+/* Hallmark · shape: night log · genre: modern-minimal · theme: custom · job: try · idea: "the screen a parent reads at 3 a.m. answers who fed the baby last" · vibe: "calm, warm, honest, nightlight, house-made"
+ * paper: oklch(96% 0.015 85) · accent: oklch(40% 0.13 272) · display: Newsreader · body: JetBrains Mono · hero: the question in serif beside a working copy of the home screen in a phone frame · nav: house brand line, links right · footer: house license line left, links right · imagery: the product (real app screenshots, light and dark) · signature: a nursing timer you can start, switch, pause and save on the page
+ * axes: cream/serif/night-navy · posture: restrained · modes: light+dark · contrast: pass · fold: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P4 H4 E4 S4 R4 V4 · weakest: E, the only motion is the demo sheet rising and its clock */
+/* Hallmark · dismissed 77 · the inner pages (privacy, self-host, support, join, 404) are a head and one body of rows, not landing strips */
+/* Hallmark · dismissed 58 · the /join h1 and lead hold every state's text (loading, ready, expired, invalid) and join.js shows one; the static count adds them all, while each rendered state passes */
+/* Hallmark · waive 64 · mono is the brand material, docs/design/brand-spec.md · JetBrains Mono is the body and working voice on every mikeroySoft site */
+@import url("./tokens.css");
+@import url("./base.css");
 
-/* /join states (set by assets/join.js on <body data-join-state>). */
+body { font-weight: var(--weight-body); font-size: var(--text-md); line-height: 1.6; }
+h1, h2, h3 { font-weight: 400; color: var(--color-ink); letter-spacing: var(--tracking-display); }
+h1 { font-size: var(--text-display); line-height: 1.02; max-width: 12ch; }
+h2 { font-size: var(--text-section); line-height: 1.08; max-width: 20ch; }
+h3 { font-family: var(--font-body); font-size: var(--text-md); font-weight: 600; letter-spacing: 0; line-height: 1.35; }
+strong, b, dt { font-weight: 600; }
+a { text-decoration-color: color-mix(in oklab, currentColor 40%, transparent); transition: color var(--dur-short) var(--ease-out), text-decoration-color var(--dur-short) var(--ease-out); }
+a:hover { color: var(--color-accent); text-decoration-color: currentColor; }
+code, kbd, pre { font-family: var(--font-body); }
+.lead { font-size: var(--text-lead); color: var(--color-ink-2); max-width: 44ch; }
+.small { font-size: var(--text-sm); color: var(--color-muted); }
+
+/* Skip link */
+.skip { position: absolute; left: var(--space-md); top: var(--space-md); z-index: var(--z-modal); padding: var(--space-xs) var(--space-md); background: var(--color-ink); color: var(--color-paper); border-radius: var(--radius-input); transform: translateY(-200%); }
+.skip:focus-visible { transform: none; }
+
+/* Nav: the house brand line */
+.nav { display: flex; align-items: center; justify-content: space-between; gap: var(--space-lg); min-height: 72px; }
+.brand { display: inline-flex; align-items: center; gap: var(--space-sm); text-decoration: none; font-size: var(--text-sm); font-weight: 600; color: var(--color-ink); }
+.brand img { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; }
+.brand__house { color: var(--color-muted); font-weight: 400; }
+.nav ul { display: flex; gap: var(--space-lg); margin: 0; padding: 0; list-style: none; font-size: var(--text-sm); }
+.nav ul a { white-space: nowrap; display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; color: var(--color-ink-2); }
+.nav ul a:hover, .nav ul a[aria-current="page"] { color: var(--color-ink); text-decoration: underline; text-decoration-color: var(--color-accent); text-underline-offset: 0.35em; }
+
+/* Controls */
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 var(--space-lg); border: 1px solid var(--color-accent); border-radius: var(--radius-input); background: var(--color-accent); color: var(--color-accent-ink); font: 600 var(--text-md)/1 var(--font-body); white-space: nowrap; text-decoration: none; cursor: pointer; transition: background-color var(--dur-short) var(--ease-out), transform var(--dur-micro) var(--ease-out); }
+.btn:hover { background: color-mix(in oklab, var(--color-accent) 86%, var(--color-ink)); color: var(--color-accent-ink); }
+.btn:active { transform: translateY(1px); }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.55; cursor: not-allowed; transform: none; }
+.btn:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 3px; }
+.btn--quiet { background: transparent; color: var(--color-ink); border-color: var(--color-rule); }
+.btn--quiet:hover { background: var(--color-paper-2); color: var(--color-ink); }
+.textlink { display: inline-flex; align-items: center; min-height: 48px; color: var(--color-ink); }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-md) var(--space-lg); }
+
+/* A real app screen, framed by its own display corners: no drawn bezel */
+.screen { margin: 0; flex-shrink: 0; border-radius: var(--radius-screen); overflow: hidden; background: var(--color-paper-2); box-shadow: 0 0 0 1px color-mix(in oklab, var(--color-ink) 12%, transparent); }
+.screen img { width: 100%; height: auto; }
+.screen--phone { border-radius: 14% / 6.4%; }
+
+/* Hero */
+.hero { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--gap-columns); align-items: center; min-height: min(calc(100svh - 72px), 860px); padding-block: var(--space-xl) var(--space-2xl); }
+.hero__text { display: grid; gap: var(--space-lg); align-content: center; }
+.hero__text .actions { margin-top: var(--space-xs); }
+.hero__note { font-size: var(--text-sm); color: var(--color-muted); max-width: 46ch; }
+
+
+
+/* Sections */
+.band { padding-block: var(--section-gap-s); border-top: 1px solid var(--color-rule); display: grid; gap: var(--space-2xl); }
+#moments { padding-block: var(--section-gap) var(--section-gap-s); }
+.band__head { display: grid; gap: var(--space-md); }
+.band p a, .foot a { color: var(--color-ink); }
+
+/* Named moments: crops of the real iPhone screens */
+.moments { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2xl) var(--gap-columns); margin: 0; padding: 0; list-style: none; }
+.moment { display: grid; gap: var(--space-xs); align-content: start; }
+.moment .screen { margin-bottom: var(--space-sm); }
+.moment p { color: var(--color-ink-2); max-width: 45ch; }
+.screen--crop { border-radius: var(--radius-card); aspect-ratio: 1158 / 1114; }
+.screen--wide { border-radius: var(--radius-screen); }
+
+/* Text beside one screen */
+.band--split { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); align-items: center; gap: var(--space-2xl) var(--gap-columns); }
+.band--flip { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); }
+.split__text { display: grid; gap: var(--space-lg); align-content: center; }
+.split__visual { justify-self: center; width: 100%; }
+.split__visual.screen--wide { max-width: 480px; }
+.split__visual.screen--phone { max-width: 300px; }
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-xl) var(--gap-columns); margin: 0; }
+.facts > div { display: grid; gap: var(--space-xs); padding-top: var(--space-md); border-top: 1px solid var(--color-rule); }
+.facts dd { margin: 0; color: var(--color-ink-2); }
+.code { margin: 0; padding: var(--space-md) var(--space-lg); background: var(--color-paper-2); border-radius: var(--radius-input); font-size: var(--text-sm); overflow-x: auto; color: var(--color-ink); }
+
+/* Agent-ready: a terminal-style sample beside the facts, in the night ground and the mono voice */
+.band--agent { padding-block: var(--section-gap); }
+@media (min-width: 60rem) { .band--agent { min-height: min(100svh, 60rem); align-content: center; } }
+.agent__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 var(--space-lg); margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--color-rule); }
+.agent__facts li { padding-block: var(--space-sm); border-bottom: 1px solid var(--color-rule); font-weight: 600; max-width: none; }
+@media (max-width: 40rem) { .agent__facts { grid-template-columns: minmax(0, 1fr); } }
+.lead code, .row__body code { font-size: 0.92em; }
+.term { display: grid; gap: var(--space-sm); width: 100%; max-width: 520px; margin: 0; }
+.term__body { display: grid; gap: var(--space-2xs); padding: var(--space-lg); border-radius: var(--radius-card); border: 1px solid var(--color-rule); background: var(--color-night); color: var(--color-night-ink); font: var(--weight-body) var(--text-sm)/1.6 var(--font-body); }
+.term__line { display: grid; grid-template-columns: 2ch minmax(0, 1fr); max-width: none; }
+.term__line > :first-child { color: var(--color-night-muted); }
+.term__line--cmd { font-weight: 600; }
+.term__line--cmd:not(:first-child) { margin-top: var(--space-sm); }
+.term figcaption { font-size: var(--text-xs); color: var(--color-muted); }
+
+/* Sharing: two screens side by side */
+/* Siri and Apple Watch: two plain cards, SF Symbols-style line icons, no Apple marks */
+.hands { margin-top: var(--space-2xl); display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-columns); margin: 0; padding: 0; list-style: none; }
+.hands__card { display: grid; align-content: start; gap: var(--space-sm); padding: var(--space-xl); border: 1px solid var(--color-rule); border-radius: var(--radius-card); background: var(--color-paper-2); color: var(--color-ink); }
+.hands__card h3 { margin: var(--space-xs) 0 0; }
+.hands__card p { margin: 0; }
+.hands__card .small { color: var(--color-ink-2); }
+.hands__icon { width: 32px; height: 32px; color: var(--color-accent); }
+@media (max-width: 40rem) { .hands { grid-template-columns: minmax(0, 1fr); } .hands__card { padding: var(--space-lg); } }
+.band--share { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); align-items: center; gap: var(--space-2xl) var(--gap-columns); }
+.share__text { display: grid; gap: var(--space-lg); }
+.share__visual { display: grid; grid-template-columns: repeat(2, minmax(0, 280px)); justify-content: center; align-items: start; gap: var(--space-lg); }
+.share__visual > :last-child { margin-top: var(--space-3xl); }
+
+/* Privacy statement */
+.band--privacy { padding-block: var(--section-gap); gap: var(--space-xl); }
+.band--privacy h2 { font-size: var(--text-display); max-width: none; }
+.nots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--gap-columns); margin: 0; }
+.nots > div { display: grid; gap: var(--space-xs); padding-top: var(--space-md); border-top: 1px solid var(--color-ink); }
+.nots dd { margin: 0; color: var(--color-ink-2); max-width: 36ch; }
+
+/* Close: the action again beside one last screen */
+.band--close { grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); align-items: center; gap: var(--space-2xl) var(--gap-columns); padding-block: var(--section-gap-s) var(--section-gap); }
+.close__text { display: grid; gap: var(--space-lg); }
+.close__visual { justify-self: center; width: 100%; max-width: 280px; border-radius: var(--radius-screen); aspect-ratio: 1206 / 1500; }
+.close__visual img { object-fit: cover; object-position: top; height: 100%; }
+
+/* Footer: the house line */
+.foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-md) var(--space-xl); padding-block: var(--space-xl); border-top: 1px solid var(--color-rule); font-size: var(--text-sm); color: var(--color-muted); }
+.foot ul { display: flex; flex-wrap: wrap; gap: var(--space-lg); margin: 0; padding: 0; list-style: none; }
+.foot ul a { display: inline-flex; align-items: center; min-height: 44px; }
+
+/* One reveal per page (patterns.md), visible without script */
+.js [data-reveal] { opacity: 0; transform: translateY(8px); transition: opacity var(--dur-long) var(--ease-out), transform var(--dur-long) var(--ease-out); transition-delay: calc(var(--i, 0) * 50ms); }
+.js [data-reveal].is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .js [data-reveal] { opacity: 1; transform: none; transition: none; } }
+
+/* Hero entrance: one settle from a visible default */
+@keyframes settle { from { opacity: 0.001; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.js .hero__text > *, .js .hero__visual > * { animation: settle 560ms var(--ease-out) both; animation-delay: calc(var(--i, 0) * 70ms); }
+
+@media (max-width: 60rem) {
+  .band--split, .band--flip, .band--share, .band--close { grid-template-columns: minmax(0, 1fr); }
+  .band--flip .split__visual { order: 2; }
+  .facts, .nots { grid-template-columns: minmax(0, 1fr); }
+  .moments { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hero { grid-template-columns: minmax(0, 1fr); min-height: 0; gap: var(--space-xl); }
+  .nav ul { gap: var(--space-md); }
+}
+@media (max-width: 40rem) {
+  /* six moments: a sideways row on phones, so the section stays a short scroll */
+  .moments { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 78%; gap: var(--space-md); overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); margin-inline: calc(var(--gutter) * -1); padding: 0 var(--gutter) var(--space-sm); scrollbar-width: none; }
+  .moments::-webkit-scrollbar { display: none; }
+  .moment { scroll-snap-align: start; }
+  .share__visual { gap: var(--space-sm); }
+  .share__visual > :last-child { margin-top: var(--space-xl); }
+  .nav { flex-wrap: wrap; gap: 0 var(--space-md); padding-block: var(--space-xs); }
+  .nav ul { gap: var(--space-md); font-size: var(--text-sm); }
+}
+
+/* Inner pages: a head, then rows of one heading and a short answer */
+.inner__head { display: grid; gap: var(--space-lg); padding-block: var(--section-gap-s) var(--space-xl); }
+.inner__head h1 { font-size: var(--text-display); max-width: 16ch; }
+.inner__body { padding-bottom: var(--section-gap); }
+.rows { display: grid; margin: 0; padding: 0; list-style: none; }
+.row { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--space-lg) var(--gap-columns); padding-block: var(--section-gap-s); border-top: 1px solid var(--color-rule); }
+.row:first-child { padding-top: var(--space-3xl); }
+.row h2 { font-size: var(--text-section); max-width: 14ch; }
+.row__body { display: grid; gap: var(--space-md); align-content: start; padding-top: var(--space-xs); max-width: 60ch; }
+.row__body p, .row__body li { color: var(--color-ink-2); }
+.row__body a { color: var(--color-ink); }
+.row__body b { color: var(--color-ink); }
+.row__body ul { display: grid; gap: var(--space-sm); margin: 0; padding: 0; list-style: none; }
+.row__body code { font-size: 0.92em; }
+.links { display: grid; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--color-rule); }
+.links li { border-bottom: 1px solid var(--color-rule); }
+.links a { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); min-height: 52px; text-decoration: none; }
+.links a::after { content: "→"; color: var(--color-muted); }
+.links a:hover { text-decoration: underline; text-decoration-color: var(--color-accent); }
+
+/* /join: iPhone first. The first screen is the invite on top and its actions in the thumb zone; the app's join screen sits below the fold.
+   Safe areas come from viewport-fit=cover; svh keeps the dock above Safari's toolbars; rem sizes follow Dynamic Type through -apple-system-body. */
+@supports (font: -apple-system-body) { html:has(body.joinpage) { font: -apple-system-body; } }
+.joinpage { --join-pad: max(var(--space-lg), env(safe-area-inset-left), env(safe-area-inset-right)); --jbar-h: 3.5rem; }
+.jbar { display: flex; align-items: center; min-height: var(--jbar-h); padding: env(safe-area-inset-top) var(--join-pad) 0; box-sizing: content-box; }
+.jbar .brand { min-height: 44px; font-size: var(--text-md); }
+.jbar .brand img { width: 28px; height: 28px; border-radius: 7px; }
+.join { width: 100%; max-width: 30rem; margin-inline: auto; padding-inline: var(--join-pad); }
+.join__panel { display: flex; flex-direction: column; gap: var(--space-lg); min-height: calc(100vh - var(--jbar-h) - env(safe-area-inset-top)); min-height: calc(100svh - var(--jbar-h) - env(safe-area-inset-top)); padding-block: var(--space-md) max(var(--space-lg), env(safe-area-inset-bottom)); }
+.join__invite { display: grid; gap: var(--space-lg); justify-items: start; padding-top: var(--space-md); }
+.join__icon { width: 4rem; height: 4rem; border-radius: 22.5%; box-shadow: 0 0 0 1px var(--color-rule); }
+.join h1 { font-size: clamp(2rem, 5vw + 0.9rem, 2.5rem); line-height: 1.08; max-width: 14ch; }
+.join h1 [data-join-inviter], .join h1 [data-join-family] { color: var(--color-accent); }
+.join__state { flex: 1; grid-template-rows: auto 1fr; gap: var(--space-lg); }
+.join__lead { font-size: var(--text-lead); line-height: 1.55; color: var(--color-ink-2); max-width: 34ch; }
+.join__lead b { color: var(--color-ink); font-weight: 600; }
+.join__dock { display: grid; gap: var(--space-sm); align-self: end; }
+.join__dock .btn { width: 100%; min-height: 3rem; }
+.join__dock .join__open { min-height: 3.25rem; font-size: var(--text-lead); border-radius: var(--radius-card); }
+.join__more-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-sm); }
+.join__more-actions .btn { padding-inline: var(--space-sm); }
+.join .btn--quiet[data-copied="true"] { border-color: var(--color-accent); color: var(--color-accent); }
+.join__status { font-size: var(--text-sm); line-height: 1.5; color: var(--color-muted); padding-top: var(--space-2xs); text-align: center; text-wrap: balance; }
+.join__help { display: grid; gap: var(--space-md); justify-items: center; margin: 0; padding-block: var(--space-2xl) var(--space-xl); border-top: 1px solid var(--color-rule); }
+.join__visual { width: min(100%, 280px); aspect-ratio: 1206 / 1598; border-radius: var(--radius-screen); }
+.join__help figcaption { font-size: var(--text-sm); color: var(--color-muted); text-align: center; max-width: 32ch; }
+.jfoot { max-width: 30rem; margin-inline: auto; padding-inline: var(--join-pad); padding-bottom: max(var(--space-xl), env(safe-area-inset-bottom)); justify-content: center; text-align: center; }
+/* wider screens: the same phone-width column, centred, with the actions following the text */
+@media (min-width: 48rem) {
+  .jbar { justify-content: center; }
+  .join__panel { min-height: 0; padding-block: var(--space-3xl) var(--space-2xl); }
+  .join__state { grid-template-rows: auto auto; }
+}
+
+@media (max-width: 60rem) {
+  .row { grid-template-columns: minmax(0, 1fr); padding-block: var(--space-xl); }
+}
+
+/* /join states (set by assets/join.js on <body data-join-state>). PLUMBING, see README.md: keep this rule. */
 [data-when] { display: none; }
 body[data-join-state="loading"] [data-when="loading"],
 body[data-join-state="ready"] [data-when="ready"],
 body[data-join-state="expired"] [data-when="expired"],
-body[data-join-state="invalid"] [data-when="invalid"] { display: block; }
+body[data-join-state="invalid"] [data-when="invalid"] { display: grid; }
+.inner--404 { padding-block: var(--section-gap-s) var(--space-3xl); }
+/* the /join headline swaps inline text, so its shown state is a block, not a grid */
+body[data-join-state="loading"] .join__title [data-when="loading"],
+body[data-join-state="ready"] .join__title [data-when="ready"],
+body[data-join-state="expired"] .join__title [data-when="expired"],
+body[data-join-state="invalid"] .join__title [data-when="invalid"] { display: block; }

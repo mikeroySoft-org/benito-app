@@ -1,36 +1,56 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light dark">
-  <title>Privacy · Benito</title>
-  <meta name="description" content="Benito collects no data.">
-  <link rel="icon" href="/assets/benito-icon.png">
-  <link rel="apple-touch-icon" href="/assets/benito-icon.png">
-  <link rel="stylesheet" href="/assets/site.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy · Benito</title>
+<meta name="description" content="Benito collects no data. What you log stays on your phones and the server your family runs.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f1e3">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d0c0a">
+<meta property="og:title" content="Privacy · Benito">
+<meta property="og:description" content="Benito collects no data. What you log stays on your phones and the server your family runs.">
+<meta property="og:image" content="https://benito.mikeroysoft.com/assets/og.png">
+<meta property="og:url" content="https://benito.mikeroysoft.com/privacy/">
+<link rel="icon" href="../favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<link rel="preload" href="../assets/fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/site.css">
+<script>document.documentElement.classList.add('js');</script>
 </head>
-<body>
-  <main>
-    <h1>Privacy</h1>
-    <p><strong>Benito collects no data.</strong> On the App Store this is "Data Not Collected".</p>
-    <div class="card">
-      <h2>The app</h2>
-      <p>What you log stays on your iPhone, or on a family server that you run. We don't operate a server, and the app has no analytics, ads, tracking or third-party SDKs.</p>
-      <h2>This website</h2>
-      <p>No cookies, analytics or trackers. GitHub Pages hosts it and may keep standard server logs.</p>
-      <h2>Invite links</h2>
-      <p>The invite in a link sits after the "#", so your browser never sends it to this website. The join page reads it on your phone only.</p>
-      <h2>Questions</h2>
-      <p>See <a href="/support/">Support</a>.</p>
-    </div>
-    <p class="muted">Last updated October 2026.</p>
-    <nav>
-      <a href="/">Home</a>
-      <a href="/privacy/">Privacy</a>
-      <a href="/support/">Support</a>
-      <a href="https://github.com/mikeroySoft-org/benito-app/blob/main/docs/deploy-macos.md">Self-host</a>
-    </nav>
-  </main>
+<body data-product="benito">
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav container">
+  <a class="brand" href="../" aria-label="Benito home"><img src="../assets/icon-64.webp" width="64" height="64" alt=""><span><span class="brand__house">mikeroySoft ::</span> Benito</span></a>
+  <nav aria-label="Site"><ul><li><a href="../#sharing">Sharing</a></li><li><a href="../self-host/">Self-host</a></li><li><a href="../privacy/" aria-current="page">Privacy</a></li><li><a href="../support/">Support</a></li></ul></nav>
+</header>
+<main id="main">
+<section class="inner__head container" aria-labelledby="page-title">
+  <h1 id="page-title">Privacy policy</h1>
+  <p class="lead">Benito collects no data: “Data Not Collected” on the App Store.</p>
+</section>
+<section class="inner__body container" aria-label="Privacy policy">
+  <ol class="rows">
+<li class="row" id="app"><h2>Data Not Collected</h2><div class="row__body"><p>We collect nothing from the app. No analytics, ads, crash reports or tracking code. No company server, and no account with us.</p></div></li>
+<li class="row" id="where"><h2>Where your data lives</h2><div class="row__body"><p>On your Apple devices, and on your family’s own server if you add one. Export JSON or CSV any time.</p></div></li>
+<li class="row" id="who"><h2>Who can see it</h2><div class="row__body"><p>Only people you invite. Each phone has its own Secure Enclave key. Remove someone and their phone stops syncing.</p></div></li>
+<li class="row" id="apple"><h2>Apple services</h2><div class="row__body"><p>Live Activity updates can use Apple’s push service, with your server’s own key. Siri follows Apple’s policy.</p></div></li>
+<li class="row" id="invites"><h2>Invite links</h2><div class="row__body"><p>The one-time secret sits after the “#”, which browsers never send to a server. Your server keeps only its hash.</p></div></li>
+<li class="row" id="site"><h2>This website</h2><div class="row__body"><p>No cookies, analytics or trackers, and fonts are served from here. GitHub Pages may keep standard server logs.</p></div></li>
+<li class="row" id="changes"><h2>Changes</h2><div class="row__body"><p>Last updated <time datetime="2026-10-23">23 October 2026</time>. Changes appear here with a new date. Questions: <a href="../support/">Support</a>.</p></div></li>
+</ol>
+</section>
+</main>
+<footer class="foot container">
+  <p>Benito is free and MIT licensed. No ads, no analytics, no accounts with us.</p>
+  <ul>
+    <li><a href="../privacy/">Privacy</a></li>
+    <li><a href="../support/">Support</a></li>
+    <li><a href="https://www.mikeroysoft.com/">mikeroySoft</a></li>
+  </ul>
+</footer>
+<script src="../assets/config.js"></script>
+<script src="../assets/js/site.js"></script>
 </body>
 </html>

@@ -1,32 +1,49 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light dark">
-  <title>Not found · Benito</title>
-  <meta name="description" content="Free, open-source baby tracker. Your family's data stays on your iPhone or your own server.">
-  <link rel="icon" href="/assets/benito-icon.png">
-  <link rel="apple-touch-icon" href="/assets/benito-icon.png">
-  <link rel="stylesheet" href="/assets/site.css">
-  <script>
-    // PLUMBING: any /join/... path (universal-link shape) lands on the join page, keeping the #invite.
-    if (/^\/join(\/|$)/.test(location.pathname)) location.replace("/join/" + location.hash);
-  </script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Not found · Benito</title>
+<meta name="description" content="Free, open-source baby tracker. Your family’s data stays on your phones and your own server.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f7f1e3">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d0c0a">
+<meta property="og:title" content="Not found · Benito">
+<meta property="og:description" content="Free, open-source baby tracker. Your family’s data stays on your phones and your own server.">
+<meta property="og:image" content="https://benito.mikeroysoft.com/assets/og.png">
+<meta property="og:url" content="https://benito.mikeroysoft.com/404.html">
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/site.css">
+<script>document.documentElement.classList.add('js');</script>
+<script>
+  // PLUMBING: any /join/... path (universal-link shape) lands on the join page, keeping the #invite.
+  if (/^\/join(\/|$)/.test(location.pathname)) location.replace("/join/" + location.hash);
+</script>
 </head>
-<body>
-  <main>
-    <header>
-      <img src="/assets/benito-icon.png" alt="Benito's capybara icon">
-      <h1>Page not found</h1>
-      <p>That page isn't here. Try the links below.</p>
-    </header>
-        <nav>
-      <a href="/">Home</a>
-      <a href="/privacy/">Privacy</a>
-      <a href="/support/">Support</a>
-      <a href="https://github.com/mikeroySoft-org/benito-app/blob/main/docs/deploy-macos.md">Self-host</a>
-    </nav>
-  </main>
+<body data-product="benito">
+<a class="skip" href="#main">Skip to content</a>
+<header class="nav container">
+  <a class="brand" href="/" aria-label="Benito home"><img src="/assets/icon-64.webp" width="64" height="64" alt=""><span><span class="brand__house">mikeroySoft ::</span> Benito</span></a>
+  <nav aria-label="Site"><ul><li><a href="/#sharing">Sharing</a></li><li><a href="/self-host/">Self-host</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="/support/">Support</a></li></ul></nav>
+</header>
+<main id="main">
+<section class="inner__head inner--404 container" aria-labelledby="page-title">
+  <h1 id="page-title">This page isn’t here.</h1>
+  <div class="actions"><a class="btn btn--quiet" href="/">Benito home</a><a class="textlink" href="/support/">Support</a></div>
+</section>
+</main>
+<footer class="foot container">
+  <p>Benito is free and MIT licensed. No ads, no analytics, no accounts with us.</p>
+  <ul>
+    <li><a href="/privacy/">Privacy</a></li>
+    <li><a href="/support/">Support</a></li>
+    <li><a href="https://www.mikeroysoft.com/">mikeroySoft</a></li>
+  </ul>
+</footer>
+<script src="/assets/config.js"></script>
+<script src="/assets/js/site.js"></script>
 </body>
 </html>

@@ -1,0 +1,53 @@
+@font-face { font-family: "Newsreader"; src: url("fonts/newsreader.woff2") format("woff2"); font-weight: 200 800; font-style: normal; font-display: swap; }
+@font-face { font-family: "JetBrains Mono"; src: url("fonts/jetbrains-mono.woff2") format("woff2"); font-weight: 100 800; font-style: normal; font-display: swap; }
+:root {
+  color-scheme: light dark;
+  --space-3xs: 2px; --space-2xs: 4px; --space-xs: 8px; --space-sm: 12px; --space-md: 16px; --space-lg: 24px; --space-xl: 40px; --space-2xl: 64px; --space-3xl: 96px; --space-4xl: 144px;
+  --text-xs: 0.8125rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.25rem; --text-xl: 1.5625rem; --text-2xl: 1.953rem; --text-3xl: 2.441rem;
+  --text-display-s: clamp(2.25rem, 4vw + 0.5rem, 3.75rem); --text-display: clamp(2.75rem, 5vw + 1rem, 5.25rem);
+  --text-section: clamp(2rem, 2.5vw + 1rem, 3.25rem); --text-title: clamp(1.25rem, 0.75vw + 0.875rem, 1.5rem); --text-lead: clamp(1.0625rem, 0.3vw + 1rem, 1.1875rem);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1); --ease-in: cubic-bezier(0.7, 0, 0.84, 0); --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-micro: 120ms; --dur-short: 220ms; --dur-long: 420ms;
+  --color-error: oklch(52% 0.19 27); --color-success: oklch(50% 0.12 150);
+  --container: 1280px; --gutter: 64px; --gap-columns: 32px; --section-gap-s: 120px; --section-gap: 144px; --section-gap-l: 176px;
+  --z-base: 1; --z-raised: 10; --z-dropdown: 100; --z-sticky: 200; --z-sticky-nav: 300; --z-modal: 400; --z-toast: 500; --z-tooltip: 600;
+  /* mikeroySoft house light ground (site.css), Benito night-navy accent from the app icon */
+  --color-paper: oklch(96% 0.015 85); --color-paper-2: oklch(93% 0.018 85); --color-paper-3: oklch(98.5% 0.008 85);
+  --color-ink: oklch(22% 0.014 70); --color-ink-2: oklch(37% 0.018 70); --color-muted: oklch(47% 0.016 70);
+  --color-rule: oklch(86% 0.018 85);
+  --color-accent: oklch(40% 0.13 272); --color-accent-ink: oklch(97% 0.008 85); --color-focus: oklch(42% 0.19 272);
+  --color-night: oklch(22% 0.03 272); --color-night-ink: oklch(94% 0.012 85); --color-night-muted: oklch(76% 0.02 272);
+  /* the hero demo recreates the app, so it uses the app's own palette and the system face, sampled from the app's screenshots */
+  --font-app: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+  --font-app-text: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+  --app-bg: #faf6ef; --app-card: #fffbf1; --app-ink: #1f1a16; --app-muted: #5e564d; --app-faint: #6f675d; --app-rule: #e9e2d6; --app-pill: #e6e1d9;
+  --app-feed: #b23f2c; --app-feed-ink: #fffaf3; --app-feed-wash: #f1dcd2; --app-feed-ring: #e2a89f; --app-quick-run: #e1b8ae;
+  --app-diaper: #8a5a01; --app-diaper-ink: #fffaf0; --app-diaper-wash: #fff8e7; --app-chip: #ebe2d2; --app-chip-line: #d9c9ac; --app-row: #e9dfcf; --app-row-line: #cab38a;
+  --app-sleep: #1d6a80; --app-sleep-ink: #f5fbfd; --app-sleep-wash: #d3e2e6; --app-awake: #1b6e46; --app-go: #a3c1af; --app-go-ink: #146b45;
+  --app-bottle: #5a3fb3; --app-bottle-ink: #fbf9ff; --app-stop: #c02626; --app-bar: #eee6d9; --app-side: #efe8dc; --app-seg: #efebe3; --app-tabs: #fffcf5; --app-tab-on: #ebe7df;
+  --app-walk: #a2307f; --app-cry: #56650a; --app-pump: #684cc0; --app-med: #2e764f;
+  --app-feed-coin: #f1d9cf; --app-diaper-coin: #eadec6; --app-sleep-coin: #d6e1dd; --app-walk-coin: #eed6dd; --app-cry-coin: #e1e0c8; --app-pump-coin: #e3dbe9; --app-med-coin: #d9e3d4;
+  --app-scrim: rgb(31 26 22 / 0.22); --app-island: oklch(14% 0.004 70); --app-shadow: 0 8px 24px -12px oklch(20% 0.02 70 / 0.35); --app-shadow-phone: 0 24px 48px -28px oklch(20% 0.02 70 / 0.45); --app-frame: #2a2622; --app-frame-edge: #5b554e;
+  --font-display: "Newsreader", Georgia, ui-serif, serif; --font-body: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace; --font-outlier: var(--font-body);
+  --radius-card: 12px; --radius-input: 8px; --radius-pill: 999px; --radius-screen: 28px; --rule-hair: 1px; --shadow-card: 0 1px 2px oklch(20% 0.01 70 / 0.05);
+  --tracking-display: -0.025em; --weight-body: 400;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* mikeroySoft house dark ground (mikeroysoft.css), re-derived per dark-mode.md */
+    --color-paper: oklch(14.5% 0.01 75); --color-paper-2: oklch(18% 0.012 75); --color-paper-3: oklch(21% 0.014 75);
+    --color-ink: oklch(92% 0.014 82); --color-ink-2: oklch(76% 0.018 75); --color-muted: oklch(66% 0.018 75);
+    --color-rule: oklch(30% 0.016 75);
+    --color-accent: oklch(80% 0.09 272); --color-accent-ink: oklch(18% 0.02 272); --color-focus: oklch(80% 0.13 272);
+    --color-night: oklch(21% 0.03 272); --color-night-ink: oklch(93% 0.012 85); --color-night-muted: oklch(76% 0.02 272);
+    --shadow-card: none; --weight-body: 350;
+    --app-bg: #0b0d10; --app-card: #161a20; --app-ink: #f5f7fa; --app-muted: #9aa3b2; --app-faint: #8d96a5; --app-rule: #2a3039; --app-pill: #25282d;
+    --app-feed: #ff8b7b; --app-feed-ink: #2a100c; --app-feed-wash: #3a2a2d; --app-feed-ring: #8e4a45; --app-quick-run: #6d4540;
+    --app-diaper: #e7b86d; --app-diaper-ink: #241804; --app-diaper-wash: #161a20; --app-chip: #222831; --app-chip-line: #3a3f47; --app-row: #222831; --app-row-line: #635641;
+    --app-sleep: #6bb3c8; --app-sleep-ink: #0a1b21; --app-sleep-wash: #1e2d34; --app-awake: #4fd391; --app-go: #255f47; --app-go-ink: #7fe0ae;
+    --app-bottle: #b8a4ff; --app-bottle-ink: #1b1238; --app-stop: #ff4d4d; --app-bar: #1c222b; --app-side: #1c222b; --app-seg: #202329; --app-tabs: #1b1e22; --app-tab-on: #3c3f44;
+    --app-walk: #ee8fd0; --app-cry: #cbe07a; --app-pump: #b4a1fa; --app-med: #7bca9d;
+    --app-feed-coin: #402e30; --app-diaper-coin: #3c362e; --app-sleep-coin: #25363e; --app-walk-coin: #3d2f40; --app-cry-coin: #373e30; --app-pump-coin: #333347; --app-med-coin: #293a37;
+    --app-scrim: rgb(0 0 0 / 0.55); --app-frame: #3a3d42; --app-frame-edge: #6b6f76;
+  }
+}
