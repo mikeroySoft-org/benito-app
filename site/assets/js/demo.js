@@ -58,7 +58,7 @@
     }
     return out;
   })();
-  var S = { tab: "home", view: "day", timer: null, tkind: "walk", mode: "nursing", oz: 4, ago: 0,
+  var S = { tab: "home", view: "week", timer: null, tkind: "walk", mode: "nursing", oz: 4, ago: 0,
     pside: "Both", poz: "4 oz", mname: "Vitamin D", mdose: "1 ml", ev: null, ver: 0, sheet: null, opener: null };
   var SIDE = { L: "Left", R: "Right" };
   var K = { sleep: ["Sleep", "#i-moon", "Sleeping"], walk: ["Walk", "#i-walk", "Walk"], ride: ["Car ride", "#i-car", "Car ride"], cry: ["Crying", "#i-cry", "Crying"] };
@@ -157,7 +157,7 @@
   /* ---- week grid, after the app's TimelineWeekView: a rolling 7 days ending today, one block per event per day,
      overlaps packed side by side, instants stretched to 15 minutes so they stay tappable, the running timer as an
      open dashed block that grows to now. Blocks are buttons with one tab stop; arrow keys move between them. ---- */
-  var HH = 44, wkDrawn = "", rove = "", runEl = null, nowEl = null;
+  var HH = 51, wkSeen = 0, wkDrawn = "", rove = "", runEl = null, nowEl = null;
   var mins = function (at) { var d = new Date(at); return d.getHours() * 60 + d.getMinutes() + d.getSeconds() / 60; };
   var px = function (m) { return m * HH / 60; };
   var fmt = function (at, o) { return new Date(at).toLocaleDateString("en-US", o); };
@@ -400,10 +400,10 @@
   app.addEventListener("click", function (e) {
     var b = e.target.closest("[data-act]"); if (!b || !app.contains(b)) return;
     var a = b.getAttribute("data-act"), v = b.getAttribute("data-v"), t = S.timer, msg;
-    if (a === "tab") S.tab = b.getAttribute("data-tab");
-    else if (a === "view") {
-      var was = S.view; S.view = b.getAttribute("data-view");
-      if (S.view === "week" && was !== "week") { sync(); $("wkscroll").scrollTop = px(Math.max(0, new Date(wall()).getHours() - 2) * 60); return; }
+    if (a === "tab" || a === "view") {
+      var was = S.tab + S.view; S[a] = b.getAttribute("data-" + a);
+      /* Week opens two hours before now: on its first showing and whenever the view switches back to it. */
+      if (S.tab === "timeline" && S.view === "week" && (a === "view" ? was.slice(-4) !== "week" : !wkSeen)) { wkSeen = 1; sync(); $("wkscroll").scrollTop = px(Math.max(0, new Date(wall()).getHours() - 2) * 60); return; }
     }
     else if (a === "wkprev") say("The demo keeps the last 7 days.");
     else if (a === "feed") open("feed");

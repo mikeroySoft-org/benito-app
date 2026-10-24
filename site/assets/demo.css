@@ -188,10 +188,10 @@
 .app__wkdays .is-today b { background: var(--app-ink); color: var(--app-bg); }
 .app__wkscroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 10px 0 140px; scrollbar-width: none; }
 .app__wkscroll::-webkit-scrollbar { display: none; }
-.app__wkgrid { height: 1057px; }
+.app__wkgrid { height: 1225px; }
 .app__wkhours { position: relative; }
 .app__wkhours span { position: absolute; right: 6px; font-size: 11px; line-height: 14px; color: var(--app-faint); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.app__wkcol { position: relative; border-left: 1px solid var(--app-rule); background-image: repeating-linear-gradient(to bottom, var(--app-rule) 0 1px, transparent 1px 44px); }
+.app__wkcol { position: relative; border-left: 1px solid var(--app-rule); background-image: repeating-linear-gradient(to bottom, var(--app-rule) 0 1px, transparent 1px 51px); }
 .app__wkcol:last-child { border-right: 1px solid var(--app-rule); }
 .app__wkcol.is-today { background-color: color-mix(in srgb, var(--app-card) 60%, transparent); }
 .app__wb { position: absolute; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; overflow: hidden; padding: var(--space-3xs) 1px 0 var(--space-2xs); border-radius: 4px; background: color-mix(in srgb, var(--k) 32%, transparent); box-shadow: inset 2.5px 0 0 var(--k); text-align: left; font-size: 11px; line-height: 13px; }
