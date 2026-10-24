@@ -25,6 +25,8 @@
   --app-diaper: #8a5a01; --app-diaper-ink: #fffaf0; --app-diaper-wash: #fff8e7; --app-chip: #ebe2d2; --app-chip-line: #d9c9ac; --app-row: #e9dfcf; --app-row-line: #cab38a;
   --app-sleep: #1d6a80; --app-sleep-ink: #f5fbfd; --app-sleep-wash: #d3e2e6; --app-awake: #1b6e46; --app-go: #a3c1af; --app-go-ink: #146b45;
   --app-bottle: #5a3fb3; --app-bottle-ink: #fbf9ff; --app-stop: #c02626; --app-bar: #eee6d9; --app-side: #efe8dc; --app-seg: #efebe3; --app-tabs: #fffcf5; --app-tab-on: #ebe7df;
+  --app-walk: #a2307f; --app-cry: #56650a; --app-pump: #684cc0; --app-med: #2e764f;
+  --app-feed-coin: #f1d9cf; --app-diaper-coin: #eadec6; --app-sleep-coin: #d6e1dd; --app-walk-coin: #eed6dd; --app-cry-coin: #e1e0c8; --app-pump-coin: #e3dbe9; --app-med-coin: #d9e3d4;
   --app-scrim: rgb(31 26 22 / 0.22); --app-island: oklch(14% 0.004 70); --app-shadow: 0 8px 24px -12px oklch(20% 0.02 70 / 0.35); --app-shadow-phone: 0 24px 48px -28px oklch(20% 0.02 70 / 0.45); --app-frame: #2a2622; --app-frame-edge: #5b554e;
   --font-display: "Newsreader", Georgia, ui-serif, serif; --font-body: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace; --font-outlier: var(--font-body);
   --radius-card: 12px; --radius-input: 8px; --radius-pill: 999px; --radius-screen: 28px; --rule-hair: 1px; --shadow-card: 0 1px 2px oklch(20% 0.01 70 / 0.05);
@@ -44,6 +46,8 @@
     --app-diaper: #e7b86d; --app-diaper-ink: #241804; --app-diaper-wash: #161a20; --app-chip: #222831; --app-chip-line: #3a3f47; --app-row: #222831; --app-row-line: #635641;
     --app-sleep: #6bb3c8; --app-sleep-ink: #0a1b21; --app-sleep-wash: #1e2d34; --app-awake: #4fd391; --app-go: #255f47; --app-go-ink: #7fe0ae;
     --app-bottle: #b8a4ff; --app-bottle-ink: #1b1238; --app-stop: #ff4d4d; --app-bar: #1c222b; --app-side: #1c222b; --app-seg: #202329; --app-tabs: #1b1e22; --app-tab-on: #3c3f44;
+    --app-walk: #ee8fd0; --app-cry: #cbe07a; --app-pump: #b4a1fa; --app-med: #7bca9d;
+    --app-feed-coin: #402e30; --app-diaper-coin: #3c362e; --app-sleep-coin: #25363e; --app-walk-coin: #3d2f40; --app-cry-coin: #373e30; --app-pump-coin: #333347; --app-med-coin: #293a37;
     --app-scrim: rgb(0 0 0 / 0.55); --app-frame: #3a3d42; --app-frame-edge: #6b6f76;
   }
 }
