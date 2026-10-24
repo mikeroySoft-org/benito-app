@@ -109,10 +109,10 @@ html:not(.js) .live__toggle { display: none; }
 .lead code, .row__body code { font-size: 0.92em; }
 .term { display: grid; gap: var(--space-sm); width: 100%; max-width: 520px; margin: 0; }
 .term__body { display: grid; gap: var(--space-2xs); padding: var(--space-lg); border-radius: var(--radius-card); border: 1px solid var(--color-rule); background: var(--color-night); color: var(--color-night-ink); font: var(--weight-body) var(--text-sm)/1.6 var(--font-body); }
-.term__line { display: grid; grid-template-columns: 3ch minmax(0, 1fr); max-width: none; }
+.term__line { display: grid; grid-template-columns: 2ch minmax(0, 1fr); max-width: none; }
 .term__line > :first-child { color: var(--color-night-muted); }
-.term__line--you:not(:first-child) { margin-top: var(--space-sm); }
-.term__line--agent > :first-child { font-weight: 600; }
+.term__line--cmd { font-weight: 600; }
+.term__line--cmd:not(:first-child) { margin-top: var(--space-sm); }
 .term figcaption { font-size: var(--text-xs); color: var(--color-muted); }
 
 /* Sharing: two screens side by side */

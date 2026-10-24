@@ -129,25 +129,26 @@
   </div>
 </section>
 
-<!-- AGENT-READY: copy is a placeholder until Benito PM's blurb and file paths land. Swap the h2, lead, facts and link freely. -->
 <section class="band band--split band--agent container" id="agents" aria-labelledby="agents-title">
   <div class="split__text">
     <h2 id="agents-title">Agent-ready.</h2>
-    <p class="lead">An open Agent Skill lets your own AI agent self-host Benito and read your log.</p>
+    <p class="lead">Benito’s skill lets your agent set up your server and answer “when did the baby last eat?”</p>
     <ul class="agent__facts" role="list">
-      <li>Read-only by default</li>
-      <li>Backs up, asks first</li>
-      <li>Stays on your machine</li>
-      <li>Not a doctor: ask your pediatrician</li>
+      <li>Read-only, never writes</li>
+      <li>Keeps it backed up</li>
+      <li>Stays on your computer</li>
+      <li>Your pediatrician makes sense of it</li>
     </ul>
-    <p><a href="https://github.com/mikeroySoft-org/benito-app/tree/main/skills/benito">Read the Skill and <code>AGENTS.md</code></a></p>
+    <p><a href="https://github.com/mikeroySoft-org/benito-app/tree/main/skills/benito">Read the skill</a></p>
   </div>
   <figure class="term split__visual" data-reveal>
-    <div class="term__body" role="group" aria-label="An illustrative chat with an agent, using sample data">
-      <p class="term__line term__line--you"><span aria-hidden="true">›</span><span>When did he last eat?</span></p>
-      <p class="term__line term__line--agent"><span></span><span>4 oz bottle, 2:40 PM.</span></p>
-      <p class="term__line term__line--you"><span aria-hidden="true">›</span><span>Crying minutes as CSV?</span></p>
-      <p class="term__line term__line--agent"><span></span><span>Wrote crying-minutes.csv. Nothing changed.</span></p>
+    <div class="term__body" role="group" aria-label="The benito-query helper in a terminal, with sample data">
+      <p class="term__line term__line--cmd"><span>$</span><code>benito-query today</code></p>
+      <p class="term__line"><span></span><span>feeds: 2 nursing (L 1, R 0, 10m), 1 bottle (4.06 oz)</span></p>
+      <p class="term__line"><span></span><span>sleep: 5.13 h</span></p>
+      <p class="term__line"><span></span><span>diapers: 2 wet, 1 dirty</span></p>
+      <p class="term__line term__line--cmd"><span>$</span><code>benito-query sql "DELETE FROM events"</code></p>
+      <p class="term__line"><span></span><span>refused: benito-query is read-only</span></p>
     </div>
     <figcaption>Illustrative sample data.</figcaption>
   </figure>
