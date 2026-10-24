@@ -1,0 +1,700 @@
+#!/usr/bin/env python3
+"""benito-query: read-only answers from a Benito server database.
+
+Opens the SQLite file read-only three ways (URI mode=ro, PRAGMA query_only, and an
+authorizer that only allows reads), so no subcommand, including `sql`, can change it.
+Python 3.9+ standard library only.
+
+Day math mirrors the server's /summary/daily, which the app calls with the phone's local
+midnight -> next midnight: counts use events that START in the day; sleep, nursing and
+crying time is the part of each FINISHED event inside the day, minus paused time; events
+with no ended_at add no time.
+
+  benito-query [--db PATH] [--tz ZONE] [--child NAME|ID] [--now ISO] [--json] COMMAND
+
+Run `benito-query --help` or `benito-query COMMAND --help` for details.
+"""
+from __future__ import annotations
+
+import argparse
+import csv
+import datetime as dt
+import json
+import os
+import re
+import sqlite3
+import sys
+from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import quote
+
+try:
+    from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+except ImportError:  # pragma: no cover - Python < 3.9
+    ZoneInfo = None  # type: ignore[assignment]
+    ZoneInfoNotFoundError = Exception  # type: ignore[assignment,misc]
+
+UTC = dt.timezone.utc
+OZ_TO_ML = 29.5735
+MAC_DB = os.path.expanduser("~/Library/Application Support/Benito/benito.db")
+REQUIRED_TABLES = ("children", "events", "timers")
+FEED_TYPES = ("feed_breast", "feed_bottle", "feed_solid")
+
+
+class UserError(Exception):
+    """Bad input or an unusable database; printed without a traceback, exit 2."""
+
+
+# --------------------------------------------------------------------------- opening
+
+
+_ALLOWED_ACTIONS = {
+    getattr(sqlite3, "SQLITE_SELECT", 21),
+    getattr(sqlite3, "SQLITE_READ", 20),
+    getattr(sqlite3, "SQLITE_FUNCTION", 31),
+    getattr(sqlite3, "SQLITE_RECURSIVE", 33),
+}
+_PRAGMA = getattr(sqlite3, "SQLITE_PRAGMA", 19)
+_READ_PRAGMAS = {"table_info", "table_xinfo", "index_list", "index_info", "foreign_key_list",
+                 "user_version", "schema_version", "query_only", "journal_mode", "page_count",
+                 "page_size", "integrity_check", "quick_check"}
+
+
+def _authorizer(action: int, arg1: Optional[str], arg2: Optional[str], _db: Any, _src: Any) -> int:
+    if action in _ALLOWED_ACTIONS:
+        return sqlite3.SQLITE_OK
+    # PRAGMA with an argument (arg2) is a write ("PRAGMA journal_mode=DELETE"), except
+    # table-style pragmas whose argument is a table name.
+    if action == _PRAGMA and (arg1 or "").lower() in _READ_PRAGMAS:
+        if arg2 is None or (arg1 or "").lower() in {"table_info", "table_xinfo", "index_list",
+                                                     "index_info", "foreign_key_list"}:
+            return sqlite3.SQLITE_OK
+    return sqlite3.SQLITE_DENY
+
+
+def resolve_db_path(arg: Optional[str]) -> str:
+    for candidate in (arg, os.environ.get("BENITO_DB")):
+        if candidate:
+            return os.path.abspath(os.path.expanduser(candidate))
+    if os.path.exists(MAC_DB):
+        return MAC_DB
+    raise UserError(
+        "no database given: pass --db PATH or set BENITO_DB "
+        f"(macOS service default {MAC_DB} does not exist)"
+    )
+
+
+def open_readonly(path: str) -> sqlite3.Connection:
+    if not os.path.isfile(path):
+        # mode=ro never creates a file, but say so plainly instead of "unable to open".
+        raise UserError(f"database not found: {path}")
+    uri = "file:" + quote(path) + "?mode=ro"
+    try:
+        conn = sqlite3.connect(uri, uri=True, timeout=5.0)
+        conn.execute("PRAGMA query_only = ON")
+        conn.set_authorizer(_authorizer)
+        names = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type = 'table'")}
+    except sqlite3.Error as e:
+        raise UserError(f"cannot open {path} read-only: {e}") from e
+    missing = [t for t in REQUIRED_TABLES if t not in names]
+    if missing:
+        raise UserError(f"{path} is not a Benito server database (missing tables: {', '.join(missing)})")
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+# --------------------------------------------------------------------------- time
+
+
+_FRACTION = re.compile(r"(\.\d+)")
+
+
+def parse_ts(raw: Optional[str]) -> Optional[dt.datetime]:
+    """RFC 3339 text as stored by the server (`2026-10-20T14:05:00+00:00`, maybe with
+    nanoseconds or `Z`) -> aware UTC datetime. None for NULL or unparseable."""
+    if raw is None:
+        return None
+    s = raw.strip()
+    if s.endswith(("Z", "z")):
+        s = s[:-1] + "+00:00"
+    s = _FRACTION.sub(lambda m: m.group(1)[:7].ljust(7, "0"), s, count=1)
+    try:
+        value = dt.datetime.fromisoformat(s)
+    except ValueError:
+        return None
+    if value.tzinfo is None:
+        value = value.replace(tzinfo=UTC)
+    return value.astimezone(UTC)
+
+
+def system_zone_name() -> Optional[str]:
+    try:
+        target = os.path.realpath("/etc/localtime")
+    except OSError:
+        return None
+    marker = "zoneinfo/"
+    if marker in target:
+        return target.split(marker, 1)[1]
+    return None
+
+
+def resolve_tz(arg: Optional[str]) -> Tuple[dt.tzinfo, str]:
+    name = arg or os.environ.get("BENITO_TZ") or os.environ.get("TZ") or system_zone_name()
+    if name and ZoneInfo is not None:
+        try:
+            return ZoneInfo(name.lstrip(":")), name.lstrip(":")
+        except (ZoneInfoNotFoundError, ValueError, OSError) as e:
+            if arg:
+                raise UserError(f"unknown time zone: {arg}") from e
+    if arg:
+        raise UserError(f"unknown time zone: {arg}")
+    local = dt.datetime.now().astimezone().tzinfo
+    assert local is not None
+    return local, str(local)
+
+
+def day_bounds(day: dt.date, tz: dt.tzinfo) -> Tuple[dt.datetime, dt.datetime]:
+    """Local midnight -> next local midnight, in UTC (23 or 25 hours on DST days)."""
+    start = dt.datetime.combine(day, dt.time(0, 0), tzinfo=tz)
+    end = dt.datetime.combine(day + dt.timedelta(days=1), dt.time(0, 0), tzinfo=tz)
+    return start.astimezone(UTC), end.astimezone(UTC)
+
+
+def fmt_duration(seconds: float) -> str:
+    seconds = int(round(max(seconds, 0)))
+    h, rem = divmod(seconds, 3600)
+    m = rem // 60
+    if h and m:
+        return f"{h}h {m:02d}m"
+    if h:
+        return f"{h}h"
+    return f"{m}m"
+
+
+def fmt_local(ts: Optional[dt.datetime], tz: dt.tzinfo) -> str:
+    if ts is None:
+        return "-"
+    return ts.astimezone(tz).strftime("%a %b %d %I:%M %p").replace(" 0", " ")
+
+
+# --------------------------------------------------------------------------- data
+
+
+class Event:
+    __slots__ = ("id", "type", "subtype", "start", "end", "amount", "unit", "side", "notes",
+                 "paused", "raw")
+
+    def __init__(self, row: sqlite3.Row) -> None:
+        self.raw = dict(row)
+        self.id = row["id"]
+        self.type = row["type"]
+        self.subtype = row["subtype"]
+        self.start = parse_ts(row["started_at"])
+        self.end = parse_ts(row["ended_at"])
+        self.amount = row["amount_value"]
+        self.unit = row["amount_unit"]
+        self.side = row["side"]
+        self.notes = row["notes"]
+        self.paused = paused_seconds(row["payload_json"])
+
+
+def paused_seconds(payload: Optional[str]) -> int:
+    if not payload:
+        return 0
+    try:
+        value = json.loads(payload).get("paused_seconds", 0)
+    except (ValueError, AttributeError):
+        return 0
+    return max(int(value), 0) if isinstance(value, (int, float)) and not isinstance(value, bool) else 0
+
+
+def list_children(conn: sqlite3.Connection) -> List[sqlite3.Row]:
+    return list(conn.execute("SELECT id, name, birthdate, sex, created_at FROM children ORDER BY created_at"))
+
+
+def pick_child(conn: sqlite3.Connection, wanted: Optional[str]) -> sqlite3.Row:
+    kids = list_children(conn)
+    if not kids:
+        raise UserError("no children in this database yet")
+    if wanted:
+        hits = [k for k in kids if k["id"] == wanted or k["name"].lower() == wanted.lower()]
+        if len(hits) == 1:
+            return hits[0]
+        raise UserError(f"no single child matches {wanted!r}; children: "
+                        + ", ".join(f"{k['name']} ({k['id']})" for k in kids))
+    if len(kids) > 1:
+        raise UserError("several children; pass --child NAME|ID: "
+                        + ", ".join(f"{k['name']} ({k['id']})" for k in kids))
+    return kids[0]
+
+
+def load_events(conn: sqlite3.Connection, child_id: str) -> List[Event]:
+    rows = conn.execute(
+        "SELECT * FROM events WHERE child_id = ? AND deleted_at IS NULL ORDER BY started_at",
+        (child_id,),
+    )
+    return [e for e in (Event(r) for r in rows) if e.start is not None]
+
+
+# --------------------------------------------------------------------------- math
+
+
+def timed_secs(e: Event) -> float:
+    """Whole duration minus pauses; 0 when open-ended (server: timed_event_secs)."""
+    if e.start is None or e.end is None:
+        return 0.0
+    return float(max(int((e.end - e.start).total_seconds()) - e.paused, 0))
+
+
+def clipped_active_secs(e: Event, frm: dt.datetime, to: dt.datetime) -> float:
+    """Active seconds of a finished event inside [frm, to); pauses scaled by the clipped share
+    (server: clipped_active_secs)."""
+    if e.start is None or e.end is None or e.end <= e.start:
+        return 0.0
+    clip_start, clip_end = max(e.start, frm), min(e.end, to)
+    if clip_end <= clip_start:
+        return 0.0
+    wall = float(int((e.end - e.start).total_seconds()))
+    clipped = float(int((clip_end - clip_start).total_seconds()))
+    if wall <= 0:
+        return 0.0
+    return clipped * max(wall - e.paused, 0.0) / wall
+
+
+def overlapping(events: List[Event], etype: str, subtype: Optional[str],
+                frm: dt.datetime, to: dt.datetime) -> List[Event]:
+    return [e for e in events
+            if e.type == etype and (subtype is None or e.subtype == subtype)
+            and e.end is not None and e.start is not None
+            and e.start < to and e.end > frm and e.end > e.start]
+
+
+def r2(x: float) -> float:
+    return round(x * 100.0) / 100.0
+
+
+def summarize(events: List[Event], frm: dt.datetime, to: dt.datetime) -> Dict[str, Any]:
+    """Same fields and rules as GET /summary/daily (server/src/routes/summary.rs)."""
+    s: Dict[str, Any] = dict(
+        feed_breast_count=0, feed_breast_left=0, feed_breast_right=0, feed_bottle_count=0,
+        bottle_oz_total=0.0, bottle_ml_total=0.0, feed_solid_count=0, feed_seconds=0.0,
+        diaper_wet=0, diaper_dirty=0, diaper_both=0, diaper_other=0, sleep_event_count=0,
+        pump_count=0, medicine_count=0, total_events=0,
+    )
+    for e in events:
+        if not (frm <= e.start < to):
+            continue
+        s["total_events"] += 1
+        if e.type == "feed_breast":
+            s["feed_breast_count"] += 1
+            if e.side in ("L", "l", "left"):
+                s["feed_breast_left"] += 1
+            elif e.side in ("R", "r", "right"):
+                s["feed_breast_right"] += 1
+            s["feed_seconds"] += timed_secs(e)
+        elif e.type == "feed_bottle":
+            s["feed_bottle_count"] += 1
+            if e.amount is not None:
+                if (e.unit or "oz").lower() == "ml":
+                    s["bottle_ml_total"] += e.amount
+                else:
+                    s["bottle_oz_total"] += e.amount
+            s["feed_seconds"] += timed_secs(e)
+        elif e.type == "feed_solid":
+            s["feed_solid_count"] += 1
+            s["feed_seconds"] += timed_secs(e)
+        elif e.type == "diaper":
+            kind = (e.subtype or "").lower()
+            if kind == "wet":
+                s["diaper_wet"] += 1
+            elif kind in ("dirty", "poop", "bm"):
+                s["diaper_dirty"] += 1
+            elif kind in ("both", "mixed"):
+                s["diaper_both"] += 1
+            else:
+                s["diaper_other"] += 1
+        elif e.type == "pump":
+            s["pump_count"] += 1
+        elif e.type == "medicine":
+            s["medicine_count"] += 1
+    sleep_secs = 0.0
+    for e in overlapping(events, "sleep", None, frm, to):
+        if e.start < frm:
+            s["total_events"] += 1
+        s["sleep_event_count"] += 1
+        sleep_secs += clipped_active_secs(e, frm, to)
+
+    def clipped_total(etype: str, sub: Optional[str]) -> float:
+        return sum(clipped_active_secs(e, frm, to) for e in overlapping(events, etype, sub, frm, to))
+
+    oz_equiv = s["bottle_oz_total"] + s["bottle_ml_total"] / OZ_TO_ML
+    s.update(
+        bottle_oz_total=r2(s["bottle_oz_total"]), bottle_ml_total=r2(s["bottle_ml_total"]),
+        bottle_oz_equiv=r2(oz_equiv), feed_seconds=r2(s["feed_seconds"]),
+        nursing_seconds=r2(clipped_total("feed_breast", None)),
+        crying_seconds=r2(clipped_total("activity", "crying")),
+        sleep_hours=r2(sleep_secs / 3600.0),
+        # Not in /summary/daily; same clipping rules.
+        walk_seconds=r2(clipped_total("activity", "walk")),
+        car_ride_seconds=r2(clipped_total("activity", "car_ride")),
+    )
+    return s
+
+
+# --------------------------------------------------------------------------- commands
+
+
+class Ctx:
+    def __init__(self, args: argparse.Namespace) -> None:
+        self.args = args
+        self.db_path = resolve_db_path(args.db)
+        self.conn = open_readonly(self.db_path)
+        self.tz, self.tz_name = resolve_tz(args.tz)
+        if args.now:
+            now = parse_ts(args.now)
+            if now is None:
+                raise UserError(f"--now must be RFC 3339, got {args.now!r}")
+            self.now = now
+        else:
+            self.now = dt.datetime.now(UTC)
+        self.today = self.now.astimezone(self.tz).date()
+        self._child: Optional[sqlite3.Row] = None
+        self._events: Optional[List[Event]] = None
+
+    @property
+    def child(self) -> sqlite3.Row:
+        if self._child is None:
+            self._child = pick_child(self.conn, self.args.child)
+        return self._child
+
+    @property
+    def events(self) -> List[Event]:
+        if self._events is None:
+            events = load_events(self.conn, self.child["id"])
+            # With --now, answer "as of" that moment: ignore anything logged later.
+            self._events = [e for e in events if e.start <= self.now] if self.args.now else events
+        return self._events
+
+    def days(self) -> List[dt.date]:
+        a = self.args
+        if getattr(a, "start", None) or getattr(a, "end", None):
+            first = parse_date(a.start) if a.start else self.today - dt.timedelta(days=a.days - 1)
+            last = parse_date(a.end) if a.end else self.today
+        else:
+            last = self.today
+            first = last - dt.timedelta(days=a.days - 1)
+        if last < first:
+            raise UserError("--end is before --start")
+        if (last - first).days > 366:
+            raise UserError("range longer than a year; use export-csv for bulk data")
+        return [first + dt.timedelta(days=i) for i in range((last - first).days + 1)]
+
+    def header(self) -> Dict[str, Any]:
+        return {"child": self.child["name"], "tz": self.tz_name}
+
+
+def parse_date(raw: str) -> dt.date:
+    try:
+        return dt.date.fromisoformat(raw)
+    except ValueError as e:
+        raise UserError(f"dates are YYYY-MM-DD, got {raw!r}") from e
+
+
+def emit(ctx: Ctx, data: Any, text: str) -> None:
+    if ctx.args.json:
+        print(json.dumps(data, indent=2, default=str))
+    else:
+        print(text)
+
+
+def event_dict(e: Event, ctx: Ctx) -> Dict[str, Any]:
+    d = {k: e.raw[k] for k in ("id", "type", "subtype", "started_at", "ended_at", "amount_value",
+                               "amount_unit", "side", "notes")}
+    d["started_local"] = e.start.astimezone(ctx.tz).isoformat() if e.start else None
+    d["ended_local"] = e.end.astimezone(ctx.tz).isoformat() if e.end else None
+    d["active_seconds"] = timed_secs(e) if e.end else None
+    d["paused_seconds"] = e.paused
+    return d
+
+
+def describe(e: Event) -> str:
+    bits = [e.type + (f"/{e.subtype}" if e.subtype else "")]
+    if e.side:
+        bits.append(f"side {e.side}")
+    if e.amount is not None:
+        bits.append(f"{e.amount:g} {e.unit or ''}".strip())
+    if e.end:
+        bits.append(fmt_duration(timed_secs(e)) + (f" (paused {fmt_duration(e.paused)})" if e.paused else ""))
+    elif e.type in ("sleep", "feed_breast", "activity"):
+        bits.append("no end time (counts as 0)")
+    return ", ".join(bits)
+
+
+def cmd_info(ctx: Ctx) -> None:
+    kids = list_children(ctx.conn)
+    counts = []
+    for k in kids:
+        row = ctx.conn.execute(
+            "SELECT COUNT(*), MIN(started_at), MAX(started_at) FROM events "
+            "WHERE child_id = ? AND deleted_at IS NULL", (k["id"],)).fetchone()
+        active = ctx.conn.execute(
+            "SELECT COUNT(*) FROM timers WHERE child_id = ? AND state IN ('running','paused')",
+            (k["id"],)).fetchone()[0]
+        counts.append({"id": k["id"], "name": k["name"], "birthdate": k["birthdate"],
+                       "events": row[0], "first": row[1], "last": row[2], "active_timers": active})
+    data = {"db": ctx.db_path, "tz": ctx.tz_name, "read_only": True, "children": counts}
+    lines = [f"db: {ctx.db_path} (read-only)", f"tz: {ctx.tz_name}"]
+    for c in counts:
+        first = fmt_local(parse_ts(c["first"]), ctx.tz) if c["first"] else "-"
+        last = fmt_local(parse_ts(c["last"]), ctx.tz) if c["last"] else "-"
+        lines.append(f"child: {c['name']} (born {c['birthdate'] or '?'}) id={c['id']}")
+        lines.append(f"  {c['events']} events, {first} -> {last}; {c['active_timers']} active timer(s)")
+    emit(ctx, data, "\n".join(lines))
+
+
+def cmd_children(ctx: Ctx) -> None:
+    kids = [dict(k) for k in list_children(ctx.conn)]
+    emit(ctx, kids, "\n".join(f"{k['name']}\t{k['birthdate'] or '-'}\t{k['id']}" for k in kids) or "(none)")
+
+
+def cmd_last_feed(ctx: Ctx) -> None:
+    feeds = [e for e in ctx.events if e.type in FEED_TYPES]
+    if not feeds:
+        emit(ctx, {**ctx.header(), "last_feed": None}, f"{ctx.child['name']}: no feeds logged yet")
+        return
+    last = max(feeds, key=lambda e: e.start)
+    # The app's "since last feed" counts from the feed's START (HomeGlance).
+    since = (ctx.now - last.start).total_seconds()
+    data = {**ctx.header(), "last_feed": event_dict(last, ctx), "seconds_since_start": int(since)}
+    text = (f"{ctx.child['name']}: last feed {fmt_local(last.start, ctx.tz)} ({ctx.tz_name}): "
+            f"{describe(last)}\n{fmt_duration(since)} since it started")
+    if last.end:
+        data["seconds_since_end"] = int((ctx.now - last.end).total_seconds())
+        text += f", {fmt_duration(data['seconds_since_end'])} since it ended"
+    emit(ctx, data, text)
+
+
+def cmd_timers(ctx: Ctx) -> None:
+    rows = ctx.conn.execute(
+        "SELECT * FROM timers WHERE child_id = ? AND state IN ('running','paused') ORDER BY started_at",
+        (ctx.child["id"],))
+    out = []
+    for r in rows:
+        start = parse_ts(r["started_at"])
+        paused = int(r["paused_seconds"] or 0)
+        open_pause = 0
+        if r["state"] == "paused" and r["paused_at"]:
+            pa = parse_ts(r["paused_at"])
+            open_pause = max(int((ctx.now - pa).total_seconds()), 0) if pa else 0
+        elapsed = max(int((ctx.now - start).total_seconds()) - paused - open_pause, 0) if start else 0
+        out.append({"id": r["id"], "kind": r["kind"], "state": r["state"], "side": r["side"],
+                    "started_at": r["started_at"], "active_seconds": elapsed,
+                    "paused_seconds": paused + open_pause})
+    text = "\n".join(
+        f"{t['kind']}{' ' + t['side'] if t['side'] else ''}: {t['state']}, "
+        f"{fmt_duration(t['active_seconds'])} active since {fmt_local(parse_ts(t['started_at']), ctx.tz)}"
+        + (f" (paused {fmt_duration(t['paused_seconds'])})" if t["paused_seconds"] else "")
+        for t in out) or f"{ctx.child['name']}: no timers running"
+    emit(ctx, {**ctx.header(), "timers": out}, text)
+
+
+def day_summary(ctx: Ctx, day: dt.date) -> Dict[str, Any]:
+    frm, to = day_bounds(day, ctx.tz)
+    s = summarize(ctx.events, frm, to)
+    return {"day": day.isoformat(), "from": frm.isoformat(), "to": to.isoformat(), **s}
+
+
+def cmd_day(ctx: Ctx) -> None:
+    day = parse_date(ctx.args.date) if getattr(ctx.args, "date", None) else ctx.today
+    s = day_summary(ctx, day)
+    partial = " (so far)" if day == ctx.today else ""
+    lines = [
+        f"{ctx.child['name']}, {day:%a %b %d %Y}{partial} [{ctx.tz_name} midnight to midnight]",
+        f"feeds:   {s['feed_breast_count']} nursing (L {s['feed_breast_left']}, R {s['feed_breast_right']}, "
+        f"{fmt_duration(s['nursing_seconds'])}), {s['feed_bottle_count']} bottle ({s['bottle_oz_equiv']:g} oz), "
+        f"{s['feed_solid_count']} solid",
+        f"sleep:   {s['sleep_hours']:g} h across {s['sleep_event_count']} sleep(s)",
+        f"diapers: {s['diaper_wet']} wet, {s['diaper_dirty']} dirty, {s['diaper_both']} both"
+        + (f", {s['diaper_other']} other" if s["diaper_other"] else ""),
+        f"crying:  {fmt_duration(s['crying_seconds'])}; walks {fmt_duration(s['walk_seconds'])}; "
+        f"car rides {fmt_duration(s['car_ride_seconds'])}",
+        f"other:   {s['pump_count']} pump, {s['medicine_count']} medicine; {s['total_events']} events total",
+    ]
+    emit(ctx, {**ctx.header(), **s}, "\n".join(lines))
+
+
+def table(rows: List[List[str]]) -> str:
+    widths = [max(len(r[i]) for r in rows) for i in range(len(rows[0]))]
+    return "\n".join("  ".join(c.rjust(w) if i else c.ljust(w) for i, (c, w) in enumerate(zip(r, widths)))
+                     for r in rows)
+
+
+def range_report(ctx: Ctx, title: str, cols: List[Tuple[str, Any]]) -> None:
+    days = [day_summary(ctx, d) for d in ctx.days()]
+    rows = [["day"] + [c[0] for c in cols]]
+    for s in days:
+        label = dt.date.fromisoformat(s["day"]).strftime("%a %m-%d") + ("*" if s["day"] == ctx.today.isoformat() else "")
+        rows.append([label] + [c[1](s) for c in cols])
+    note = "\n* today so far" if any(s["day"] == ctx.today.isoformat() for s in days) else ""
+    emit(ctx, {**ctx.header(), "days": days},
+         f"{ctx.child['name']}: {title} [{ctx.tz_name}]\n" + table(rows) + note)
+
+
+def cmd_sleep(ctx: Ctx) -> None:
+    range_report(ctx, "sleep by day", [
+        ("hours", lambda s: f"{s['sleep_hours']:.2f}"),
+        ("sleeps", lambda s: str(s["sleep_event_count"])),
+    ])
+
+
+def cmd_diapers(ctx: Ctx) -> None:
+    range_report(ctx, "diapers by day", [
+        ("wet", lambda s: str(s["diaper_wet"])),
+        ("dirty", lambda s: str(s["diaper_dirty"])),
+        ("both", lambda s: str(s["diaper_both"])),
+        ("other", lambda s: str(s["diaper_other"])),
+        ("total", lambda s: str(s["diaper_wet"] + s["diaper_dirty"] + s["diaper_both"] + s["diaper_other"])),
+    ])
+
+
+def cmd_feeds(ctx: Ctx) -> None:
+    range_report(ctx, "feeds by day", [
+        ("nursing", lambda s: str(s["feed_breast_count"])),
+        ("L/R", lambda s: f"{s['feed_breast_left']}/{s['feed_breast_right']}"),
+        ("nurse min", lambda s: f"{s['nursing_seconds'] / 60:.0f}"),
+        ("bottles", lambda s: str(s["feed_bottle_count"])),
+        ("oz", lambda s: f"{s['bottle_oz_equiv']:g}"),
+        ("solids", lambda s: str(s["feed_solid_count"])),
+        ("feeds", lambda s: str(s["feed_breast_count"] + s["feed_bottle_count"] + s["feed_solid_count"])),
+    ])
+
+
+def cmd_crying(ctx: Ctx) -> None:
+    range_report(ctx, "crying by day", [
+        ("minutes", lambda s: f"{s['crying_seconds'] / 60:.0f}"),
+    ])
+
+
+def cmd_events(ctx: Ctx) -> None:
+    day = parse_date(ctx.args.date) if ctx.args.date else ctx.today
+    frm, to = day_bounds(day, ctx.tz)
+    picked = [e for e in ctx.events if frm <= e.start < to and (not ctx.args.type or e.type == ctx.args.type)]
+    text = "\n".join(f"{e.start.astimezone(ctx.tz):%I:%M %p}  {describe(e)}" + (f"  \"{e.notes}\"" if e.notes else "")
+                     for e in picked) or f"no events on {day}"
+    emit(ctx, {**ctx.header(), "day": day.isoformat(), "events": [event_dict(e, ctx) for e in picked]}, text)
+
+
+CSV_COLUMNS = ["id", "child_id", "type", "subtype", "started_at", "ended_at", "amount_value",
+               "amount_unit", "side", "notes", "created_by", "created_at"]
+
+
+def cmd_export_csv(ctx: Ctx) -> None:
+    """Same columns as GET /export.csv, plus started_local and active_seconds."""
+    a = ctx.args
+    frm = day_bounds(parse_date(a.start), ctx.tz)[0] if a.start else None
+    to = day_bounds(parse_date(a.end), ctx.tz)[1] if a.end else None
+    kids = [ctx.child] if a.child or len(list_children(ctx.conn)) == 1 else list_children(ctx.conn)
+    out = open(a.out, "w", newline="") if a.out and a.out != "-" else sys.stdout
+    try:
+        w = csv.writer(out)
+        w.writerow(CSV_COLUMNS + ["started_local", "active_seconds"])
+        n = 0
+        for k in kids:
+            for e in load_events(ctx.conn, k["id"]):
+                if (frm and e.start < frm) or (to and e.start >= to):
+                    continue
+                w.writerow([e.raw[c] if e.raw[c] is not None else "" for c in CSV_COLUMNS]
+                           + [e.start.astimezone(ctx.tz).isoformat(), int(timed_secs(e)) if e.end else ""])
+                n += 1
+    finally:
+        if out is not sys.stdout:
+            out.close()
+    if out is not sys.stdout:
+        print(f"wrote {n} events to {a.out}", file=sys.stderr)
+
+
+def cmd_sql(ctx: Ctx) -> None:
+    try:
+        cur = ctx.conn.execute(ctx.args.query)
+        rows = cur.fetchall()
+    except sqlite3.DatabaseError as e:
+        msg = str(e)
+        if any(w in msg for w in ("not authorized", "authorization denied", "readonly", "read-only")):
+            raise UserError(f"refused: benito-query is read-only ({msg})") from e
+        raise UserError(f"sql error: {msg}") from e
+    cols = [d[0] for d in cur.description or []]
+    if ctx.args.json:
+        print(json.dumps([dict(zip(cols, r)) for r in rows], indent=2, default=str))
+        return
+    w = csv.writer(sys.stdout, delimiter="\t", lineterminator="\n")
+    w.writerow(cols)
+    w.writerows(rows)
+
+
+# --------------------------------------------------------------------------- cli
+
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        prog="benito-query",
+        description="Read-only answers from a Benito server database (never writes).",
+        epilog="Database: --db, else $BENITO_DB, else ~/Library/Application Support/Benito/benito.db.",
+    )
+    p.add_argument("--db", help="path to benito.db (or a backup copy)")
+    p.add_argument("--tz", help="IANA zone for day boundaries, e.g. America/Los_Angeles "
+                                "(default: $BENITO_TZ, $TZ, then the system zone)")
+    p.add_argument("--child", help="child name or id (needed only with several children)")
+    p.add_argument("--now", help="pretend it is this RFC 3339 time (for tests and 'as of' answers)")
+    p.add_argument("--json", action="store_true", help="machine-readable output")
+    sub = p.add_subparsers(dest="command", metavar="COMMAND")
+    sub.required = True
+
+    def add(name: str, fn: Any, help_: str) -> argparse.ArgumentParser:
+        sp = sub.add_parser(name, help=help_, description=help_)
+        sp.set_defaults(fn=fn)
+        return sp
+
+    def add_range(sp: argparse.ArgumentParser) -> None:
+        sp.add_argument("--days", type=int, default=7, help="days ending today (default 7)")
+        sp.add_argument("--start", help="first local day YYYY-MM-DD")
+        sp.add_argument("--end", help="last local day YYYY-MM-DD (default today)")
+
+    add("info", cmd_info, "database, time zone, children, event counts")
+    add("children", cmd_children, "list children")
+    add("last-feed", cmd_last_feed, "most recent feed and the time since it started")
+    add("timers", cmd_timers, "timers running or paused right now, minus paused time")
+    sp = add("today", cmd_day, "today's totals, computed like the app's summary")
+    sp.set_defaults(date=None)
+    sp = add("day", cmd_day, "one local day's totals")
+    sp.add_argument("date", help="YYYY-MM-DD")
+    for name, fn, h in (("sleep", cmd_sleep, "sleep hours per day"),
+                        ("diapers", cmd_diapers, "diaper counts per day"),
+                        ("feeds", cmd_feeds, "feeding per day (trend over a week by default)"),
+                        ("crying", cmd_crying, "crying minutes per day")):
+        add_range(add(name, fn, h))
+    sp = add("events", cmd_events, "one day's events in order")
+    sp.add_argument("--date", help="YYYY-MM-DD (default today)")
+    sp.add_argument("--type", help="only this event type, e.g. diaper")
+    sp = add("export-csv", cmd_export_csv, "events as CSV (same columns as the server's /export.csv)")
+    sp.add_argument("--start", help="first local day YYYY-MM-DD")
+    sp.add_argument("--end", help="last local day YYYY-MM-DD")
+    sp.add_argument("--out", help="file to write (default stdout)")
+    sp = add("sql", cmd_sql, "run one read-only SELECT; anything that writes is refused")
+    sp.add_argument("query")
+    return p
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    args = build_parser().parse_args(argv)
+    try:
+        ctx = Ctx(args)
+        args.fn(ctx)
+    except UserError as e:
+        print(f"benito-query: {e}", file=sys.stderr)
+        return 2
+    except BrokenPipeError:
+        return 0
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
