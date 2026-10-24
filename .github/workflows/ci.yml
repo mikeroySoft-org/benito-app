@@ -26,6 +26,17 @@ jobs:
         env:
           BENITO_BONJOUR: "0"
         run: cargo test --locked
+      - name: agent skill helper (fixture DB)
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: python3 skills/benito/tests/test_benito_query.py
+      - name: agent skill helper vs live scratch server
+        env:
+          BENITO_BONJOUR: "0"
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          (cd server && cargo build --locked)
+          python3 skills/benito/tests/test_benito_query.py --server server/target/debug/benito-server
 
   apple:
     runs-on: macos-15

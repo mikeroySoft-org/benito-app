@@ -61,3 +61,6 @@ apps/Benito/Config/Local.xcconfig
 
 # Written by the "Embed Git SHA" pre-build script
 apps/Benito/Sources/Generated/GitSHA.swift
+
+# Python bytecode (skills/benito helper and tests)
+__pycache__/
