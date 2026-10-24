@@ -36,19 +36,110 @@
     </div>
     <p class="hero__note" style="--i:3">Free and open source, for iPhone, iPad and Apple Watch. Not on the App Store yet, so for now you build it from source.</p>
   </div>
-  <div class="hero__visual">
-    <figure class="screen screen--phone" data-kind="product" style="--i:1">
-      <picture><source media="(prefers-color-scheme: dark)" srcset="assets/shots/home-dark-480.webp 480w, assets/shots/home-dark-800.webp 800w" sizes="(min-width: 60rem) 320px, (min-width: 40rem) 280px, 220px"><img src="assets/shots/home-light-800.webp" srcset="assets/shots/home-light-480.webp 480w, assets/shots/home-light-800.webp 800w" sizes="(min-width: 60rem) 320px, (min-width: 40rem) 280px, 220px" width="1206" height="2622" alt="Benito’s home screen: 1h 42m since the last feed, from the left side, with today’s feeds, diapers and sleep below" fetchpriority="high"></picture>
-    </figure>
-    <figure class="live hero__live" data-slot="live-activity" data-alt="Benito Live Activity on the Lock Screen" data-timer="447" style="--i:3">
-      <div class="live__card" data-keep>
-        <img class="live__icon" src="assets/icon-128.webp" width="128" height="128" alt="">
-        <p class="live__what"><b>Feeding <span class="live__side" aria-label="left side">L</span></b><span>Started 1:56 PM</span></p>
-        <p class="live__time" aria-live="off"><span data-timer-value>07:27</span></p>
+  <div class="hero__visual" style="--i:1">
+    <figure class="demo" aria-labelledby="demo-cap">
+      <figcaption id="demo-cap" class="demo__cap"><b>Try it.</b> A working copy of the app with sample data.</figcaption>
+      <div class="demo__fit">
+      <div class="demo__phone">
+      <div class="app" data-demo>
+        <svg class="app__defs" aria-hidden="true" focusable="false"><defs>
+          <symbol id="i-drop" viewBox="0 0 24 24"><path d="M12 2.5c-.4 0-.8.3-1.1.8C8.6 7 5.5 11.2 5.5 15a6.5 6.5 0 0 0 13 0c0-3.8-3.1-8-5.4-11.7-.3-.5-.7-.8-1.1-.8Z"/></symbol>
+          <symbol id="i-diaper" viewBox="0 0 24 24"><circle cx="12" cy="5.6" r="3.6"/><circle cx="5.6" cy="12" r="3.6"/><circle cx="18.4" cy="12" r="3.6"/><circle cx="12" cy="18.4" r="3.6"/></symbol>
+          <symbol id="i-moon" viewBox="0 0 24 24"><path d="M14.5 2.6A9.6 9.6 0 1 0 21.4 15a7.8 7.8 0 0 1-6.9-12.4Z"/></symbol>
+          <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.6v14.8c0 .9 1 1.4 1.7.9l11.2-7.4c.6-.4.6-1.4 0-1.8L8.7 3.7C8 3.2 7 3.7 7 4.6Z"/></symbol>
+          <symbol id="i-pause" viewBox="0 0 24 24"><rect x="5.5" y="4" width="4.6" height="16" rx="1.4"/><rect x="13.9" y="4" width="4.6" height="16" rx="1.4"/></symbol>
+          <symbol id="i-stop" viewBox="0 0 24 24"><rect x="4.5" y="4.5" width="15" height="15" rx="2.6"/></symbol>
+          <symbol id="i-down" viewBox="0 0 24 24"><path d="m5 9 7 7 7-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+          <symbol id="i-up" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+        </defs></svg>
+        <div class="app__status" aria-hidden="true">
+          <span data-d="clock">9:41</span><span class="app__island"></span>
+          <svg viewBox="0 0 64 16"><rect x="0" y="9" width="3.4" height="5" rx="1"/><rect x="5" y="6.5" width="3.4" height="7.5" rx="1"/><rect x="10" y="4" width="3.4" height="10" rx="1"/><rect x="15" y="1.5" width="3.4" height="12.5" rx="1"/><path d="M30 13.6 26.5 10a5 5 0 0 1 7 0Zm-6.2-6.3-1.6-1.6a11 11 0 0 1 15.6 0l-1.6 1.6a8.7 8.7 0 0 0-12.4 0Z"/><rect class="app__batt" x="42" y="2" width="19" height="11" rx="3.2"/><rect x="62" y="5.5" width="1.6" height="4" rx=".8"/></svg>
+        </div>
+        <div class="app__home" data-d="home">
+          <p class="app__title">Benito</p>
+          <div class="app__pills"><span class="app__pill">Demo</span><span class="app__state" data-d="state">Awake</span></div>
+          <div class="app__card app__last">
+            <p class="app__k">Since last feed</p>
+            <p class="app__big num" data-d="since">1h 49m</p>
+            <p class="app__badges"><span class="app__badge" data-d="lastkind" data-kind="bottle">Bottle</span><span class="app__amt" data-d="lastamt">3.5 oz</span></p>
+          </div>
+          <div class="app__pair">
+            <div class="app__card app__mini"><p class="app__h">Diaper</p><p class="app__val num" data-d="diaperago">1h 24m</p><p class="app__sub app__sub--diaper" data-d="diaperkind">Both</p></div>
+            <div class="app__card app__mini"><p class="app__h" data-d="awakeh">Awake</p><p class="app__val num" data-d="awake">2h 14m</p><p class="app__sub app__sub--sleep" data-d="awakesub">Since last wake</p></div>
+          </div>
+          <div class="app__card app__sum">
+            <p class="app__since">Since 12 AM</p>
+            <dl class="app__stats">
+              <div class="app__stat app__stat--feed"><dt>Feeds</dt><dd class="num" data-d="feeds">6</dd></div>
+              <div class="app__stat app__stat--diaper"><dt>Diapers</dt><dd class="num" data-d="diapers">4</dd></div>
+              <div class="app__stat app__stat--sleep"><dt>Sleep</dt><dd class="num" data-d="sleep">7h 40m</dd></div>
+            </dl>
+            <p class="app__fed"><svg aria-hidden="true"><use href="#i-drop"/></svg><b>Fed</b> <span data-d="fed">1h 9m nursing · 6.5 oz bottle</span></p>
+          </div>
+        </div>
+        <div class="app__bar" data-d="bar" data-kind="feed" hidden>
+          <span class="app__baricon" aria-hidden="true"><svg><use href="#i-drop" data-d="baruse"/></svg></span>
+          <button class="app__barmain" type="button" data-act="open" aria-label="Open the timer">
+            <span class="app__barlabel" data-d="barlabel">Nursing: Left</span>
+            <span class="app__bartime num" data-d="bartime">00:00</span>
+            <svg aria-hidden="true"><use href="#i-up"/></svg>
+          </button>
+          <button class="app__round" type="button" data-act="pause" data-d="pausebtn" aria-label="Pause"><svg aria-hidden="true"><use href="#i-pause" data-d="pauseuse"/></svg></button>
+          <button class="app__round app__round--stop" type="button" data-act="stop" aria-label="Stop and save"><svg aria-hidden="true"><use href="#i-stop"/></svg></button>
+        </div>
+        <div class="app__quick" data-d="quick">
+          <button type="button" class="app__q app__q--feed" data-act="feed" aria-label="Log a feed"><svg aria-hidden="true"><use href="#i-drop"/></svg><span>Feed</span><small data-d="feedsub">Bottle · 1h 49m ago</small></button>
+          <button type="button" class="app__q" data-act="diaper" aria-label="Log a diaper"><svg aria-hidden="true"><use href="#i-diaper"/></svg><span>Diaper</span></button>
+          <button type="button" class="app__q" data-act="sleep" aria-label="Start sleep" data-d="sleepq"><svg aria-hidden="true"><use href="#i-moon"/></svg><span>Sleep</span></button>
+        </div>
+        <div class="app__tabs" aria-hidden="true">
+          <span class="is-on"><svg viewBox="0 0 24 24"><path d="M12 3.2 2.8 11h2.6v9h5v-5.6h3.2V20h5v-9h2.6Z"/></svg>Home</span>
+          <span><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 7.5v9M7.5 12h9" stroke="var(--app-tabs)" stroke-width="2.2" stroke-linecap="round"/></svg>Log</span>
+          <span><svg viewBox="0 0 24 24"><circle cx="4.5" cy="6" r="1.5"/><circle cx="4.5" cy="12" r="1.5"/><circle cx="4.5" cy="18" r="1.5"/><rect x="8" y="5" width="13" height="2" rx="1"/><rect x="8" y="11" width="13" height="2" rx="1"/><rect x="8" y="17" width="13" height="2" rx="1"/></svg>Timeline</span>
+          <span><svg viewBox="0 0 24 24"><path d="M12 2.5a9.5 9.5 0 1 0 0 19 9.5 9.5 0 0 0 0-19Zm0 3.8a3.5 3.5 0 1 1 0 7 3.5 3.5 0 0 1 0-7Zm0 13.2a7.4 7.4 0 0 1-5.6-2.6c.7-1.6 3-2.6 5.6-2.6s4.9 1 5.6 2.6a7.4 7.4 0 0 1-5.6 2.6Z"/></svg>Account</span>
+        </div>
+        <div class="app__scrim" data-d="scrim" data-act="close"></div>
+        <section class="app__sheet" data-sheet="feed" role="dialog" aria-labelledby="dm-feed" hidden>
+          <div class="app__shead"><button class="app__close" type="button" data-act="close" aria-label="Close"><svg aria-hidden="true"><use href="#i-down"/></svg></button><h2 id="dm-feed">Feeding</h2></div>
+          <div class="app__seg" role="group" aria-label="Feed type"><button type="button" data-act="mode" data-mode="nursing" aria-pressed="true">Nursing</button><button type="button" data-act="mode" data-mode="bottle" aria-pressed="false">Bottle</button></div>
+          <div data-d="nursing">
+            <p class="app__start" data-d="fstartrow" hidden><span>Start Time</span><span class="app__link" data-d="fstart">Today</span></p>
+            <p class="app__hms num" aria-hidden="true"><span data-d="fh">00</span><i>:</i><span data-d="fm">00</span><i>:</i><span data-d="fs">00</span></p>
+            <p class="app__hmsl" aria-hidden="true"><span>Hours</span><span>Min</span><span>Sec</span></p>
+            <div class="app__sides">
+              <div><button class="app__side" type="button" data-act="side" data-side="L" aria-label="Start left side"><svg aria-hidden="true"><use href="#i-play"/></svg><span class="num" data-d="tL">00:00</span></button><span aria-hidden="true">L</span></div>
+              <div><button class="app__side" type="button" data-act="side" data-side="R" aria-label="Start right side"><svg aria-hidden="true"><use href="#i-play"/></svg><span class="num" data-d="tR">00:00</span></button><span aria-hidden="true">R</span></div>
+            </div>
+            <button class="app__save" type="button" data-act="stop" data-d="fsave" hidden>Stop and save</button>
+          </div>
+          <div class="app__bottle" data-d="bottle" hidden>
+            <p class="app__k">Amount</p>
+            <div class="app__chips" role="group" aria-label="Amount"><button type="button" data-act="oz" data-oz="2" aria-pressed="false">2 oz</button><button type="button" data-act="oz" data-oz="3" aria-pressed="false">3 oz</button><button type="button" data-act="oz" data-oz="4" aria-pressed="true">4 oz</button><button type="button" data-act="oz" data-oz="5" aria-pressed="false">5 oz</button></div>
+            <button class="app__save" type="button" data-act="bottle">Save bottle</button>
+          </div>
+        </section>
+        <section class="app__sheet" data-sheet="diaper" role="dialog" aria-labelledby="dm-diaper" hidden>
+          <div class="app__shead"><button class="app__close" type="button" data-act="close" aria-label="Close"><svg aria-hidden="true"><use href="#i-down"/></svg></button><h2 id="dm-diaper">Diaper</h2></div>
+          <div class="app__when">
+            <p class="app__k"><span>When</span><span data-d="whenlbl">Now</span></p>
+            <div class="app__chips" role="group" aria-label="When"><button type="button" data-act="when" data-ago="0" aria-pressed="true">Now</button><button type="button" data-act="when" data-ago="15" aria-pressed="false">15m ago</button><button type="button" data-act="when" data-ago="30" aria-pressed="false">30m ago</button><button type="button" data-act="when" data-ago="60" aria-pressed="false">1h ago</button></div>
+          </div>
+          <div class="app__rows"><button type="button" data-act="nappy" data-kind="Wet">Wet</button><button type="button" data-act="nappy" data-kind="Dirty">Dirty</button><button type="button" data-act="nappy" data-kind="Both">Both</button></div>
+        </section>
+        <section class="app__sheet" data-sheet="sleep" role="dialog" aria-labelledby="dm-sleep" hidden>
+          <div class="app__shead"><button class="app__close" type="button" data-act="close" aria-label="Close"><svg aria-hidden="true"><use href="#i-down"/></svg></button><h2 id="dm-sleep">Timer</h2></div>
+          <div class="app__sleepcard">
+            <span class="app__badge" data-kind="sleep">Sleep</span>
+            <p class="app__sleeptime num" data-d="stime">00:00</p>
+            <p class="app__start"><span>Start Time</span><span class="app__link" data-d="sstart">Today</span></p>
+            <p class="app__note">Shared sleep timer</p>
+          </div>
+          <div class="app__sleepbar"><button type="button" data-act="pause" data-d="spause"><svg aria-hidden="true"><use href="#i-pause" data-d="spauseuse"/></svg><span data-d="spauselbl">Pause</span></button><button type="button" data-act="stop"><svg aria-hidden="true"><use href="#i-stop"/></svg><span>Stop</span></button></div>
+        </section>
+        <p class="visually-hidden" aria-live="polite" data-d="live"></p>
       </div>
-      <div class="live__foot" data-keep>
-        <figcaption>A Live Activity, drawn here as a sample. The real one sits on the Lock Screen and in the Dynamic Island.</figcaption>
-        <button class="live__toggle" type="button" data-timer-toggle aria-pressed="false">Pause</button>
+      </div>
       </div>
     </figure>
   </div>
@@ -183,5 +274,6 @@
 </footer>
 <script src="assets/config.js"></script>
 <script src="assets/js/site.js"></script>
+<script src="assets/js/demo.js" defer></script>
 </body>
 </html>
