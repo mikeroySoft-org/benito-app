@@ -99,7 +99,7 @@
           </div>
         </div>
         <div class="app__tl" data-d="timeline" data-view="day" hidden>
-          <div class="app__vseg" role="group" aria-label="Timeline view"><button type="button" data-act="view" data-view="day" aria-pressed="true">Day</button><button type="button" data-act="view" data-view="list" aria-pressed="false">List</button></div>
+          <div class="app__vseg" role="group" aria-label="Timeline view"><button type="button" data-act="view" data-view="week" aria-pressed="false">Week</button><button type="button" data-act="view" data-view="day" aria-pressed="true">Day</button><button type="button" data-act="view" data-view="list" aria-pressed="false">List</button></div>
           <h2 class="app__day">Today <span data-d="date"></span></h2>
           <div class="app__scroll">
             <div class="app__card app__sum app__tsum" data-d="tsum">
@@ -115,6 +115,17 @@
             <ul class="app__events" data-d="events" aria-label="Today’s events, newest first"></ul>
             <p class="app__empty" data-d="empty" hidden>Nothing logged</p>
           </div>
+          <div class="app__wk">
+            <div class="app__wkhead">
+              <button type="button" class="app__chev app__chev--prev" data-act="wkprev" aria-disabled="true" aria-label="Previous week"><svg aria-hidden="true"><use href="#i-chev"/></svg></button>
+              <h2 class="app__wkt"><span data-d="wkrange"></span><small>Last 7 days</small></h2>
+              <button type="button" class="app__chev" disabled aria-label="Next week"><svg aria-hidden="true"><use href="#i-chev"/></svg></button>
+            </div>
+            <div class="app__wkdays" data-d="wkdays" aria-hidden="true"></div>
+            <div class="app__wkscroll" data-d="wkscroll">
+              <div class="app__wkgrid" data-d="wkgrid"><div class="app__wkhours" data-d="wkhours" aria-hidden="true"></div></div>
+            </div>
+          </div>
         </div>
         <div class="app__bar" data-d="bar" data-kind="feed" hidden>
           <span class="app__baricon" aria-hidden="true"><svg><use href="#i-drop" data-d="baruse"/></svg></span>
@@ -127,7 +138,7 @@
           <button class="app__round app__round--stop" type="button" data-act="stop" aria-label="Stop and save"><svg aria-hidden="true"><use href="#i-stop"/></svg></button>
         </div>
         <div class="app__quick" data-d="quick">
-          <button type="button" class="app__q app__q--feed" data-act="feed" aria-label="Log a feed"><svg aria-hidden="true"><use href="#i-drop"/></svg><span>Feed</span><small data-d="feedsub">Bottle · 1h 49m ago</small></button>
+          <button type="button" class="app__q app__q--feed" data-act="feed" aria-label="Log a feed"><svg aria-hidden="true"><use href="#i-drop"/></svg><span>Feed</span></button>
           <button type="button" class="app__q" data-act="diaper" aria-label="Log a diaper"><svg aria-hidden="true"><use href="#i-diaper"/></svg><span>Diaper</span></button>
           <button type="button" class="app__q" data-act="sleep" aria-label="Start sleep" data-d="sleepq"><svg aria-hidden="true"><use href="#i-moon"/></svg><span>Sleep</span></button>
         </div>

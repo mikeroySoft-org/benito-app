@@ -76,7 +76,6 @@
 .app[data-run="sleep"] .app__quick { background: var(--app-sleep-wash); box-shadow: 0 0 0 1.5px var(--app-sleep); }
 .app__q { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; border-radius: 36px; font-weight: 600; }
 .app__q span { font-size: 15px; line-height: 1; }
-.app__q small { font-size: 12px; font-weight: 400; color: var(--app-muted); white-space: nowrap; }
 .app[data-run="feed"] .app__q--feed { color: var(--app-feed); }
 .app__tabs { position: absolute; top: 791px; left: 20px; right: 20px; z-index: 2; height: 61px; display: grid; grid-template-columns: repeat(4, 1fr); align-items: center; padding: 0 5px; border-radius: 31px; background: var(--app-tabs); box-shadow: 0 0 0 1px var(--app-rule); font-size: 12px; font-weight: 500; }
 .app__tab { display: flex; flex-direction: column; align-items: center; gap: var(--space-3xs); height: 51px; justify-content: center; border-radius: 26px; }
@@ -151,9 +150,9 @@
 .app__rt { display: grid; gap: 3px; min-width: 0; }
 .app__rt b { overflow: hidden; font-size: 17px; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; }
 .app__rt small { overflow: hidden; font-size: 15px; color: var(--app-muted); white-space: nowrap; text-overflow: ellipsis; }
-.app__vseg { align-self: center; display: inline-grid; grid-template-columns: 1fr 1fr; height: 34px; margin-top: var(--space-xs); padding: 3px; border-radius: 17px; background: var(--app-seg); box-shadow: inset 0 0 0 1px var(--app-rule); }
-.app__vseg button { min-width: 70px; border-radius: 14px; font-size: 14px; font-weight: 600; color: var(--app-muted); }
-.app__vseg [aria-pressed="true"] { background: var(--app-card); color: var(--app-ink); box-shadow: 0 0 0 1px var(--app-rule); }
+.app__vseg { align-self: center; display: inline-grid; grid-template-columns: repeat(3, 1fr); height: 36px; margin-top: var(--space-xs); padding: 3px; border-radius: 18px; background: var(--app-seg); box-shadow: inset 0 0 0 1px var(--app-rule); }
+.app__vseg button { min-width: 66px; padding: 0 var(--space-sm); border-radius: 15px; font-size: 16px; font-weight: 600; }
+.app__vseg [aria-pressed="true"] { background: var(--app-feed); color: var(--app-feed-ink); }
 .app__day { margin: 14px 0 var(--space-xs); text-align: center; font: 600 17px/22px var(--font-app-text); }
 .app__day span { margin-left: 6px; font-size: 15px; font-weight: 400; color: var(--app-muted); }
 .app__tsum { height: auto; margin-top: 0; padding-bottom: var(--space-sm); }
@@ -169,6 +168,44 @@
 .app__tl[data-view="list"] .app__ev { min-height: 50px; border-radius: 0; background: none; box-shadow: 0 1px 0 var(--app-rule); }
 .app__tl[data-view="list"] .app__ev .app__coin { width: 30px; height: 30px; border-radius: 8px; }
 .app__tl[data-view="list"] .app__ev .app__coin svg { width: 17px; height: 17px; }
+/* Week: the app's 7-day grid (TimelineWeekView). 44pt hour rows and time gutter; the day header row and the
+   day columns share one grid template, so each weekday sits exactly over its column. */
+.app__wk { display: none; flex: 1; min-height: 0; flex-direction: column; }
+.app__tl[data-view="week"] .app__wk { display: flex; }
+.app__tl[data-view="week"] .app__day, .app__tl[data-view="week"] .app__scroll { display: none; }
+.app__wkhead { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; margin: var(--space-2xs) var(--space-xs) 0; }
+.app__chev { display: grid; place-items: center; width: 44px; height: 44px; color: var(--app-muted); }
+.app .app__chev svg { width: 20px; height: 20px; }
+.app__chev--prev svg { transform: scaleX(-1); }
+.app__chev:is([disabled], [aria-disabled="true"]) { background: none; color: color-mix(in srgb, var(--app-faint) 55%, transparent); cursor: not-allowed; }
+.app__wkt { display: grid; text-align: center; font: 600 17px/22px var(--font-app-text); }
+.app__wkt small { font-size: 13px; line-height: 16px; font-weight: 400; color: var(--app-muted); }
+.app__wkdays, .app__wkgrid { display: grid; grid-template-columns: 44px repeat(7, minmax(0, 1fr)); padding-right: var(--space-2xs); }
+.app__wkdays { padding-block: 6px; border-bottom: 1px solid var(--app-rule); }
+.app__wkdays span { display: grid; justify-items: center; gap: var(--space-3xs); font-size: 12px; line-height: 14px; font-weight: 600; color: var(--app-faint); }
+.app__wkdays b { display: grid; place-items: center; min-width: 26px; height: 26px; border-radius: 13px; font-size: 16px; font-weight: 700; color: var(--app-muted); font-variant-numeric: tabular-nums; }
+.app__wkdays .is-today { color: var(--app-ink); }
+.app__wkdays .is-today b { background: var(--app-ink); color: var(--app-bg); }
+.app__wkscroll { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 10px 0 140px; scrollbar-width: none; }
+.app__wkscroll::-webkit-scrollbar { display: none; }
+.app__wkgrid { height: 1057px; }
+.app__wkhours { position: relative; }
+.app__wkhours span { position: absolute; right: 6px; font-size: 11px; line-height: 14px; color: var(--app-faint); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.app__wkcol { position: relative; border-left: 1px solid var(--app-rule); background-image: repeating-linear-gradient(to bottom, var(--app-rule) 0 1px, transparent 1px 44px); }
+.app__wkcol:last-child { border-right: 1px solid var(--app-rule); }
+.app__wkcol.is-today { background-color: color-mix(in srgb, var(--app-card) 60%, transparent); }
+.app__wb { position: absolute; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; overflow: hidden; padding: var(--space-3xs) 1px 0 var(--space-2xs); border-radius: 4px; background: color-mix(in srgb, var(--k) 32%, transparent); box-shadow: inset 2.5px 0 0 var(--k); text-align: left; font-size: 11px; line-height: 13px; }
+.app__wb.is-run { background: color-mix(in srgb, var(--k) 14%, transparent); box-shadow: none; outline: 1.5px dashed var(--k); outline-offset: -1.5px; }
+.app[data-paused] .app__wb.is-run { background: repeating-linear-gradient(-45deg, transparent 0 4px, color-mix(in srgb, var(--k) 22%, transparent) 4px 5px), color-mix(in srgb, var(--k) 7%, transparent); outline-color: color-mix(in srgb, var(--k) 55%, transparent); }
+.app .app__wb:focus-visible { z-index: 1; outline: 3px solid var(--color-focus); outline-offset: 1px; }
+.app__wbt { display: flex; align-items: center; gap: var(--space-3xs); max-width: 100%; font-weight: 600; white-space: nowrap; }
+.app__wbt span { overflow: hidden; text-overflow: ellipsis; }
+.app .app__wb svg { flex: none; width: 9px; height: 9px; color: var(--k); }
+.app__wbd { color: var(--app-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.app__wb.is-icon { align-items: center; justify-content: center; padding: 0; }
+.app__wb.is-icon .app__wbt span { display: none; }
+.app__now { position: absolute; left: 0; right: 0; z-index: 2; height: 1.5px; background: var(--app-awake); pointer-events: none; }
+.app__now::before { content: ""; position: absolute; top: -2.75px; left: -3.5px; width: 7px; height: 7px; border-radius: 50%; background: inherit; }
 .app__empty { margin-top: var(--space-xl); text-align: center; color: var(--app-muted); }
 .app__tidle { margin: var(--space-sm) 15px 0; }
 .app__tpick { display: grid; justify-items: center; gap: var(--space-md); padding: 30px 18px 22px; border-radius: 22px; background: var(--app-diaper-wash); text-align: center; }
