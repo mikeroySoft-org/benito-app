@@ -66,7 +66,7 @@ struct SettingsPrototypeView: View {
 
                     Button("Probe /health") { Task { await model.probeHealth() } }
 
-                    LabeledContent("Sync", value: model.syncConnected ? "connected" : "offline")
+                    LabeledContent("Sync", value: model.syncRouteText)
                     Text(model.storeLabel)
                         .font(.caption2)
                         .foregroundStyle(.secondary)

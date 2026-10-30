@@ -87,9 +87,6 @@ extension AppModel {
                 BenitoLog.ui.error("device key register failed: \(String(describing: error), privacy: .public)")
             }
         }
-        if knownEndpoints.isEmpty, let info = try? await api.serverInfo() {
-            rememberEndpoints([url] + info.advertisedUrls.compactMap(URL.init(string:)), serverId: info.serverId)
-        }
     }
 
     /// Signs this phone's key for a fresh session (no prompt). False when there is no key for this
@@ -131,25 +128,74 @@ extension AppModel {
         UserDefaults.standard.set(serverId, forKey: Self.serverIdKey)
     }
 
-    /// The current address doesn't answer but another known one does (left home Wi-Fi, so use
-    /// Tailscale; or back home). Moves the session over. True when the server address changed.
-    func failOverIfUnreachable() async -> Bool {
-        guard let current = serverBaseURL else { return false }
-        let currentKey = SessionTokenStoreKey.account(for: current)
-        let others = knownEndpoints.filter { SessionTokenStoreKey.account(for: $0) != currentKey }
-        guard !others.isEmpty else { return false }
-        if await Self.probe(current, timeout: 2) != nil { return false }
-        let serverId = UserDefaults.standard.string(forKey: Self.serverIdKey)
-        guard let next = await Self.firstReachable(others, serverId: serverId) else { return false }
-        BenitoLog.ui.notice("server failover → \(SessionTokenStoreKey.account(for: next), privacy: .public)")
-        if let token = try? tokenStore.token(for: current) {
-            try? tokenStore.setToken(token, for: next)
+    /// Points `api` at the saved Server URL when it answers, else at another address of the same
+    /// server (remembered `advertised_urls`, then Bonjour), verified by `server_id`. The saved URL,
+    /// tokens and device key stay keyed to the primary. True when the address changed.
+    @discardableResult
+    func updateRoute() async -> Bool {
+        guard let primary = serverBaseURL, let api, !isRouting else { return false }
+        isRouting = true
+        defer { isRouting = false }
+        let known = knownEndpoints
+        let choice = await ServerRoute.choose(
+            primary: primary,
+            candidates: { known + (await ServerBrowser.discover()) },
+            serverId: UserDefaults.standard.string(forKey: Self.serverIdKey),
+            probe: { await Self.probe($0, timeout: 2) }
+        )
+        // Signed out or Server URL changed while probing.
+        guard self.api === api, serverBaseURL == primary else { return false }
+        if let info = choice.primaryInfo {
+            rememberEndpoints([primary] + info.advertisedUrls.compactMap(URL.init(string:)), serverId: info.serverId)
         }
-        if let deviceId = storedDeviceId(for: current) {
-            storeDeviceId(deviceId, for: next)
+        watchPrimary(on: choice.route)
+        guard choice.route != route else { return false }
+        let wasFallback = route?.label != nil
+        route = choice.route
+        await api.route(to: choice.route.url)
+        BenitoLog.ui.notice("server route → \(SessionTokenStoreKey.account(for: choice.route.url), privacy: .public)")
+        if let label = choice.route.label {
+            status = "Syncing via \(label)"
+        } else if wasFallback {
+            status = "Back on \(primary.host() ?? "server")"
         }
-        await switchServer(to: next)
         return true
+    }
+
+    /// After a dropped connection: move to the route that answers and resend what's queued.
+    func rerouteIfNeeded() async {
+        guard await updateRoute() else { return }
+        connectSync()
+        await flushOutbox()
+    }
+
+    /// Settings › Sync: "connected via home network" while on a fallback.
+    var syncRouteText: String {
+        guard syncConnected else { return "offline" }
+        return route?.label.map { "connected via \($0)" } ?? "connected"
+    }
+
+    func forgetRoute() {
+        primaryWatch?.cancel()
+        primaryWatch = nil
+        route = nil
+    }
+
+    /// On a fallback, retries the saved Server URL every 30 s and moves back once it answers.
+    private func watchPrimary(on current: ServerRoute) {
+        guard case .fallback = current else {
+            primaryWatch?.cancel()
+            primaryWatch = nil
+            return
+        }
+        guard primaryWatch == nil else { return }
+        primaryWatch = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(30))
+                guard !Task.isCancelled, let self else { return }
+                await self.rerouteIfNeeded()
+            }
+        }
     }
 
     /// Points the app at `url` without touching the saved sessions for any server.

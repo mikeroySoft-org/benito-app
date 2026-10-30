@@ -190,9 +190,9 @@ public actor APIClient {
         return try decode(await post(path: "/timers", json: Body(child_id: childId, kind: kind, side: side, at: at)))
     }
 
-    public func setBaseURL(_ url: URL) {
+    /// Same server, another address (`ServerRoute`): the session token stays valid.
+    public func route(to url: URL) {
         baseURL = url
-        token = nil
     }
 
     public func stopTimer(id: UUID, at: Date = Date()) async throws -> TimerDTO {

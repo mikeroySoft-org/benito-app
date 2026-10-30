@@ -35,6 +35,11 @@ final class AppModel {
     /// Temp file from the latest Export JSON/CSV tap; Settings presents a share sheet.
     var exportShareItem: ExportShareItem?
     var syncConnected = false
+    /// Address `api` and sync use now: the saved Server URL, or a verified fallback to it.
+    var route: ServerRoute?
+    /// While on a fallback, checks the saved Server URL again until it answers.
+    @ObservationIgnored var primaryWatch: Task<Void, Never>?
+    @ObservationIgnored var isRouting = false
     var storeLabel = "store: ?"
     var outboxPending = 0
     var isSignedIn = false
@@ -128,6 +133,7 @@ final class AppModel {
         sync = nil
         syncConnected = false
         api = nil
+        forgetRoute()
         try? await store.setPreference("server_url", value: trimmed)
         isSignedIn = false
         signedInEmail = ""
@@ -163,17 +169,15 @@ final class AppModel {
             BenitoLog.ui.notice("restore skipped: no saved session for \(SessionTokenStoreKey.account(for: url), privacy: .public)")
             return
         }
-        // Several known addresses for this server (LAN + tailnet): move to one that answers.
-        if await failOverIfUnreachable() {
-            await restoreSession()
-            return
-        }
         BenitoLog.ui.notice("restoring session for \(SessionTokenStoreKey.account(for: url), privacy: .public)")
         let created = APIClient(baseURL: url, token: saved, clientId: clientId)
         api = created
         wireStateRefetcher(api: created)
         isSignedIn = true
         status = "Restoring session…"
+        // Saved address down (e.g. Tailscale broken)? Use the same server's home-network address.
+        await updateRoute()
+        guard api === created else { return }
         await refreshMe()
         // Server URL changed or session rejected while /me was in flight.
         guard api === created else { return }
@@ -216,6 +220,7 @@ final class AppModel {
         sync?.disconnect()
         sync = nil
         syncConnected = false
+        forgetRoute()
         LiveActivityController.shared.setPushTokenHandler(nil)
         api = nil
         isSignedIn = false
@@ -487,6 +492,12 @@ final class AppModel {
         } catch {
             guard generation == stateFetchGeneration else { return }
             if handleUnauthorized(error) { return }
+            // Couldn't reach the saved address (not a 401/403): try the same server's other route once.
+            if ServerRoute.isUnreachable(error), await updateRoute() {
+                connectSync()
+                await refreshState()
+                return
+            }
             BenitoLog.ui.error("state failed: \(String(describing: error), privacy: .public)")
             status = "State offline — using local DB"
             await loadLocalGlance()
@@ -527,7 +538,7 @@ final class AppModel {
     func appBecameActive() async {
         guard isSignedIn else { return }
         BenitoLog.ui.notice("app active: resync (sync connected=\(self.syncConnected, privacy: .public))")
-        if sync == nil || sync?.isConnected != true {
+        if await updateRoute() || sync == nil || sync?.isConnected != true {
             connectSync()
         }
         await refreshState()
@@ -1385,11 +1396,13 @@ final class AppModel {
             BenitoLog.ui.notice("sync skipped: no family yet")
             return
         }
-        guard let url = URL(string: serverURLString), let api else {
-            BenitoLog.ui.notice("sync skipped: no server URL or API client")
+        guard let api else {
+            BenitoLog.ui.notice("sync skipped: no API client")
             return
         }
         Task {
+            // The current route's address, not necessarily the saved Server URL.
+            let url = await api.baseURL
             guard let token = await api.token else {
                 BenitoLog.ui.notice("sync skipped: API client has no token")
                 return
@@ -1414,6 +1427,10 @@ final class AppModel {
                             // Prefer the server's explanation over URLSession's generic close error.
                             if let message = self.lastSyncServerError ?? reason {
                                 self.status = "Sync disconnected: \(message)"
+                            }
+                            // The server closing on us is not "unreachable"; only a lost connection reroutes.
+                            if self.lastSyncServerError == nil {
+                                await self.rerouteIfNeeded()
                             }
                         }
                     },
@@ -1520,6 +1537,7 @@ final class AppModel {
         case SyncMessageType.hello.rawValue:
             lastSyncServerError = nil
             syncConnected = true
+            if let label = route?.label { status = "Synced via \(label)" }
             BenitoLog.sync.notice("server accepted sync (hello)")
         case SyncMessageType.error.rawValue:
             if case .object(let obj) = envelope.payload, case .string(let message)? = obj["message"] {
