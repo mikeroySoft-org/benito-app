@@ -37,6 +37,24 @@ The Simulator build works without a team. Running on a phone needs your own Appl
 - SwiftUI: target iOS 18, use `@Observable`, keep views small, and support light and dark mode and Dynamic Type.
 - Server: database changes go in a new numbered file in `server/migrations`. Never edit a migration that has shipped. Changes must stay backward compatible with older app builds.
 
+## Factory gate
+
+Run `python -m factory gate` with the factory environment on the native Mac host.
+`.factory.toml` runs server and BenitoKit tests, the helper fixture and scratch-server
+tests, timer chrome lint, project-generation drift, iOS/watch Simulator builds, and
+site tests/plumbing in order. `--tier release` runs the unsigned Release Simulator
+build only; signed device builds and archives require the owner's team.
+
+Each check uses `scripts/gate-env.sh` to disable Bonjour and Python bytecode and
+set `BENITO_DB=/nonexistent`. Scratch-server tests use a temporary database and a
+free loopback port, never the live service. Cold caches need network access.
+Run `scripts/check-site-plumbing.sh` separately to check Pages without deploying.
+
+The gate protects signing, deployment, published migrations, service/backup scripts,
+and its own configuration. New numbered migrations remain allowed. `SPEC.md` still
+requires human review: factory has no nonblocking path-review flag, so it is not
+protected. Clippy/fmt cleanup and signed builds are deliberately outside this gate.
+
 ## Reporting security problems
 
 Please don't open a public issue. See [SECURITY.md](./SECURITY.md).
