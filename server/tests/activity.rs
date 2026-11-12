@@ -92,7 +92,13 @@ async fn get(base: &str, token: &str, path_and_query: &str) -> (u16, Value) {
         .unwrap()
 }
 
-async fn start_timer(base: &str, token: &str, child_id: &str, kind: &str, side: Option<&str>) -> Value {
+async fn start_timer(
+    base: &str,
+    token: &str,
+    child_id: &str,
+    kind: &str,
+    side: Option<&str>,
+) -> Value {
     let mut body = json!({ "child_id": child_id, "kind": kind });
     if let Some(s) = side {
         body["side"] = json!(s);
@@ -296,11 +302,17 @@ async fn summary_crying_seconds_clip_per_day_and_exclude_outings() {
 
     let s0 = summary(day0, day1).await;
     let c0 = s0["crying_seconds"].as_f64().unwrap();
-    assert!((c0 - 30.0 * 60.0).abs() < 1.0, "day0 crying ~30m, got {c0}: {s0}");
+    assert!(
+        (c0 - 30.0 * 60.0).abs() < 1.0,
+        "day0 crying ~30m, got {c0}: {s0}"
+    );
 
     let s1 = summary(day1, day2).await;
     let c1 = s1["crying_seconds"].as_f64().unwrap();
-    assert!((c1 - 10.0 * 60.0).abs() < 1.0, "day1 crying ~10m, got {c1}: {s1}");
+    assert!(
+        (c1 - 10.0 * 60.0).abs() < 1.0,
+        "day1 crying ~10m, got {c1}: {s1}"
+    );
 }
 
 /// Regression for the "12h 12m nursing" report (Oct 23, 2026): live row 91f2e5ef is a
@@ -326,13 +338,31 @@ async fn summary_durations_ignore_events_without_end() {
     ];
     // Oct 23 PDT's real nursing sessions: 799 + 931 + 110 + 1113 = 2953 s.
     for (side, start, end) in [
-        ("R", "2026-10-23T07:33:03+00:00", "2026-10-23T07:46:22+00:00"),
-        ("L", "2026-10-23T11:31:50+00:00", "2026-10-23T11:47:21+00:00"),
-        ("L", "2026-10-23T12:55:22+00:00", "2026-10-23T12:57:12+00:00"),
-        ("L", "2026-10-23T12:59:22+00:00", "2026-10-23T13:17:55+00:00"),
+        (
+            "R",
+            "2026-10-23T07:33:03+00:00",
+            "2026-10-23T07:46:22+00:00",
+        ),
+        (
+            "L",
+            "2026-10-23T11:31:50+00:00",
+            "2026-10-23T11:47:21+00:00",
+        ),
+        (
+            "L",
+            "2026-10-23T12:55:22+00:00",
+            "2026-10-23T12:57:12+00:00",
+        ),
+        (
+            "L",
+            "2026-10-23T12:59:22+00:00",
+            "2026-10-23T13:17:55+00:00",
+        ),
     ] {
-        bodies.push(json!({ "child_id": child_id, "type": "feed_breast", "side": side,
-                            "started_at": start, "ended_at": end }));
+        bodies.push(
+            json!({ "child_id": child_id, "type": "feed_breast", "side": side,
+                            "started_at": start, "ended_at": end }),
+        );
     }
     for body in bodies {
         let (status, ev) = post_event(&base, &token, body).await;
@@ -352,8 +382,14 @@ async fn summary_durations_ignore_events_without_end() {
     .await;
     assert_eq!(status, 200, "{s}");
     let nursing = s["nursing_seconds"].as_f64().unwrap();
-    assert!((nursing - 2953.0).abs() < 1.0, "nursing ~49m, got {nursing}: {s}");
+    assert!(
+        (nursing - 2953.0).abs() < 1.0,
+        "nursing ~49m, got {nursing}: {s}"
+    );
     let sleep = s["sleep_hours"].as_f64().unwrap();
-    assert!((sleep - 13_003.0 / 3600.0).abs() < 0.01, "sleep ~3.61h, got {sleep}: {s}");
+    assert!(
+        (sleep - 13_003.0 / 3600.0).abs() < 0.01,
+        "sleep ~3.61h, got {sleep}: {s}"
+    );
     assert_eq!(s["crying_seconds"].as_f64().unwrap(), 0.0, "{s}");
 }

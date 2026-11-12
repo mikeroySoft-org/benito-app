@@ -85,9 +85,14 @@ async fn parent_with_family(base: &str, email: &str, family_name: &str) -> (Stri
 }
 
 async fn mint(base: &str, token: &str) -> (u16, Value) {
-    http_json("POST", &format!("{base}/families/pairing-tokens"), Some(token), Some(json!({})))
-        .await
-        .unwrap()
+    http_json(
+        "POST",
+        &format!("{base}/families/pairing-tokens"),
+        Some(token),
+        Some(json!({})),
+    )
+    .await
+    .unwrap()
 }
 
 async fn pair(base: &str, token: &str, pairing_token: &str) -> (u16, Value) {
@@ -124,12 +129,14 @@ async fn mint_and_redeem_joins_family_once() {
     assert_eq!(status, 200, "{minted}");
     assert_eq!(minted["family_name"], "Rossi", "{minted}");
     let pairing_token = minted["token"].as_str().unwrap().to_string();
-    let expires_at: DateTime<Utc> = DateTime::parse_from_rfc3339(minted["expires_at"].as_str().unwrap())
-        .unwrap()
-        .with_timezone(&Utc);
+    let expires_at: DateTime<Utc> =
+        DateTime::parse_from_rfc3339(minted["expires_at"].as_str().unwrap())
+            .unwrap()
+            .with_timezone(&Utc);
     let ttl = expires_at - before;
     assert!(
-        ttl > chrono::Duration::minutes(4) && ttl <= chrono::Duration::minutes(5) + chrono::Duration::seconds(5),
+        ttl > chrono::Duration::minutes(4)
+            && ttl <= chrono::Duration::minutes(5) + chrono::Duration::seconds(5),
         "expires_at should be ~5 minutes out: {minted}"
     );
 
@@ -165,7 +172,10 @@ async fn expired_token_is_rejected() {
     open_db(&dir)
         .execute(
             "UPDATE pairing_tokens SET expires_at = ?2 WHERE token = ?1",
-            rusqlite::params![pairing_token, (Utc::now() - chrono::Duration::seconds(1)).to_rfc3339()],
+            rusqlite::params![
+                pairing_token,
+                (Utc::now() - chrono::Duration::seconds(1)).to_rfc3339()
+            ],
         )
         .unwrap();
 

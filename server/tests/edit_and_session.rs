@@ -106,7 +106,13 @@ async fn create_event(base: &str, token: &str, body: Value) -> Value {
     event
 }
 
-async fn start_timer(base: &str, token: &str, child_id: &str, kind: &str, side: Option<&str>) -> Value {
+async fn start_timer(
+    base: &str,
+    token: &str,
+    child_id: &str,
+    kind: &str,
+    side: Option<&str>,
+) -> Value {
     let mut body = json!({ "child_id": child_id, "kind": kind });
     if let Some(s) = side {
         body["side"] = json!(s);
@@ -136,9 +142,12 @@ fn open_db(dir: &std::path::Path) -> rusqlite::Connection {
 }
 
 fn ts(v: &Value) -> DateTime<Utc> {
-    DateTime::parse_from_rfc3339(v.as_str().unwrap_or_else(|| panic!("expected timestamp, got {v}")))
-        .unwrap()
-        .with_timezone(&Utc)
+    DateTime::parse_from_rfc3339(
+        v.as_str()
+            .unwrap_or_else(|| panic!("expected timestamp, got {v}")),
+    )
+    .unwrap()
+    .with_timezone(&Utc)
 }
 
 fn session_expiry(dir: &std::path::Path, token: &str) -> String {
@@ -182,17 +191,35 @@ async fn edit_event_times_validated() {
 
     // Moving the start earlier keeps the existing end and is reflected in the response.
     let earlier = now - chrono::Duration::hours(2);
-    let (status, edited) = patch(&base, &token, &path, json!({ "started_at": earlier.to_rfc3339() })).await;
+    let (status, edited) = patch(
+        &base,
+        &token,
+        &path,
+        json!({ "started_at": earlier.to_rfc3339() }),
+    )
+    .await;
     assert_eq!(status, 200, "{edited}");
     assert_eq!(ts(&edited["started_at"]), earlier, "{edited}");
     assert_eq!(ts(&edited["ended_at"]), ended, "{edited}");
 
     // End before (resulting) start → 400, whether the bad side is the new end or the new start.
     let before_start = earlier - chrono::Duration::minutes(5);
-    let (status, body) = patch(&base, &token, &path, json!({ "ended_at": before_start.to_rfc3339() })).await;
+    let (status, body) = patch(
+        &base,
+        &token,
+        &path,
+        json!({ "ended_at": before_start.to_rfc3339() }),
+    )
+    .await;
     assert_eq!(status, 400, "ended before started: {body}");
     let after_end = ended + chrono::Duration::minutes(1);
-    let (status, body) = patch(&base, &token, &path, json!({ "started_at": after_end.to_rfc3339() })).await;
+    let (status, body) = patch(
+        &base,
+        &token,
+        &path,
+        json!({ "started_at": after_end.to_rfc3339() }),
+    )
+    .await;
     assert_eq!(status, 400, "started after existing end: {body}");
 
     // Start an hour in the future → 400.
@@ -257,7 +284,11 @@ async fn edit_bottle_amount_and_delete() {
     let (status, events) = get(&base, &token, &format!("/events?child_id={child_id}")).await;
     assert_eq!(status, 200, "{events}");
     assert!(
-        !events.as_array().unwrap().iter().any(|e| e["id"] == id.as_str()),
+        !events
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|e| e["id"] == id.as_str()),
         "deleted event still listed: {events}"
     );
     let (status, _) = patch(&base, &token, &path, json!({ "notes": "x" })).await;
@@ -274,7 +305,13 @@ async fn adjust_running_timer_start_carries_into_auto_event() {
     let now = Utc::now();
 
     let ten_ago = now - chrono::Duration::minutes(10);
-    let (status, adjusted) = patch(&base, &token, &path, json!({ "started_at": ten_ago.to_rfc3339() })).await;
+    let (status, adjusted) = patch(
+        &base,
+        &token,
+        &path,
+        json!({ "started_at": ten_ago.to_rfc3339() }),
+    )
+    .await;
     assert_eq!(status, 200, "{adjusted}");
     assert_eq!(ts(&adjusted["started_at"]), ten_ago, "{adjusted}");
     assert_eq!(adjusted["state"], "running");
@@ -352,16 +389,34 @@ async fn adjust_paused_timer_and_access_rules() {
     .await;
     assert_eq!(status, 400, "start after paused_at: {body}");
     let thirty_ago = now - chrono::Duration::minutes(30);
-    let (status, adjusted) = patch(&base, &token_a, &path, json!({ "started_at": thirty_ago.to_rfc3339() })).await;
+    let (status, adjusted) = patch(
+        &base,
+        &token_a,
+        &path,
+        json!({ "started_at": thirty_ago.to_rfc3339() }),
+    )
+    .await;
     assert_eq!(status, 200, "{adjusted}");
     assert_eq!(adjusted["state"], "paused", "{adjusted}");
     assert_eq!(ts(&adjusted["started_at"]), thirty_ago, "{adjusted}");
 
-    let (status, body) = patch(&base, &token_b, &path, json!({ "started_at": thirty_ago.to_rfc3339() })).await;
+    let (status, body) = patch(
+        &base,
+        &token_b,
+        &path,
+        json!({ "started_at": thirty_ago.to_rfc3339() }),
+    )
+    .await;
     assert_eq!(status, 401, "other family: {body}");
 
     let unknown = format!("/timers/{}", uuid::Uuid::new_v4());
-    let (status, body) = patch(&base, &token_a, &unknown, json!({ "started_at": thirty_ago.to_rfc3339() })).await;
+    let (status, body) = patch(
+        &base,
+        &token_a,
+        &unknown,
+        json!({ "started_at": thirty_ago.to_rfc3339() }),
+    )
+    .await;
     assert_eq!(status, 404, "unknown timer: {body}");
 }
 
@@ -381,7 +436,10 @@ async fn adjust_start_bounds_follow_phone_clock() {
         json!({ "started_at": phone_now.to_rfc3339() }),
     )
     .await;
-    assert_eq!(status, 400, "phone-now without at is in the server future: {body}");
+    assert_eq!(
+        status, 400,
+        "phone-now without at is in the server future: {body}"
+    );
 
     let (status, adjusted) = patch(
         &base,
@@ -410,7 +468,11 @@ async fn sessions_slide_when_close_to_expiry() {
     let (token, _child) = parent_with_child(&base, "a@example.com").await;
 
     // 10 days left → renewed to ~30 days from now on use.
-    set_session_expiry(&dir, &token, &(Utc::now() + chrono::Duration::days(10)).to_rfc3339());
+    set_session_expiry(
+        &dir,
+        &token,
+        &(Utc::now() + chrono::Duration::days(10)).to_rfc3339(),
+    );
     let (status, me) = get(&base, &token, "/me").await;
     assert_eq!(status, 200, "{me}");
     let renewed = DateTime::parse_from_rfc3339(&session_expiry(&dir, &token))

@@ -7,11 +7,11 @@ use rusqlite::{params, OptionalExtension};
 use serde::Deserialize;
 use uuid::Uuid;
 
-use axum::http::HeaderMap;
 use crate::auth::{AuthError, AuthUser};
 use crate::models::{CreateEventRequest, Event, UpdateEventRequest};
 use crate::sync::{broadcast_event_delete, broadcast_event_upsert};
 use crate::AppState;
+use axum::http::HeaderMap;
 
 #[derive(Debug, Deserialize)]
 pub struct TimelineQuery {
@@ -64,7 +64,6 @@ fn client_id_from(headers: &HeaderMap) -> Option<String> {
         .map(|s| s.to_string())
 }
 
-
 fn map_event(r: &rusqlite::Row<'_>) -> rusqlite::Result<Event> {
     let payload: Option<String> = r.get(10)?;
     Ok(Event {
@@ -102,17 +101,17 @@ fn parse_dt(s: &str) -> rusqlite::Result<chrono::DateTime<Utc>> {
     chrono::DateTime::parse_from_rfc3339(s)
         .map(|d| d.with_timezone(&Utc))
         .map_err(|e| {
-            rusqlite::Error::FromSqlConversionFailure(
-                0,
-                rusqlite::types::Type::Text,
-                Box::new(e),
-            )
+            rusqlite::Error::FromSqlConversionFailure(0, rusqlite::types::Type::Text, Box::new(e))
         })
 }
 
 const EVENT_COLS: &str = "id, child_id, type, subtype, started_at, ended_at, amount_value, amount_unit, side, notes, payload_json, created_by, created_at, updated_at, deleted_at";
 
-fn user_can_access_child(conn: &rusqlite::Connection, user_id: Uuid, child_id: Uuid) -> Result<bool, AuthError> {
+fn user_can_access_child(
+    conn: &rusqlite::Connection,
+    user_id: Uuid,
+    child_id: Uuid,
+) -> Result<bool, AuthError> {
     let ok: Option<i64> = conn
         .query_row(
             "SELECT 1 FROM children c
@@ -157,10 +156,7 @@ pub async fn create_event(
     let id = body.id.unwrap_or_else(Uuid::new_v4);
     let now = Utc::now();
     let started = body.started_at.unwrap_or(now);
-    let payload = body
-        .payload_json
-        .as_ref()
-        .map(|v| v.to_string());
+    let payload = body.payload_json.as_ref().map(|v| v.to_string());
     {
         let conn = state.db.lock().map_err(|_| AuthError::Internal)?;
         conn.execute(
@@ -389,7 +385,9 @@ fn validate_edit_times(
     }
     if let Some(started) = body.started_at {
         if started > now + chrono::Duration::minutes(EDIT_FUTURE_SLACK_MINUTES) {
-            return Err(AuthError::BadRequest("started_at cannot be in the future".into()));
+            return Err(AuthError::BadRequest(
+                "started_at cannot be in the future".into(),
+            ));
         }
     }
     let started = match body.started_at {
@@ -405,7 +403,9 @@ fn validate_edit_times(
     };
     if let Some(ended) = ended {
         if ended < started {
-            return Err(AuthError::BadRequest("ended_at cannot be before started_at".into()));
+            return Err(AuthError::BadRequest(
+                "ended_at cannot be before started_at".into(),
+            ));
         }
     }
     Ok(())
@@ -436,6 +436,12 @@ pub async fn delete_event(
     )
     .map_err(|_| AuthError::Internal)?;
     drop(conn);
-    broadcast_event_delete(&state.sync, &state.db, id, child_uuid, client_id_from(&headers));
+    broadcast_event_delete(
+        &state.sync,
+        &state.db,
+        id,
+        child_uuid,
+        client_id_from(&headers),
+    );
     Ok(Json(serde_json::json!({ "ok": true, "id": id })))
 }
