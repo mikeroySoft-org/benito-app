@@ -274,7 +274,7 @@ pub fn load_family_tokens(db: &Db, family_id: Uuid) -> Result<Vec<StoredToken>, 
 /// Validate a hex ActivityKit push token (32+ bytes → 64+ hex chars).
 pub fn validate_token_hex(token: &str) -> Result<(), String> {
     let t = token.trim();
-    if t.len() < 64 || !t.len().is_multiple_of(2) {
+    if t.len() < 64 || t.len() % 2 == 1 {
         return Err("token must be hex of at least 32 bytes".into());
     }
     if !t.chars().all(|c| c.is_ascii_hexdigit()) {
