@@ -265,15 +265,10 @@ async fn feed_bottle_breast_sleep_timer_and_export() {
     assert!(state_body["last_feed"].is_object(), "{state_body}");
     assert!(state_body["last_diaper"].is_object(), "{state_body}");
 
-    let (status, export_body) = http_json(
-        "GET",
-        &format!("{base}/export"),
-        Some(&token),
-        None,
-        &[],
-    )
-    .await
-    .unwrap();
+    let (status, export_body) =
+        http_json("GET", &format!("{base}/export"), Some(&token), None, &[])
+            .await
+            .unwrap();
     assert_eq!(status, 200, "{export_body}");
     assert!(export_body["family"].is_object());
     assert!(export_body["events"].as_array().unwrap().len() >= 4);
@@ -337,7 +332,6 @@ async fn feed_breast_timer_creates_event_with_side() {
     assert!(state_body["last_feed"]["ended_at"].is_string());
 }
 
-
 #[tokio::test]
 async fn two_clients_ws_timer_and_event_fanout() {
     let (base, _dir) = spawn_server().await;
@@ -378,29 +372,27 @@ async fn two_clients_ws_timer_and_event_fanout() {
     let (mut ws_a, _) = tokio_tungstenite::connect_async(&ws_url)
         .await
         .expect("ws a");
-    ws_a
-        .send(Message::Text(
-            json!({
-                "type": "auth",
-                "payload": { "token": token_a, "client_id": "ada-phone" }
-            })
-            .to_string(),
-        ))
-        .await
-        .unwrap();
+    ws_a.send(Message::Text(
+        json!({
+            "type": "auth",
+            "payload": { "token": token_a, "client_id": "ada-phone" }
+        })
+        .to_string(),
+    ))
+    .await
+    .unwrap();
     let (mut ws_b, _) = tokio_tungstenite::connect_async(&ws_url)
         .await
         .expect("ws b");
-    ws_b
-        .send(Message::Text(
-            json!({
-                "type": "auth",
-                "payload": { "token": token_b, "client_id": "bob-phone" }
-            })
-            .to_string(),
-        ))
-        .await
-        .unwrap();
+    ws_b.send(Message::Text(
+        json!({
+            "type": "auth",
+            "payload": { "token": token_b, "client_id": "bob-phone" }
+        })
+        .to_string(),
+    ))
+    .await
+    .unwrap();
 
     {
         let hello = tokio::time::timeout(Duration::from_secs(5), ws_a.next())

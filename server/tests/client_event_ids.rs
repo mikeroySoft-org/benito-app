@@ -100,20 +100,38 @@ async fn client_event_id_is_kept_and_idempotent() {
     let started = (Utc::now() - chrono::Duration::hours(2)).to_rfc3339();
     let body = json!({ "child_id": child, "type": "diaper", "subtype": "wet", "started_at": started, "id": id });
 
-    let (status, first) = http_json("POST", &format!("{base}/events"), Some(&token), Some(body.clone())).await.unwrap();
+    let (status, first) = http_json(
+        "POST",
+        &format!("{base}/events"),
+        Some(&token),
+        Some(body.clone()),
+    )
+    .await
+    .unwrap();
     assert_eq!(status, 200, "{first}");
     assert_eq!(first["id"], json!(id));
 
     let mut retry = body.clone();
     retry["subtype"] = json!("dirty");
-    let (status, second) = http_json("POST", &format!("{base}/events"), Some(&token), Some(retry)).await.unwrap();
+    let (status, second) = http_json("POST", &format!("{base}/events"), Some(&token), Some(retry))
+        .await
+        .unwrap();
     assert_eq!(status, 200, "{second}");
     assert_eq!(second["id"], json!(id));
-    assert_eq!(second["subtype"], json!("wet"), "retry returns the stored event unchanged");
+    assert_eq!(
+        second["subtype"],
+        json!("wet"),
+        "retry returns the stored event unchanged"
+    );
 
     let (status, list) = get(&base, &token, &format!("/events?child_id={child}")).await;
     assert_eq!(status, 200, "{list}");
-    let count = list.as_array().unwrap().iter().filter(|e| e["id"] == json!(id)).count();
+    let count = list
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|e| e["id"] == json!(id))
+        .count();
     assert_eq!(count, 1);
 
     // Without an id the server still mints one.
@@ -129,7 +147,13 @@ async fn client_event_id_is_kept_and_idempotent() {
     assert_ne!(minted["id"], json!(id));
 
     let (_, info) = get(&base, &token, "/server/info").await;
-    assert!(info["features"].as_array().unwrap().contains(&json!("client_event_ids")), "{info}");
+    assert!(
+        info["features"]
+            .as_array()
+            .unwrap()
+            .contains(&json!("client_event_ids")),
+        "{info}"
+    );
     let _ = std::fs::remove_dir_all(dir);
 }
 
@@ -157,6 +181,9 @@ async fn client_event_id_from_another_family_conflicts() {
     .await
     .unwrap();
     assert_eq!(status, 409, "{body}");
-    assert!(!body.to_string().contains("private"), "never leaks the other family's event");
+    assert!(
+        !body.to_string().contains("private"),
+        "never leaks the other family's event"
+    );
     let _ = std::fs::remove_dir_all(dir);
 }

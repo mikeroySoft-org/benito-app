@@ -73,10 +73,18 @@ pub struct StoredToken {
 impl ApnsClient {
     /// Build from env. Missing any of the four vars → disabled (no-op sends).
     pub fn from_env() -> Self {
-        let key_path = std::env::var("APNS_KEY_PATH").ok().filter(|s| !s.trim().is_empty());
-        let key_id = std::env::var("APNS_KEY_ID").ok().filter(|s| !s.trim().is_empty());
-        let team_id = std::env::var("APNS_TEAM_ID").ok().filter(|s| !s.trim().is_empty());
-        let topic = std::env::var("APNS_TOPIC").ok().filter(|s| !s.trim().is_empty());
+        let key_path = std::env::var("APNS_KEY_PATH")
+            .ok()
+            .filter(|s| !s.trim().is_empty());
+        let key_id = std::env::var("APNS_KEY_ID")
+            .ok()
+            .filter(|s| !s.trim().is_empty());
+        let team_id = std::env::var("APNS_TEAM_ID")
+            .ok()
+            .filter(|s| !s.trim().is_empty());
+        let topic = std::env::var("APNS_TOPIC")
+            .ok()
+            .filter(|s| !s.trim().is_empty());
 
         match (key_path, key_id, team_id, topic) {
             (Some(path), Some(key_id), Some(team_id), Some(topic)) => {
@@ -208,7 +216,10 @@ impl Configured {
     }
 
     fn bearer_jwt(&self) -> Result<String, String> {
-        let mut guard = self.jwt.lock().map_err(|_| "jwt lock poisoned".to_string())?;
+        let mut guard = self
+            .jwt
+            .lock()
+            .map_err(|_| "jwt lock poisoned".to_string())?;
         if let Some((token, at)) = guard.as_ref() {
             if at.elapsed() < JWT_TTL {
                 return Ok(token.clone());
@@ -242,9 +253,7 @@ fn unix_now() -> i64 {
 pub fn load_family_tokens(db: &Db, family_id: Uuid) -> Result<Vec<StoredToken>, String> {
     let conn = db.lock().map_err(|_| "db lock".to_string())?;
     let mut stmt = conn
-        .prepare(
-            "SELECT token, client_id, apns_env FROM live_activity_tokens WHERE family_id = ?1",
-        )
+        .prepare("SELECT token, client_id, apns_env FROM live_activity_tokens WHERE family_id = ?1")
         .map_err(|e| e.to_string())?;
     let rows = stmt
         .query_map(params![family_id.to_string()], |r| {
@@ -265,7 +274,7 @@ pub fn load_family_tokens(db: &Db, family_id: Uuid) -> Result<Vec<StoredToken>, 
 /// Validate a hex ActivityKit push token (32+ bytes → 64+ hex chars).
 pub fn validate_token_hex(token: &str) -> Result<(), String> {
     let t = token.trim();
-    if t.len() < 64 || t.len() % 2 != 0 {
+    if t.len() < 64 || t.len() % 2 == 1 {
         return Err("token must be hex of at least 32 bytes".into());
     }
     if !t.chars().all(|c| c.is_ascii_hexdigit()) {
@@ -278,7 +287,9 @@ pub fn normalize_apns_env(env: &str) -> Result<&'static str, String> {
     match env.trim().to_ascii_lowercase().as_str() {
         "sandbox" | "development" => Ok("sandbox"),
         "production" | "prod" => Ok("production"),
-        other => Err(format!("apns_env must be sandbox or production, got {other}")),
+        other => Err(format!(
+            "apns_env must be sandbox or production, got {other}"
+        )),
     }
 }
 
