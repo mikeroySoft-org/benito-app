@@ -11,8 +11,6 @@ struct BenitoLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: BenitoActivityAttributes.self) { context in
             ActivityContentView(childName: context.attributes.childName, state: context.state)
-                .activityBackgroundTint(Palette.canvas)
-                .activitySystemActionForegroundColor(Palette.textPrimary)
         } dynamicIsland: { context in
             let state = context.state
             return DynamicIsland {
@@ -65,14 +63,22 @@ struct BenitoLiveActivity: Widget {
 /// Lock Screen / banner (`.medium`) vs. Apple Watch Smart Stack (`.small`).
 private struct ActivityContentView: View {
     @Environment(\.activityFamily) private var family
+    @Environment(\.self) private var environment
     let childName: String
     let state: BenitoActivityAttributes.ContentState
 
     var body: some View {
         if family == .small {
             SmartStackView(state: state)
+                // Resolve the plate with the content, not in the mirrored ActivityKit host.
+                // Keep the same plate and controls when Always On reduces luminance.
+                .background(Color(Palette.canvas.resolve(in: environment)))
+                .activityBackgroundTint(.clear)
+                .activitySystemActionForegroundColor(Color(Palette.textPrimary.resolve(in: environment)))
         } else {
             LockScreenView(childName: childName, state: state)
+                .activityBackgroundTint(Palette.canvas)
+                .activitySystemActionForegroundColor(Palette.textPrimary)
         }
     }
 }
@@ -601,6 +607,12 @@ extension BenitoActivityAttributes.ContentState {
         )
     }
 
+    fileprivate static var sleepingPaused: Self {
+        var state = sleeping
+        state.timerPausedAt = Date.now.addingTimeInterval(-60)
+        return state
+    }
+
     fileprivate static var idle: Self {
         Self(
             lastDiaperAt: Date.now.addingTimeInterval(-38 * 60),
@@ -650,13 +662,13 @@ extension BenitoActivityAttributes.ContentState {
             ForEach([false, true], id: \.self) { small in
                 ForEach([false, true], id: \.self) { dark in
                     ForEach([false, true], id: \.self) { reduced in
-                        ForEach([false, true], id: \.self) { paused in
+                        ForEach(0..<4) { index in
                             VStack {
-                                Text("\(small ? "Watch" : "Lock Screen") · \(dark ? "dark" : "light") · \(reduced ? "dim" : "normal") · \(paused ? "paused" : "running")")
+                                Text("\(small ? "Watch" : "Lock Screen") · \(dark ? "dark" : "light") · \(reduced ? "dim" : "normal") · \(index < 2 ? "feed" : "sleep") · \(index.isMultiple(of: 2) ? "running" : "paused")")
                                     .font(.caption2)
                                 ActivityContentView(
                                     childName: "Sam",
-                                    state: paused ? .breastLeftPaused : .breastLeft
+                                    state: [.breastLeft, .breastLeftPaused, .sleeping, .sleepingPaused][index]
                                 )
                                 .environment(\.activityFamily, small ? .small : .medium)
                                 .environment(\.isLuminanceReduced, reduced)
