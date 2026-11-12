@@ -642,3 +642,32 @@ extension BenitoActivityAttributes.ContentState {
 } contentStates: {
     BenitoActivityAttributes.ContentState.sleeping
 }
+
+// Repro #12: compare the same controls across host appearance and Always On states.
+#Preview("Timer appearance matrix") {
+    ScrollView {
+        VStack(spacing: 16) {
+            ForEach([false, true], id: \.self) { small in
+                ForEach([false, true], id: \.self) { dark in
+                    ForEach([false, true], id: \.self) { reduced in
+                        ForEach([false, true], id: \.self) { paused in
+                            VStack {
+                                Text("\(small ? "Watch" : "Lock Screen") · \(dark ? "dark" : "light") · \(reduced ? "dim" : "normal") · \(paused ? "paused" : "running")")
+                                    .font(.caption2)
+                                ActivityContentView(
+                                    childName: "Sam",
+                                    state: paused ? .breastLeftPaused : .breastLeft
+                                )
+                                .environment(\.activityFamily, small ? .small : .medium)
+                                .environment(\.isLuminanceReduced, reduced)
+                                .background(Palette.canvas)
+                                .environment(\.colorScheme, dark ? .dark : .light)
+                                .frame(width: small ? 184 : 360)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
