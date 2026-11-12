@@ -247,6 +247,9 @@ private struct SmartStackView: View {
 
 /// Pause/Resume + Stop for the active timer.
 private struct TimerControls: View {
+    @Environment(\.activityFamily) private var family
+    @Environment(\.self) private var environment
+
     enum Style {
         /// Icon-only circles (Lock Screen, next to the clock).
         case circles
@@ -298,7 +301,7 @@ private struct TimerControls: View {
             intent: intent,
             title: style == .pills ? title : nil,
             symbol: symbol,
-            tint: tint,
+            tint: family == .small ? Color(tint.resolve(in: environment)) : tint,
             height: height,
             accessibilityLabel: accessibilityLabel
         )
