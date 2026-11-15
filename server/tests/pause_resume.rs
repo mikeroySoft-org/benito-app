@@ -97,7 +97,13 @@ async fn get(base: &str, token: &str, path_and_query: &str) -> (u16, Value) {
         .unwrap()
 }
 
-async fn start_timer(base: &str, token: &str, child_id: &str, kind: &str, side: Option<&str>) -> Value {
+async fn start_timer(
+    base: &str,
+    token: &str,
+    child_id: &str,
+    kind: &str,
+    side: Option<&str>,
+) -> Value {
     let mut body = json!({ "child_id": child_id, "kind": kind });
     if let Some(s) = side {
         body["side"] = json!(s);
@@ -160,13 +166,21 @@ async fn pause_resume_stop_lifecycle() {
     let (status, listed) = get(&base, &token, &format!("/timers?child_id={child_id}")).await;
     assert_eq!(status, 200, "{listed}");
     assert!(
-        listed.as_array().unwrap().iter().any(|t| t["id"] == id.as_str()),
+        listed
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|t| t["id"] == id.as_str()),
         "paused timer missing from list: {listed}"
     );
     let (status, listed_all) = get(&base, &token, "/timers").await;
     assert_eq!(status, 200, "{listed_all}");
     assert!(
-        listed_all.as_array().unwrap().iter().any(|t| t["id"] == id.as_str()),
+        listed_all
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|t| t["id"] == id.as_str()),
         "paused timer missing from family list: {listed_all}"
     );
 
@@ -181,7 +195,10 @@ async fn pause_resume_stop_lifecycle() {
     assert_eq!(resumed["state"], "running");
     assert!(resumed["paused_at"].is_null(), "{resumed}");
     let after_resume = resumed["paused_seconds"].as_i64().unwrap();
-    assert!(after_resume >= 1, "paused_seconds after 1.1s pause: {resumed}");
+    assert!(
+        after_resume >= 1,
+        "paused_seconds after 1.1s pause: {resumed}"
+    );
 
     let (status, again) = timer_action(&base, &token, &id, "resume").await;
     assert_eq!(status, 409, "double resume: {again}");
@@ -192,7 +209,10 @@ async fn pause_resume_stop_lifecycle() {
     open_db(&dir)
         .execute(
             "UPDATE timers SET paused_at = ?2 WHERE id = ?1",
-            rusqlite::params![id, (Utc::now() - chrono::Duration::seconds(90)).to_rfc3339()],
+            rusqlite::params![
+                id,
+                (Utc::now() - chrono::Duration::seconds(90)).to_rfc3339()
+            ],
         )
         .unwrap();
 
@@ -212,7 +232,11 @@ async fn pause_resume_stop_lifecycle() {
     assert_eq!(feeds.len(), 1, "{events}");
     assert_eq!(feeds[0]["side"], "L");
     assert_eq!(feeds[0]["started_at"], timer["started_at"]);
-    assert_eq!(feeds[0]["payload_json"]["paused_seconds"], final_paused, "{}", feeds[0]);
+    assert_eq!(
+        feeds[0]["payload_json"]["paused_seconds"], final_paused,
+        "{}",
+        feeds[0]
+    );
 
     let (_, st) = get(&base, &token, &format!("/state?child_id={child_id}")).await;
     assert!(st["active_timer"].is_null(), "{st}");
@@ -285,7 +309,10 @@ async fn summary_sleep_hours_exclude_paused_time() {
     assert_eq!(status, 200, "{summary}");
     assert_eq!(summary["sleep_event_count"], 1, "{summary}");
     let hours = summary["sleep_hours"].as_f64().unwrap();
-    assert!((hours - 1.5).abs() < 0.02, "sleep_hours should exclude pause: {summary}");
+    assert!(
+        (hours - 1.5).abs() < 0.02,
+        "sleep_hours should exclude pause: {summary}"
+    );
 }
 
 #[tokio::test]
@@ -379,7 +406,6 @@ async fn client_at_is_stored_as_timer_wall_times() {
     assert_eq!(resumed["paused_seconds"], 60, "{resumed}");
 }
 
-
 /// Overnight sleep 22:00→02:00: day-of-start and day-of-wake each get ~2h (clipped overlap).
 #[tokio::test]
 async fn summary_overnight_sleep_is_clipped_per_day() {
@@ -464,7 +490,9 @@ async fn summary_nursing_seconds_clip_per_day_and_bottle_totals() {
         let token = token.clone();
         async move {
             let (status, created) =
-                http_json("POST", &format!("{base}/events"), Some(&token), Some(body)).await.unwrap();
+                http_json("POST", &format!("{base}/events"), Some(&token), Some(body))
+                    .await
+                    .unwrap();
             assert_eq!(status, 200, "{created}");
         }
     };
@@ -515,12 +543,18 @@ async fn summary_nursing_seconds_clip_per_day_and_bottle_totals() {
 
     let d0 = summary(day0, day1).await;
     let nursing0 = d0["nursing_seconds"].as_f64().unwrap();
-    assert!((nursing0 - 25.0 * 60.0).abs() < 1.0, "day0 nursing 15+10 min: {d0}");
+    assert!(
+        (nursing0 - 25.0 * 60.0).abs() < 1.0,
+        "day0 nursing 15+10 min: {d0}"
+    );
     assert_eq!(d0["bottle_oz_total"].as_f64().unwrap(), 3.0, "{d0}");
     assert_eq!(d0["bottle_ml_total"].as_f64().unwrap(), 60.0, "{d0}");
 
     let d1 = summary(day1, day2).await;
     let nursing1 = d1["nursing_seconds"].as_f64().unwrap();
-    assert!((nursing1 - 10.0 * 60.0).abs() < 1.0, "day1 gets the 10 min after midnight: {d1}");
+    assert!(
+        (nursing1 - 10.0 * 60.0).abs() < 1.0,
+        "day1 gets the 10 min after midnight: {d1}"
+    );
     assert_eq!(d1["bottle_oz_equiv"].as_f64().unwrap(), 0.0, "{d1}");
 }

@@ -158,10 +158,7 @@ impl SyncHub {
 
         {
             let mut s = sender.lock().await;
-            if s.send(Message::Text(hello.to_json().into()))
-                .await
-                .is_err()
-            {
+            if s.send(Message::Text(hello.to_json().into())).await.is_err() {
                 self.drop_client(conn_id).await;
                 return;
             }
@@ -293,8 +290,7 @@ async fn authenticate(
 
 fn resolve_auth(db: &Db, token: &str, client_id: Option<String>) -> Result<AuthInfo, String> {
     let user = user_from_token(db, token).map_err(|_| "invalid or expired session".to_string())?;
-    let family_id = family_id_for_user(db, user.id)
-        .map_err(|e| e)?
+    let family_id = family_id_for_user(db, user.id)?
         .ok_or_else(|| "join or create a family before connecting to /sync".to_string())?;
     Ok(AuthInfo {
         user_id: user.id,
@@ -337,8 +333,7 @@ async fn handle_client_text(
     text: &str,
 ) -> Result<(), String> {
     if text == "ping" || text.trim() == r#"{"type":"ping"}"# {
-        let env = SyncEnvelope::new("pong", json!({}))
-            .with_client_id(Some(client_id.to_string()));
+        let env = SyncEnvelope::new("pong", json!({})).with_client_id(Some(client_id.to_string()));
         hub.publish_to_family_async(family_id, env).await;
         return Ok(());
     }
@@ -349,8 +344,8 @@ async fn handle_client_text(
 
     match msg_type {
         "ping" => {
-            let env = SyncEnvelope::new("pong", json!({}))
-                .with_client_id(Some(client_id.to_string()));
+            let env =
+                SyncEnvelope::new("pong", json!({})).with_client_id(Some(client_id.to_string()));
             hub.publish_to_family_async(family_id, env).await;
         }
         "auth" => {
@@ -362,8 +357,11 @@ async fn handle_client_text(
                 .pointer("/payload/child_id")
                 .cloned()
                 .unwrap_or(Value::Null);
-            let env = SyncEnvelope::new("state", json!({ "child_id": child_id, "action": "refetch" }))
-                .with_client_id(Some(client_id.to_string()));
+            let env = SyncEnvelope::new(
+                "state",
+                json!({ "child_id": child_id, "action": "refetch" }),
+            )
+            .with_client_id(Some(client_id.to_string()));
             hub.publish_to_family_async(family_id, env).await;
         }
         "" => return Err("missing type".into()),
@@ -375,8 +373,11 @@ async fn handle_client_text(
 }
 
 /// Look up family_id for a child (used by HTTP handlers when broadcasting).
-pub fn family_id_for_child(db: &Db, child_id: Uuid) -> Result<Option<Uuid>, ()> {
-    let conn = db.lock().map_err(|_| ())?;
+pub fn family_id_for_child(
+    db: &Db,
+    child_id: Uuid,
+) -> Result<Option<Uuid>, crate::auth::AuthError> {
+    let conn = db.lock().map_err(|_| crate::auth::AuthError::Internal)?;
     let row: Result<String, _> = conn.query_row(
         "SELECT family_id FROM children WHERE id = ?1",
         params![child_id.to_string()],
@@ -385,7 +386,7 @@ pub fn family_id_for_child(db: &Db, child_id: Uuid) -> Result<Option<Uuid>, ()> 
     match row {
         Ok(s) => Ok(Uuid::parse_str(&s).ok()),
         Err(rusqlite::Error::QueryReturnedNoRows) => Ok(None),
-        Err(_) => Err(()),
+        Err(_) => Err(crate::auth::AuthError::Internal),
     }
 }
 

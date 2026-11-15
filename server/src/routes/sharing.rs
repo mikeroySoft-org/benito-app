@@ -682,7 +682,7 @@ pub async fn redeem_invite(
     let now = Utc::now();
     let mut conn = state.db.lock().map_err(|_| AuthError::Internal)?;
     let tx = conn.transaction().map_err(|_| AuthError::Internal)?;
-    let invite: Option<(
+    type InviteRow = (
         String,
         String,
         String,
@@ -690,7 +690,8 @@ pub async fn redeem_invite(
         String,
         Option<String>,
         Option<String>,
-    )> = tx
+    );
+    let invite: Option<InviteRow> = tx
         .query_row(
             "SELECT family_id, secret_hash, role, access_hours, expires_at, used_at, revoked_at
              FROM family_invites WHERE id = ?1",
@@ -716,7 +717,7 @@ pub async fn redeem_invite(
     if !digests_match(&secret_hash, &hash_secret(&body.secret))
         || used_at.is_some()
         || revoked_at.is_some()
-        || parse_time(&expires_at).map_or(true, |e| e <= now)
+        || parse_time(&expires_at).is_none_or(|e| e <= now)
     {
         return Err(invalid());
     }

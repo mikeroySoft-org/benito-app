@@ -62,7 +62,11 @@ pub struct DailySummary {
     pub total_events: i64,
 }
 
-fn ensure_child_access(conn: &rusqlite::Connection, user_id: Uuid, child_id: Uuid) -> Result<(), AuthError> {
+fn ensure_child_access(
+    conn: &rusqlite::Connection,
+    user_id: Uuid,
+    child_id: Uuid,
+) -> Result<(), AuthError> {
     let ok: Option<i64> = conn
         .query_row(
             "SELECT 1 FROM children c
@@ -93,7 +97,9 @@ impl<T> OptionalRow<T> for rusqlite::Result<T> {
     }
 }
 
-fn resolve_window(q: &DailySummaryQuery) -> Result<(DateTime<Utc>, DateTime<Utc>, Option<String>), AuthError> {
+type SummaryWindow = (DateTime<Utc>, DateTime<Utc>, Option<String>);
+
+fn resolve_window(q: &DailySummaryQuery) -> Result<SummaryWindow, AuthError> {
     if let (Some(from), Some(to)) = (q.from, q.to) {
         if to <= from {
             return Err(AuthError::BadRequest("to must be after from".into()));
@@ -120,7 +126,6 @@ fn paused_seconds(payload: Option<&str>) -> i64 {
         .unwrap_or(0)
         .max(0)
 }
-
 
 /// Wall-clock duration minus paused time for a fully-contained timed event; 0 if open-ended / unparseable.
 fn timed_event_secs(ended: Option<&str>, payload: Option<&str>, started: &str) -> f64 {
@@ -199,7 +204,13 @@ fn overlapping_spans(
         .map_err(|_| AuthError::Internal)?;
     let rows = stmt
         .query_map(
-            params![child, from.to_rfc3339(), to.to_rfc3339(), event_type, subtype],
+            params![
+                child,
+                from.to_rfc3339(),
+                to.to_rfc3339(),
+                event_type,
+                subtype
+            ],
             |r| {
                 Ok((
                     r.get::<_, String>(0)?,
@@ -213,7 +224,8 @@ fn overlapping_spans(
     let mut spans = Vec::new();
     for row in rows {
         let (started, ended, payload) = row.map_err(|_| AuthError::Internal)?;
-        let Ok(start) = DateTime::parse_from_rfc3339(&started).map(|d| d.with_timezone(&Utc)) else {
+        let Ok(start) = DateTime::parse_from_rfc3339(&started).map(|d| d.with_timezone(&Utc))
+        else {
             continue;
         };
         let Ok(end) = DateTime::parse_from_rfc3339(&ended).map(|d| d.with_timezone(&Utc)) else {
@@ -222,7 +234,11 @@ fn overlapping_spans(
         if end <= start {
             continue;
         }
-        spans.push(EventSpan { start, end, paused: paused_seconds(payload.as_deref()) });
+        spans.push(EventSpan {
+            start,
+            end,
+            paused: paused_seconds(payload.as_deref()),
+        });
     }
     Ok(spans)
 }
@@ -299,23 +315,36 @@ pub async fn daily_summary(
                         Some("R") | Some("r") | Some("right") => feed_breast_right += 1,
                         _ => {}
                     }
-                    feed_secs += timed_event_secs(ended.as_deref(), payload.as_deref(), started.as_str());
+                    feed_secs +=
+                        timed_event_secs(ended.as_deref(), payload.as_deref(), started.as_str());
                 }
                 "feed_bottle" => {
                     feed_bottle_count += 1;
                     if let Some(v) = amount {
-                        match unit.as_deref().unwrap_or("oz").to_ascii_lowercase().as_str() {
+                        match unit
+                            .as_deref()
+                            .unwrap_or("oz")
+                            .to_ascii_lowercase()
+                            .as_str()
+                        {
                             "ml" => bottle_ml_total += v,
                             _ => bottle_oz_total += v,
                         }
                     }
-                    feed_secs += timed_event_secs(ended.as_deref(), payload.as_deref(), started.as_str());
+                    feed_secs +=
+                        timed_event_secs(ended.as_deref(), payload.as_deref(), started.as_str());
                 }
                 "feed_solid" => {
                     feed_solid_count += 1;
-                    feed_secs += timed_event_secs(ended.as_deref(), payload.as_deref(), started.as_str());
+                    feed_secs +=
+                        timed_event_secs(ended.as_deref(), payload.as_deref(), started.as_str());
                 }
-                "diaper" => match subtype.as_deref().unwrap_or("").to_ascii_lowercase().as_str() {
+                "diaper" => match subtype
+                    .as_deref()
+                    .unwrap_or("")
+                    .to_ascii_lowercase()
+                    .as_str()
+                {
                     "wet" => diaper_wet += 1,
                     "dirty" | "poop" | "bm" => diaper_dirty += 1,
                     "both" | "mixed" => diaper_both += 1,
@@ -345,10 +374,12 @@ pub async fn daily_summary(
 
     // Nursing minutes use the same overlap clip (counts stay started-in-window above).
     let clipped_total = |event_type: &str, subtype: Option<&str>| -> Result<f64, AuthError> {
-        Ok(overlapping_spans(&conn, &child, event_type, subtype, from, to)?
-            .iter()
-            .map(|span| span.clipped_active_secs(from, to))
-            .sum())
+        Ok(
+            overlapping_spans(&conn, &child, event_type, subtype, from, to)?
+                .iter()
+                .map(|span| span.clipped_active_secs(from, to))
+                .sum(),
+        )
     };
     let nursing_secs = clipped_total("feed_breast", None)?;
     let crying_secs = clipped_total("activity", Some("crying"))?;

@@ -11,10 +11,10 @@ use uuid::Uuid;
 
 use crate::auth::{AuthError, AuthUser};
 use crate::models::{AdjustTimerRequest, Event, StartTimerRequest, Timer, TimerAtRequest};
+use crate::routes::events::ACTIVITY_SUBTYPES;
 use crate::sync::{
     broadcast_event_upsert, broadcast_timer_stop, broadcast_timer_upsert, family_id_for_child,
 };
-use crate::routes::events::ACTIVITY_SUBTYPES;
 use crate::AppState;
 
 #[derive(Debug, Deserialize)]
@@ -73,7 +73,11 @@ fn map_timer(r: &rusqlite::Row<'_>) -> rusqlite::Result<Timer> {
 const TIMER_SELECT: &str =
     "SELECT id, child_id, kind, started_at, started_by, state, stopped_at, updated_at, side, paused_at, paused_seconds FROM timers";
 
-fn can_access(conn: &rusqlite::Connection, user_id: Uuid, child_id: Uuid) -> Result<bool, AuthError> {
+fn can_access(
+    conn: &rusqlite::Connection,
+    user_id: Uuid,
+    child_id: Uuid,
+) -> Result<bool, AuthError> {
     let ok: Option<i64> = conn
         .query_row(
             "SELECT 1 FROM children c
@@ -116,7 +120,6 @@ fn load_accessible_timer(
     }
     Ok(timer)
 }
-
 
 /// How far a client `at` may sit ahead of server `Utc::now()` (phone clock skew).
 const CLIENT_AT_FUTURE_SLACK_SECS: i64 = 300;
@@ -316,7 +319,9 @@ pub async fn adjust_timer(
             return Err(AuthError::Conflict("timer is not active".into()));
         }
         if started_at > now + chrono::Duration::seconds(ADJUST_FUTURE_SLACK_SECS) {
-            return Err(AuthError::BadRequest("started_at cannot be in the future".into()));
+            return Err(AuthError::BadRequest(
+                "started_at cannot be in the future".into(),
+            ));
         }
         if started_at < now - chrono::Duration::hours(ADJUST_MAX_AGE_HOURS) {
             return Err(AuthError::BadRequest(
@@ -333,7 +338,11 @@ pub async fn adjust_timer(
         let updated_at = Utc::now();
         conn.execute(
             "UPDATE timers SET started_at = ?2, updated_at = ?3 WHERE id = ?1",
-            params![id.to_string(), started_at.to_rfc3339(), updated_at.to_rfc3339()],
+            params![
+                id.to_string(),
+                started_at.to_rfc3339(),
+                updated_at.to_rfc3339()
+            ],
         )
         .map_err(|_| AuthError::Internal)?;
         load_timer(&conn, id)?
@@ -395,7 +404,9 @@ pub async fn stop_timer(
         };
         let auto_event = match auto_kind {
             Some((event_type, subtype)) => {
-                let side = (event_type == "feed_breast").then(|| timer.side.clone()).flatten();
+                let side = (event_type == "feed_breast")
+                    .then(|| timer.side.clone())
+                    .flatten();
                 let event_id = Uuid::new_v4();
                 conn.execute(
                     "INSERT INTO events (id, child_id, type, subtype, started_at, ended_at, amount_value, amount_unit, side, notes, payload_json, created_by, created_at, updated_at, deleted_at)
@@ -451,7 +462,6 @@ pub async fn stop_timer(
     }
     Ok(Json(timer))
 }
-
 
 /// Active timers (`running` or `paused`), newest first.
 pub async fn list_timers(
