@@ -2,6 +2,7 @@ pub mod apns;
 pub mod auth;
 pub mod db;
 pub mod device_auth;
+pub mod envfile;
 pub mod lan;
 pub mod models;
 pub mod routes;
