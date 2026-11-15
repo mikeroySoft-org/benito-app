@@ -51,7 +51,8 @@ free loopback port, never the live service. Cold caches need network access.
 Run `scripts/check-site-plumbing.sh` separately to check Pages without deploying.
 
 The gate protects signing, deployment, published migrations, service/backup scripts,
-and its own configuration. New numbered migrations remain allowed. `SPEC.md` still
+its own configuration, and gate helpers (`scripts/gate-env.sh` and
+`scripts/check-site-plumbing.sh`). New numbered migrations remain allowed. `SPEC.md` still
 requires human review: factory has no nonblocking path-review flag, so it is not
 protected. Clippy/fmt cleanup and signed builds are deliberately outside this gate.
 
