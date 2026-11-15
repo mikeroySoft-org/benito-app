@@ -8,39 +8,24 @@ fn load_dotenv_file(path: &Path) {
     let Ok(text) = std::fs::read_to_string(path) else {
         return;
     };
-    for line in text.lines() {
-        let line = line.trim();
-        if line.is_empty() || line.starts_with('#') {
+    for (key, value) in benito_server::envfile::parse_dotenv(&text) {
+        if std::env::var_os(&key).is_some() {
             continue;
         }
-        let Some((key, value)) = line.split_once('=') else {
-            continue;
-        };
-        let key = key.trim();
-        if key.is_empty() {
-            continue;
-        }
-        if std::env::var_os(key).is_some() {
-            continue;
-        }
-        let value = value.trim().trim_matches('"').trim_matches('\'');
         std::env::set_var(key, value);
     }
 }
 
 fn resolve_session_secret() -> String {
     // Prefer explicit env / file after optional dotenv load.
-    if let Ok(s) = std::env::var("SESSION_SECRET") {
-        let s = s.trim().to_string();
-        if !s.is_empty() {
-            return s;
-        }
+    let env_value = std::env::var("SESSION_SECRET").ok();
+    if let Some(secret) = benito_server::envfile::pick_session_secret(env_value.as_deref(), None) {
+        return secret;
     }
     if let Ok(path) = std::env::var("SESSION_SECRET_FILE") {
         if let Ok(s) = std::fs::read_to_string(&path) {
-            let s = s.trim().to_string();
-            if !s.is_empty() {
-                return s;
+            if let Some(secret) = benito_server::envfile::pick_session_secret(None, Some(&s)) {
+                return secret;
             }
         } else {
             tracing::warn!("SESSION_SECRET_FILE set but unreadable: {path}");
