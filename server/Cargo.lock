@@ -169,6 +169,7 @@ dependencies = [
  "hyper",
  "hyper-util",
  "jsonwebtoken",
+ "libc",
  "p256",
  "password-hash",
  "rand 0.8.8",
