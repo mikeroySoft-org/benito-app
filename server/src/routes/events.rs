@@ -156,6 +156,18 @@ pub async fn create_event(
     let id = body.id.unwrap_or_else(Uuid::new_v4);
     let now = Utc::now();
     let started = body.started_at.unwrap_or(now);
+    if started > now + chrono::Duration::minutes(EDIT_FUTURE_SLACK_MINUTES) {
+        return Err(AuthError::BadRequest(
+            "started_at cannot be in the future".into(),
+        ));
+    }
+    if let Some(ended) = body.ended_at {
+        if ended < started {
+            return Err(AuthError::BadRequest(
+                "ended_at cannot be before started_at".into(),
+            ));
+        }
+    }
     let payload = body.payload_json.as_ref().map(|v| v.to_string());
     {
         let conn = state.db.lock().map_err(|_| AuthError::Internal)?;
