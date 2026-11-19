@@ -244,8 +244,8 @@ async fn summary_rejects_invalid_windows() {
 
 async fn midnight_events(base: &str, token: &str, child: &str) {
     for (at, subtype) in [
-        ("2026-11-19T00:00:00Z", "wet"),
-        ("2026-11-20T00:00:00Z", "dirty"),
+        ("2025-11-19T00:00:00Z", "wet"),
+        ("2025-11-20T00:00:00Z", "dirty"),
     ] {
         post_event(
             base,
@@ -265,13 +265,13 @@ async fn summary_day_param_is_utc_calendar_day() {
     let (status, body) = get(
         &base,
         &token,
-        &format!("/summary/daily?child_id={child}&day=2026-11-19"),
+        &format!("/summary/daily?child_id={child}&day=2025-11-19"),
     )
     .await;
     assert_eq!(status, 200, "{body}");
-    assert_eq!(body["from"], "2026-11-19T00:00:00Z");
-    assert_eq!(body["to"], "2026-11-20T00:00:00Z");
-    assert_eq!(body["day"], "2026-11-19");
+    assert_eq!(body["from"], "2025-11-19T00:00:00Z");
+    assert_eq!(body["to"], "2025-11-20T00:00:00Z");
+    assert_eq!(body["day"], "2025-11-19");
     assert_eq!(body["diaper_wet"], 1);
     assert_eq!(body["diaper_dirty"], 0);
     assert_eq!(body["total_events"], 1);
@@ -284,14 +284,14 @@ async fn summary_from_to_override_day() {
     midnight_events(&base, &token, &child).await;
     let path = window(
         &child,
-        "2026-11-20T00:00:00+00:00",
-        "2026-11-21T00:00:00+00:00",
+        "2025-11-20T00:00:00+00:00",
+        "2025-11-21T00:00:00+00:00",
     );
-    let (status, body) = get(&base, &token, &format!("{path}&day=2026-11-19")).await;
+    let (status, body) = get(&base, &token, &format!("{path}&day=2025-11-19")).await;
     assert_eq!(status, 200, "{body}");
-    assert_eq!(body["from"], "2026-11-20T00:00:00Z");
-    assert_eq!(body["to"], "2026-11-21T00:00:00Z");
-    assert_eq!(body["day"], "2026-11-19");
+    assert_eq!(body["from"], "2025-11-20T00:00:00Z");
+    assert_eq!(body["to"], "2025-11-21T00:00:00Z");
+    assert_eq!(body["day"], "2025-11-19");
     assert_eq!(body["diaper_wet"], 0);
     assert_eq!(body["diaper_dirty"], 1);
     assert_eq!(body["total_events"], 1);
