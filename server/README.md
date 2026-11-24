@@ -46,6 +46,7 @@ Optional ActivityKit push (no-op when unset — WebSocket still works):
 3. Second parent: register + `POST /families/join` `{ "invite_code" }`, **or** proximity pairing (SharePlay/AirDrop): a member calls `POST /families/pairing-tokens` → `{ "token", "family_name", "expires_at" }` (single-use, 5-minute TTL; minting doesn't revoke earlier tokens), hands the token over, and the joiner calls `POST /families/pair` `{ "token" }` → `Family` (same as join). Unknown/expired/used token → 404; redeemer already in a family → 409 (token not consumed); minting without a family → 404.
    To switch families (mostly troubleshooting/dev): `POST /families/leave` removes the caller's membership (`{ "left": true }`; 404 if not in a family). The family and its data stay for the remaining members; already-open `WS /sync` connections for that user keep streaming until they reconnect.
 4. `GET /me` → user + family + children
+5. `DELETE /me` (Bearer) deletes the caller's account → `{ "deleted": true }`. If they are the last member, the family and its whole history go too; otherwise the family stays and events they logged remain, attributed to `Former member`. Their sessions, device keys, push tokens and unused invites are removed, and the email is free to register again.
 
 Sessions are bearer tokens valid for 30 days and **slide** for active users: any authenticated request (including `WS /sync` auth) on a session with fewer than 15 days left pushes its `expires_at` back to now + 30 days, keeping the same token. Expired sessions are rejected with 401 and never renewed.
 
@@ -65,7 +66,7 @@ New people never pick a username or password. Each phone holds a P-256 key (Secu
 
 - `GET /health`
 - `POST /auth/register`, `POST /auth/login`
-- `GET /me`
+- `GET /me`, `DELETE /me`
 - `POST /families`, `POST /families/join`, `POST /families/leave`, `POST /families/pairing-tokens`, `POST /families/pair`
 - `GET/POST /children`
 - `POST/GET /events`, `PATCH/DELETE /events/{id}`, `GET /timeline` (`?child_id=&limit=&since=`, see below)

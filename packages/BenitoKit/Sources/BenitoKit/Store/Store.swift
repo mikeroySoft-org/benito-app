@@ -60,6 +60,9 @@ public protocol BenitoStore: Sendable {
 
     func setPreference(_ key: String, value: String) async throws
     func preference(_ key: String) async throws -> String?
+
+    /// Deletes every row: children, events, timers, the outbox and preferences.
+    func eraseAll() async throws
 }
 
 /// Optional hook so `state` / `refetch_state` envelopes can HTTP-refetch and replace local rows.
@@ -204,6 +207,14 @@ public actor InMemoryStore: BenitoStore {
 
     public func preference(_ key: String) async throws -> String? {
         prefs[key]
+    }
+
+    public func eraseAll() async throws {
+        childRows = [:]
+        events = [:]
+        timers = [:]
+        outbox = []
+        prefs = [:]
     }
 
     public func applySyncEnvelope(_ envelope: SyncEnvelopeDTO) async throws {

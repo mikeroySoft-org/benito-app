@@ -410,6 +410,14 @@ public final class GRDBStore: BenitoStore, @unchecked Sendable {
         }
     }
 
+    public func eraseAll() async throws {
+        try await dbQueue.write { db in
+            for table in ["outbox", "timers", "events", "children", "prefs"] {
+                try db.execute(sql: "DELETE FROM \(table)")
+            }
+        }
+    }
+
     // MARK: - Row encode / decode
 
     private static func insertChild(_ child: ChildDTO, db: Database) throws {

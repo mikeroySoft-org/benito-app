@@ -18,6 +18,8 @@ The iOS app is generated with **[XcodeGen](https://github.com/yonaskolb/XcodeGen
 | Sharing | `apps/Benito/Sources/Sharing` + `Sources/Pairing`. Account → Sharing lists everyone in the family (swipe to remove) and pending invites. **Invite to Family** mints a one-time, expiring invite (`POST /families/invites`) and offers Messages, AirDrop/share sheet, a QR code and SharePlay. The link (`benito://join?p=…`) carries the server's LAN and tailnet URLs; the joiner's app probes them, creates a Secure Enclave device key and redeems the invite (`POST /invites/redeem`). No username or password. SharePlay delivery needs two physical iPhones; the Simulator can't run it |
 | Default server | empty (`@AppStorage("serverURL")`) — first launch prompts for a URL. On Simulator the preset button fills `http://127.0.0.1:8080`; on device use an HTTPS origin such as `https://<machine>.<tailnet>.ts.net` (see [`docs/deploy-tailscale.md`](../docs/deploy-tailscale.md)) |
 
+TestFlight and App Store builds: [`docs/release-ios.md`](../docs/release-ios.md) (`scripts/release-ios.sh`).
+
 ### Regenerate / open
 
 ```bash
