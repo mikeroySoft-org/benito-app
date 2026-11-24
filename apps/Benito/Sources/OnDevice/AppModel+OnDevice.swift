@@ -35,7 +35,7 @@ extension AppModel {
             return
         }
         isSignedIn = true
-        status = String(localized: "On this iPhone")
+        status = String(localized: "On this \(BenitoDevice.name)")
         await refreshMe()
     }
 
@@ -51,6 +51,33 @@ extension AppModel {
 
     /// A move to a server that stopped partway (app closed, connection dropped).
     var pendingServerMove: PendingServerMigration? { PendingServerMigration.load() }
+
+    /// Account › Erase all data: deletes the local family, baby and every entry, forgets any
+    /// move to a server in progress, and returns to first-run onboarding.
+    func eraseOnDeviceData() async {
+        guard isOnDevice else { return }
+        BenitoLog.ui.notice("eraseOnDeviceData")
+        do {
+            try await store.eraseAll()
+        } catch {
+            BenitoLog.ui.error("eraseOnDeviceData failed: \(String(describing: error), privacy: .public)")
+            status = "Erase failed: \(Self.message(for: error))"
+            return
+        }
+        // A move that had started signed this phone in to that server; drop that sign-in too.
+        if let server = (pendingServerMove?.serverURL).flatMap(URL.init(string:)) {
+            try? tokenStore.deleteToken(for: server)
+            storeDeviceId(nil, for: server)
+        }
+        PendingServerMigration.clear()
+        serverMove = nil
+        BenitoMode.set(.server)
+        isOnDevice = false
+        tearDownSession()
+        clearFamilyState()
+        outboxPending = 0
+        status = "Not signed in"
+    }
 }
 
 // MARK: - Account › Connect to a server
@@ -80,7 +107,7 @@ extension AppModel {
         defer { serverMove = nil }
 
         guard let info = await Self.probe(server) else {
-            throw SharingError.failed(String(localized: "Can't reach that server. Check the address and that this iPhone is on the same network."))
+            throw SharingError.failed(String(localized: "Can't reach that server. Check the address and that this \(BenitoDevice.name) is on the same network."))
         }
         let client = try await serverSession(at: server)
 
