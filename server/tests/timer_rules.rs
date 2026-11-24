@@ -138,7 +138,8 @@ async fn timer_unknown_id_is_not_found() {
     let (token, _child_id) = parent_with_child(&base, "parent@example.com").await;
     let id = uuid::Uuid::new_v4();
     for action in ["pause", "resume", "stop"] {
-        let (status, body) = post(&base, &token, &format!("/timers/{id}/{action}"), json!({})).await;
+        let (status, body) =
+            post(&base, &token, &format!("/timers/{id}/{action}"), json!({})).await;
         // Unknown pause/resume statuses are already pinned in pause_resume.rs.
         if action == "stop" {
             assert_eq!(status, 404, "{action}: {body}");
@@ -183,7 +184,10 @@ async fn rejected_start(base: &str, token: &str, child_id: &str, kind: &str) -> 
         json!({"child_id": child_id, "kind": kind}),
     )
     .await;
-    assert!((400..500).contains(&status), "start {kind}: {status} {body}");
+    assert!(
+        (400..500).contains(&status),
+        "start {kind}: {status} {body}"
+    );
     assert_eq!(timers(base, token).await, json!([]));
     status
 }
