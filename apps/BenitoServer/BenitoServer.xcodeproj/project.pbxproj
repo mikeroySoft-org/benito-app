@@ -1038,7 +1038,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BENITO_BUNDLE_PREFIX).benito.serverapp";
 				PRODUCT_NAME = "Benito Server";
 				SDKROOT = macosx;
@@ -1185,7 +1185,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				MARKETING_VERSION = 0.1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BENITO_BUNDLE_PREFIX).benito.serverapp";
 				PRODUCT_NAME = "Benito Server";
 				SDKROOT = macosx;
