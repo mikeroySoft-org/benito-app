@@ -71,6 +71,7 @@ Each invite works once and expires after three days.
 SPEC.md                 product and technical decisions
 server/                 Rust sync server (axum + SQLite)
 apps/Benito/            iPhone and iPad app (SwiftUI, XcodeGen)
+apps/BenitoServer/      Mac menubar app that looks after the server (in progress, see docs/plans/mac-server-app.md)
 apps/BenitoWatch/       Apple Watch app
 apps/BenitoWidgets/     widgets and Live Activities
 packages/BenitoKit/     shared Swift package: models, API client, local store

@@ -23,8 +23,44 @@ Defaults:
 | `BIND_ADDR` (list) | Comma-separated listeners, e.g. `127.0.0.1:8080,0.0.0.0:8081` (loopback for Tailscale Serve plus a LAN port) |
 | `BENITO_PUBLIC_URLS` | Comma-separated origins put into invites, LAN first. The inviter's current URL is always added |
 | `BENITO_BONJOUR_NAME` / `BENITO_BONJOUR` | Bonjour service name for `_benito._tcp` (default `Benito`); `0` disables advertising. Only advertised when bound beyond loopback |
+| `BENITO_BACKUP_DIR` | unset. Setting it turns on built-in snapshots into that folder (see Backups and restore) |
+| `BENITO_BACKUP_KEEP` / `BENITO_BACKUP_INTERVAL_HOURS` | `30` newest `benito-*.db` files kept / a snapshot every `24` hours (`0` = on demand only) |
+| `BENITO_ADMIN_ADDR` | unset. A loopback address (port `0` = any free port) turns on the local admin API (see Admin API) |
+| `BENITO_ADMIN_FILE` | `admin.json` next to the database: where the admin URL and token are written at startup |
 
 Health check: `curl http://127.0.0.1:8080/health`
+
+Only one server may use a database file: `serve` holds a lock on `<database>.lock` and a second one exits with an error. SIGTERM and Ctrl-C shut down cleanly (open connections get 5 seconds, then the WAL is checkpointed).
+
+## Backups and restore
+
+```bash
+benito-server backup            # one snapshot into BENITO_BACKUP_DIR; safe while a server runs
+benito-server restore <file>    # replace the database with a snapshot; the server must be stopped
+```
+
+With `BENITO_BACKUP_DIR` set, the server snapshots itself: SQLite's online backup on a second read-only connection, `PRAGMA integrity_check` on the copy, mode 600, then a rename to `benito-YYYYmmdd-HHMMSS.db` (local time, the same names as `scripts/backup-db.sh`). It checks every 5 minutes and takes a snapshot when the newest one is older than the interval, so a machine that slept catches up. Only `benito-*.db` files beyond `BENITO_BACKUP_KEEP` are pruned.
+
+`restore` refuses while a server holds the lock. It checks the snapshot, saves the current database as `pre-restore-YYYYmmdd-HHMMSS.db` in `BENITO_BACKUP_DIR` (or next to the database), swaps the file, and runs migrations. Both commands print one JSON line.
+
+On a Mac installed with `scripts/macos-service.sh`, the launchd backup agent already does this nightly, and `BENITO_BACKUP_DIR` stays unset. The Mac server app's Update Server sets `BENITO_BACKUP_DIR` and removes that agent, so from then on the server takes the backups. Do not run both: they write and prune the same `benito-*.db` files.
+
+## Admin API (local)
+
+For the Mac server app ([`docs/plans/mac-server-app.md`](../docs/plans/mac-server-app.md)). Off unless `BENITO_ADMIN_ADDR` is set, and it must be loopback. It is a separate listener from `BIND_ADDR`, so nothing in front of the public port (Tailscale Serve, a reverse proxy, the LAN listener) can reach it. At startup the server writes `{"url","token","pid","started_at"}` to `BENITO_ADMIN_FILE` (mode 600) with a new random token, and removes the file on clean shutdown. Every request needs `Authorization: Bearer <token>`. Treat the file like `benito.env`.
+
+| Route | Purpose |
+|---|---|
+| `GET /admin/status` | Version, uptime, database size and counts, listeners, advertised URLs, live sync connections, backup settings and newest snapshot |
+| `GET /admin/glance` | Per child: last feed, diaper, medicine and the active timer |
+| `GET /admin/people` | Every family's members, their devices and pending invites |
+| `POST /admin/invites` | Mint an invite without a signed-in parent (`family_id` optional with one family; other fields as `POST /families/invites`). Recorded as created by the family's first parent. This is the way back in when the only parent's phone is lost |
+| `DELETE /admin/invites/{id}` | Revoke a pending invite |
+| `DELETE /admin/devices/{id}` | Revoke a device key and end its sessions |
+| `DELETE /admin/families/{family_id}/members/{user_id}` | Remove someone (membership, sessions, devices). 409 when they are the family's only parent |
+| `GET /admin/backups` / `POST /admin/backups` | List snapshots / take one now |
+| `GET /admin/export.csv` | Event CSV for a family: optional `family_id` (needed with more than one family), `child_id`, `from` (inclusive) and `to` (exclusive), RFC 3339, on the event's start |
+| `GET /admin/export.json` | The full JSON bundle for a family (same shape as `GET /export`) |
 
 Optional ActivityKit push (no-op when unset — WebSocket still works):
 

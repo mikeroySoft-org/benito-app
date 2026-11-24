@@ -10,7 +10,7 @@ The iOS app is generated with **[XcodeGen](https://github.com/yonaskolb/XcodeGen
 |---|---|
 | Project | `apps/Benito/Benito.xcodeproj` |
 | Scheme | `Benito` |
-| Bundle ID | `com.mikeroysoft.benito` |
+| Bundle ID | `<prefix>.benito`; the prefix comes from `apps/Benito/Config/Local.xcconfig` (`org.example` without one) |
 | Deployment | iOS 18.0+ (Live Activity layout for the Apple Watch Smart Stack needs iOS 18) |
 | Local package | `packages/BenitoKit` (SPM, pulls GRDB) |
 | Widget extension | `BenitoWidgets` (`com.mikeroysoft.benito.widgets`, sources `apps/BenitoWidgets`) — Live Activity for the Dynamic Island, Lock Screen and Apple Watch Smart Stack (watchOS 11+): running feed/sleep timer (pause-aware) plus time since last diaper/feed, with Pause/Resume/Stop buttons while a timer is active and Feed / Diaper / Sleep buttons when idle (Feed and Diaper open the matching Home sheets; Sleep starts the nap timer). Buttons are `LiveActivityIntent`s that run in the iPhone app. `apps/Shared` (activity attributes, content builder, App Intents) is compiled into both targets. Starts with ActivityKit `pushType: .token` so a partner stop can end a suspended phone's island once APNs env is set on the server (Phase 1 sandbox / Xcode); pause/resume push fan-out and push-to-start are later. Toggle under Account → Dynamic Island |
@@ -75,6 +75,30 @@ Escape hatch: `// timer-chrome-ok: <reason>` on/above the `TimelineView`, or a `
 ### Watch (stub target present)
 
 `BenitoWatch` target exists in the same project (`com.mikeroysoft.benito.watchkitapp`, sources under `apps/BenitoWatch/Sources`). It is **not** embedded in the `Benito` scheme yet — this Mac has no usable watchOS simulator runtime. Follow-up: embed Watch under the iOS target, install a watchOS runtime, and wire glance / one-tap logging.
+
+## Benito Server (Mac)
+
+`apps/BenitoServer` is a separate XcodeGen project: a macOS 14+ menubar app that looks after `benito-server` through its loopback admin API (`server/README.md`, Admin API). It is an admin tool, not a client: baby data appears only as a read-only glance. Plan and milestones: [`docs/plans/mac-server-app.md`](../docs/plans/mac-server-app.md).
+
+| | |
+|---|---|
+| Project | `apps/BenitoServer/BenitoServer.xcodeproj` (`xcodegen generate` in that folder) |
+| Scheme | `BenitoServer` (product `Benito Server.app`, bundle id `<prefix>.benito.serverapp`) |
+| Settings | Shares `apps/Benito/Config/Base.xcconfig` + `Local.xcconfig` (team id, bundle prefix) |
+| Build needs | Rust (`cargo`): a build phase embeds `benito-server` at `Contents/MacOS`. Network on the first build: `Scripts/fetch-sparkle.sh` downloads the pinned Sparkle release into `Vendor/` (gitignored) |
+| Service | Installs the server as the same LaunchAgent `scripts/macos-service.sh` uses (label, plist, `<data>/bin/benito-server`, `benito.env`), so the app can take over a script install. Install, Update (snapshot first, rolls back if the new server does not start), Start, Stop, Restart, Restore, Uninstall |
+| Panes | Overview, People & Devices (invites with QR), Connections (home Wi-Fi, Tailscale, address tests), Backups (and restore), Export (CSV, JSON), Reliability (login, sleep, disk, notifications), Logs |
+| Updates | Sparkle, off unless the build carries `BENITO_SPARKLE_PUBLIC_KEY`. Releases: [`docs/release-mac.md`](../docs/release-mac.md) |
+
+Run it without touching the real install:
+
+```bash
+scripts/dev-server-app.sh            # scratch server with a demo family, then the app attached to it
+scripts/dev-server-app.sh --managed  # the app with nothing installed: try Install Server and the service controls
+scripts/dev-server-app.sh --reset    # start from an empty scratch folder
+```
+
+The app's data folder is `~/Library/Application Support/Benito` by default, or `$BENITO_SERVER_HOME` (what the dev script sets). With `BENITO_SERVER_HOME` set, the LaunchAgent label becomes `com.mikeroysoft.benito.server.dev-<hash>` and the port a free one, so a test install can never be the family's service. A server installed by the script before the admin API existed shows as running with an Update Server button.
 
 ## v1a UI goals
 

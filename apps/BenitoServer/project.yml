@@ -1,0 +1,95 @@
+name: BenitoServer
+options:
+  bundleIdPrefix: org.example
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+  xcodeVersion: "16.0"
+  developmentLanguage: en
+
+packages:
+  BenitoKit:
+    path: ../../packages/BenitoKit
+
+# Team id and bundle id prefix are shared with the iOS app (Config/Base.xcconfig + Config/Local.xcconfig).
+configFiles:
+  Debug: ../Benito/Config/Base.xcconfig
+  Release: ../Benito/Config/Base.xcconfig
+
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+
+targets:
+  BenitoServer:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: Sources
+        createIntermediateGroups: true
+    info:
+      path: Resources/Info.plist
+      properties:
+        CFBundleDisplayName: Benito Server
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        # Menubar app: no Dock icon until the main window opens (the app switches activation policy).
+        LSUIElement: true
+        LSApplicationCategoryType: public.app-category.utilities
+        NSHumanReadableCopyright: "MIT License. Copyright (c) Benito contributors."
+        # The admin API and the legacy health probe are plain http on 127.0.0.1.
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+        # The Connections pane tests the home Wi-Fi address of this Mac.
+        NSLocalNetworkUsageDescription: >-
+          Benito Server checks that phones on your home Wi-Fi can reach the Benito server
+          on this Mac.
+        # Sparkle updates. The key is empty unless the release build passes
+        # BENITO_SPARKLE_PUBLIC_KEY (scripts/release-mac.sh); without it the updater stays off.
+        SUFeedURL: https://benito.mikeroysoft.com/appcast.xml
+        SUPublicEDKey: "$(BENITO_SPARKLE_PUBLIC_KEY)"
+        SUEnableAutomaticChecks: true
+    dependencies:
+      - package: BenitoKit
+        product: BenitoKit
+      # Fetched by Scripts/fetch-sparkle.sh (pre-build), pinned by version and checksum.
+      - framework: Vendor/Sparkle/Sparkle.framework
+        embed: true
+    preBuildScripts:
+      - name: Fetch Sparkle
+        basedOnDependencyAnalysis: false
+        script: |
+          "${SRCROOT}/Scripts/fetch-sparkle.sh"
+    # Puts benito-server at Contents/MacOS before the app is signed.
+    postCompileScripts:
+      - name: Embed benito-server
+        basedOnDependencyAnalysis: false
+        script: |
+          "${SRCROOT}/Scripts/embed-server.sh"
+    # Not sandboxed and no entitlements file: the app reads admin.json and server.log under ~/Library.
+    settings:
+      base:
+        # Not ".benito.server": with the prefix com.mikeroysoft that is the server's launchd label.
+        PRODUCT_BUNDLE_IDENTIFIER: $(BENITO_BUNDLE_PREFIX).benito.serverapp
+        PRODUCT_NAME: Benito Server
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        CODE_SIGN_STYLE: Automatic
+        ENABLE_HARDENED_RUNTIME: YES
+        # The embed script runs cargo, which reads and writes outside the build folder.
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+    scheme:
+      gatherCoverageData: false
+
+schemes:
+  BenitoServer:
+    build:
+      targets:
+        BenitoServer: all
+    run:
+      config: Debug
+    archive:
+      config: Release
