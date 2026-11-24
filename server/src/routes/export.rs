@@ -345,3 +345,22 @@ fn csv_escape(s: &str) -> String {
         s.to_string()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::csv_escape;
+
+    #[test]
+    fn csv_escape_preserves_plain_and_empty_values() {
+        assert_eq!(csv_escape("plain value"), "plain value");
+        assert_eq!(csv_escape(""), "");
+    }
+
+    #[test]
+    fn csv_escape_quotes_delimiters_and_doubles_quotes() {
+        assert_eq!(csv_escape("a,b"), "\"a,b\"");
+        assert_eq!(csv_escape("a\"b"), "\"a\"\"b\"");
+        assert_eq!(csv_escape("a\nb"), "\"a\nb\"");
+        assert_eq!(csv_escape("a\rb"), "\"a\rb\"");
+    }
+}

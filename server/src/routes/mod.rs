@@ -38,7 +38,10 @@ pub fn router() -> Router<AppState> {
         )
         .route("/families/invites/{id}", delete(sharing::revoke_invite))
         .route("/invites/redeem", post(sharing::redeem_invite))
-        .route("/me", get(auth_routes::me))
+        .route(
+            "/me",
+            get(auth_routes::me).delete(auth_routes::delete_account),
+        )
         .route("/families", post(auth_routes::create_family))
         .route("/families/join", post(auth_routes::join_family))
         .route("/families/leave", post(auth_routes::leave_family))

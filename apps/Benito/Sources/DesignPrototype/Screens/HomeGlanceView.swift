@@ -163,7 +163,6 @@ struct HomeGlanceView: View {
                     ThumbAction(
                         title: "Feed",
                         systemImage: "drop.fill",
-                        detail: feedThumbDetail(glance),
                         runningEmphasis: breastTimerRunning(glance),
                         accent: DesignTokens.feed,
                         transitionID: BenitoGlass.SheetTransitionID.feed,
@@ -197,7 +196,7 @@ struct HomeGlanceView: View {
                 StatusChip(text: "Demo", accent: DesignTokens.textSecondary, inverted: false)
             }
             if glance.isOnDevice {
-                StatusChip(text: String(localized: "This iPhone"), accent: DesignTokens.textSecondary, inverted: false)
+                StatusChip(text: String(localized: "This \(BenitoDevice.name)"), accent: DesignTokens.textSecondary, inverted: false)
             } else {
                 StatusChip(
                     text: glance.syncConnected ? "Sync" : "Offline",
@@ -236,15 +235,6 @@ struct HomeGlanceView: View {
         .buttonStyle(BenitoBorderlessButtonStyle())
         .accessibilityLabel(feedHeroAccessibility(glance))
         .popoverTip(model.hasFamily ? homeTips.currentTip as? LogFeedTip : nil, arrowEdge: .top)
-    }
-
-    private func feedThumbDetail(_ glance: PrototypeGlance) -> String? {
-        // Keep to side · ago so the taller thumb still reads at a glance.
-        var parts: [String] = []
-        if let side = glance.feedSideLabel { parts.append(side) }
-        let ago = PrototypeFormatters.compactDuration(glance.sinceLastFeed)
-        if ago != "—" { parts.append("\(ago) ago") }
-        return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 
     private func presentFeed() {

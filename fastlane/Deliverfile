@@ -1,0 +1,8 @@
+# Uploads the App Store text and screenshots in this folder: `fastlane deliver` (docs/release-ios.md).
+# The build itself goes up with scripts/release-ios.sh.
+app_identifier "com.mikeroysoft.benito"
+skip_binary_upload true
+overwrite_screenshots true
+submit_for_review false
+force true
+precheck_include_in_app_purchases false

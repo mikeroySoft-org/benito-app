@@ -4,9 +4,10 @@ use rusqlite::params;
 use uuid::Uuid;
 
 use crate::auth::{
-    create_session, hash_password, invite_code, new_session_token, verify_password, AuthError,
-    AuthUser,
+    create_session, hash_password, invite_code, new_session_token, revoke_user_access,
+    verify_password, AuthError, AuthUser,
 };
+use crate::device_auth::NO_PASSWORD_HASH;
 use crate::models::{
     AuthResponse, Child, CreateChildRequest, CreateFamilyRequest, CreateFamilyResponse,
     CreatePairingTokenResponse, Family, JoinFamilyRequest, LoginRequest, MeResponse,
@@ -512,6 +513,112 @@ pub async fn leave_family(
         ),
     );
     Ok(Json(json!({ "left": true })))
+}
+
+/// `DELETE /me`: deletes the caller's account (App Review 5.1.1(v)).
+///
+/// A family the caller is the last member of is deleted with its whole history. A family with
+/// other members stays, as after `leave_family`. Sessions, device keys, push tokens and unused
+/// invites of the caller go either way. The `users` row is deleted unless history kept for other
+/// people still points at it (`events.created_by` / `timers.started_by` have no cascade); then
+/// it is scrubbed in place so it identifies nobody and can never sign in.
+pub async fn delete_account(
+    State(state): State<AppState>,
+    AuthUser(user): AuthUser,
+) -> Result<Json<serde_json::Value>, AuthError> {
+    let uid = user.id.to_string();
+    let now = Utc::now().to_rfc3339();
+    let mut conn = state.db.lock().map_err(|_| AuthError::Internal)?;
+    let tx = conn.transaction().map_err(|_| AuthError::Internal)?;
+
+    let family_ids: Vec<String> = {
+        let mut stmt = tx
+            .prepare("SELECT family_id FROM family_members WHERE user_id = ?1")
+            .map_err(|_| AuthError::Internal)?;
+        let rows = stmt
+            .query_map(params![uid], |r| r.get::<_, String>(0))
+            .map_err(|_| AuthError::Internal)?;
+        rows.collect::<rusqlite::Result<_>>()
+            .map_err(|_| AuthError::Internal)?
+    };
+    let mut remaining_families = Vec::new();
+    for family_id in family_ids {
+        // A caregiver whose access has lapsed no longer counts as someone to keep the family for.
+        let has_others: bool = tx
+            .query_row(
+                "SELECT EXISTS(
+                     SELECT 1 FROM family_members
+                     WHERE family_id = ?1 AND user_id <> ?2
+                       AND (expires_at IS NULL OR expires_at > ?3))",
+                params![family_id, uid, now],
+                |r| r.get(0),
+            )
+            .map_err(|_| AuthError::Internal)?;
+        if has_others {
+            remaining_families.push(family_id);
+        } else {
+            // Cascades members, children (events, timers, reminders), invites, pairing tokens
+            // and live-activity tokens.
+            tx.execute("DELETE FROM families WHERE id = ?1", params![family_id])
+                .map_err(|_| AuthError::Internal)?;
+        }
+    }
+
+    revoke_user_access(&tx, &uid, None).map_err(|_| AuthError::Internal)?;
+    for sql in [
+        "DELETE FROM devices WHERE user_id = ?1",
+        "DELETE FROM live_activity_tokens WHERE user_id = ?1",
+        "DELETE FROM pairing_tokens WHERE created_by = ?1 AND used_at IS NULL",
+        "DELETE FROM family_invites WHERE created_by = ?1 AND used_at IS NULL",
+    ] {
+        tx.execute(sql, params![uid])
+            .map_err(|_| AuthError::Internal)?;
+    }
+
+    let referenced: bool = tx
+        .query_row(
+            "SELECT EXISTS(SELECT 1 FROM events WHERE created_by = ?1)
+                 OR EXISTS(SELECT 1 FROM timers WHERE started_by = ?1)",
+            params![uid],
+            |r| r.get(0),
+        )
+        .map_err(|_| AuthError::Internal)?;
+    if referenced {
+        tx.execute(
+            "UPDATE users SET name = 'Former member', email = ?2, password_hash = ?3 WHERE id = ?1",
+            params![
+                uid,
+                format!("{}@deleted.benito.invalid", Uuid::new_v4()),
+                NO_PASSWORD_HASH
+            ],
+        )
+        .map_err(|_| AuthError::Internal)?;
+        for sql in [
+            "UPDATE pairing_tokens SET used_by = NULL WHERE used_by = ?1",
+            "UPDATE family_invites SET used_by = NULL WHERE used_by = ?1",
+        ] {
+            tx.execute(sql, params![uid])
+                .map_err(|_| AuthError::Internal)?;
+        }
+    } else {
+        tx.execute("DELETE FROM users WHERE id = ?1", params![uid])
+            .map_err(|_| AuthError::Internal)?;
+    }
+    tx.commit().map_err(|_| AuthError::Internal)?;
+    drop(conn);
+
+    for family_id in remaining_families {
+        if let Ok(family_id) = Uuid::parse_str(&family_id) {
+            state.sync.publish_to_family(
+                family_id,
+                SyncEnvelope::new(
+                    "state",
+                    json!({ "action": "member_left", "user_id": user.id }),
+                ),
+            );
+        }
+    }
+    Ok(Json(json!({ "deleted": true })))
 }
 
 pub async fn list_children(

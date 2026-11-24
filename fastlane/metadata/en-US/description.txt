@@ -1,0 +1,35 @@
+Benito is a baby tracker for the newborn months: feeds, sleep and diapers, logged in one or two taps and shared with everyone who looks after your baby.
+
+It has no ads, no subscriptions, no in-app purchases and no analytics. There is no company cloud. Your baby's log stays on your iPhone, or on a small server your family runs itself.
+
+LOG IN A TAP
+• Nursing timer with left and right sides, pause and resume
+• Bottles with ounces, breast milk or formula
+• Diapers: wet, dirty or both
+• Sleep and naps, by timer or entered afterwards
+• Pumping, medicine, walks, car rides and crying
+• Fix mistakes: edit or delete any entry, or log one at an earlier time
+
+SEE THE DAY AT A GLANCE
+• Home shows time since the last feed and diaper, and whether your baby is asleep
+• Day and week timelines
+• Daily totals for feeds, ounces, diapers and sleep, ready for the pediatrician
+• Running timers on the Lock Screen, in the Dynamic Island and in the Apple Watch Smart Stack
+• Siri and Shortcuts: start a feed, start a nap, log a diaper
+
+SHARE WITH YOUR FAMILY
+• Every phone sees the same timeline, and timers started on one phone run on the others
+• Invite a partner, grandparent or babysitter by Messages, AirDrop, QR code or SharePlay
+• No usernames or passwords for family: each iPhone gets its own key, kept in the Secure Enclave
+• Caregiver invites can end after a few hours or days
+• Sharing uses the Benito server, a small open-source program you run on a Mac, a Raspberry Pi, a NAS or a VPS. Setup guide: https://benito.mikeroysoft.com/self-host/
+
+OR USE IT ON ONE IPHONE
+Choose "This iPhone only" (or "This iPad only") and Benito works with no server and no account. Connect a server later and your history comes along.
+
+YOUR DATA
+• Data Not Collected: the developer receives nothing from the app
+• Export everything as JSON or CSV at any time
+• Open source under the MIT license: https://github.com/mikeroysoft-org/benito-app
+
+Benito is a logbook. It does not give medical advice. Ask your pediatrician about your baby's health.
