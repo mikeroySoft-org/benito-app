@@ -163,7 +163,6 @@ struct HomeGlanceView: View {
                     ThumbAction(
                         title: "Feed",
                         systemImage: "drop.fill",
-                        detail: feedThumbDetail(glance),
                         runningEmphasis: breastTimerRunning(glance),
                         accent: DesignTokens.feed,
                         transitionID: BenitoGlass.SheetTransitionID.feed,
@@ -236,15 +235,6 @@ struct HomeGlanceView: View {
         .buttonStyle(BenitoBorderlessButtonStyle())
         .accessibilityLabel(feedHeroAccessibility(glance))
         .popoverTip(model.hasFamily ? homeTips.currentTip as? LogFeedTip : nil, arrowEdge: .top)
-    }
-
-    private func feedThumbDetail(_ glance: PrototypeGlance) -> String? {
-        // Keep to side · ago so the taller thumb still reads at a glance.
-        var parts: [String] = []
-        if let side = glance.feedSideLabel { parts.append(side) }
-        let ago = PrototypeFormatters.compactDuration(glance.sinceLastFeed)
-        if ago != "—" { parts.append("\(ago) ago") }
-        return parts.isEmpty ? nil : parts.joined(separator: " · ")
     }
 
     private func presentFeed() {

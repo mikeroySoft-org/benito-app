@@ -4,8 +4,6 @@ struct ThumbAction: Identifiable {
     var id: String { title + systemImage }
     let title: String
     let systemImage: String
-    /// Optional one-line summary under the title (e.g. last feed side · ago).
-    var detail: String? = nil
     /// Soft accent when a related timer is *running* — never a permanent selected/tab state.
     var runningEmphasis: Bool = false
     var accent: Color = DesignTokens.textSecondary
@@ -16,7 +14,7 @@ struct ThumbAction: Identifiable {
     let action: () -> Void
 }
 
-/// OpenBBQ-style floating capsule thumb bar (≥52pt; taller when any thumb has detail).
+/// OpenBBQ-style floating capsule thumb bar (≥52pt).
 /// Thumbs are capsule segments unioned into one continuous pill — never square cards
 /// stuffed inside a pill chrome.
 struct ThumbActionBar: View {
@@ -35,12 +33,7 @@ struct ThumbActionBar: View {
         )
     }
 
-    /// Uniform row height: taller when any thumb carries a detail line (Feed).
-    private var thumbHeight: CGFloat {
-        actions.contains(where: { $0.detail != nil })
-            ? DesignTokens.thumbMinTall
-            : DesignTokens.thumbMin
-    }
+    private var thumbHeight: CGFloat { DesignTokens.thumbMin }
 
     var body: some View {
         if #available(iOS 26.0, *) {
@@ -95,7 +88,7 @@ struct ThumbActionBar: View {
                 }
         }
         .buttonStyle(BenitoBorderlessButtonStyle())
-        .accessibilityLabel(item.detail.map { "\(item.title), \($0)" } ?? item.title)
+        .accessibilityLabel(item.title)
         .modifier(SheetZoomSourceModifier(
             namespace: sheetTransitionNamespace,
             sourceID: item.transitionID
@@ -104,19 +97,11 @@ struct ThumbActionBar: View {
 
     @ViewBuilder
     private func thumbLabel(_ item: ThumbAction) -> some View {
-        VStack(spacing: item.detail == nil ? 4 : 2) {
+        VStack(spacing: 4) {
             Image(systemName: item.systemImage)
                 .font(.system(size: 22, weight: .semibold))
             Text(item.title)
                 .font(.caption.weight(.semibold))
-            if let detail = item.detail {
-                Text(detail)
-                    .font(.caption2)
-                    .foregroundStyle(DesignTokens.textSecondary)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.65)
-                    .multilineTextAlignment(.center)
-            }
         }
         .frame(maxWidth: .infinity)
         .frame(minHeight: thumbHeight)
@@ -183,7 +168,7 @@ private struct GlassCapsuleThumbRow: View {
     private func glassThumb(_ item: ThumbAction, index: Int) -> some View {
         let effectID = item.glassEffectID ?? "benito.thumb.\(index)"
         return Button(action: item.action) {
-            VStack(spacing: item.detail == nil ? 4 : 2) {
+            VStack(spacing: 4) {
                 Image(systemName: item.systemImage)
                     .font(.system(size: 22, weight: .semibold))
                     // Bounce only when Reduce Motion is off; avoid re-triggering glass
@@ -191,14 +176,6 @@ private struct GlassCapsuleThumbRow: View {
                     .symbolEffect(.bounce, value: reduceMotion ? false : item.runningEmphasis)
                 Text(item.title)
                     .font(.caption.weight(.semibold))
-                if let detail = item.detail {
-                    Text(detail)
-                        .font(.caption2)
-                        .foregroundStyle(DesignTokens.textSecondary)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.65)
-                        .multilineTextAlignment(.center)
-                }
             }
             .frame(maxWidth: .infinity)
             .frame(minHeight: thumbHeight)
@@ -214,7 +191,7 @@ private struct GlassCapsuleThumbRow: View {
             }
         }
         .buttonStyle(BenitoBorderlessButtonStyle())
-        .accessibilityLabel(item.detail.map { "\(item.title), \($0)" } ?? item.title)
+        .accessibilityLabel(item.title)
         .modifier(ThumbGlassEffectModifier(
             enabled: !prefersOpaque,
             // Non-interactive glass: interactive Liquid Glass re-samples on touch and
