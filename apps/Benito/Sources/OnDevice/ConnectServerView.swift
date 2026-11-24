@@ -12,7 +12,7 @@ struct ConnectServerView: View {
     var body: some View {
         List {
             Section {
-                Text("Your log is copied to the server, then this iPhone syncs with it like any other family member. Nothing is deleted if the move stops partway; tap Connect again to finish.")
+                Text("Your log is copied to the server, then this \(BenitoDevice.name) syncs with it like any other family member. Nothing is deleted if the move stops partway; tap Connect again to finish.")
                     .font(.subheadline)
                     .foregroundStyle(DesignTokens.textSecondary)
             }

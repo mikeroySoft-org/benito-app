@@ -85,6 +85,11 @@ impl SyncHub {
         }
     }
 
+    /// Authenticated WebSocket clients connected right now.
+    pub async fn connection_count(&self) -> usize {
+        self.clients.read().await.len()
+    }
+
     /// Publish a sync envelope to every authenticated WS client in `family_id`.
     /// Includes the originating client (if any) so peers can de-dupe via `client_id`.
     pub fn publish_to_family(&self, family_id: Uuid, envelope: SyncEnvelope) {

@@ -4,12 +4,13 @@ use axum::{
     response::IntoResponse,
     Json,
 };
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use rusqlite::params;
 use uuid::Uuid;
 
 use crate::auth::{AuthError, AuthUser};
 use crate::models::{Child, Event, ExportBundle, Family, Timer};
+use crate::routes::sharing::membership;
 use crate::AppState;
 
 fn parse_dt(s: &str) -> rusqlite::Result<chrono::DateTime<Utc>> {
@@ -25,15 +26,29 @@ pub async fn export_json(
     AuthUser(user): AuthUser,
 ) -> Result<Json<ExportBundle>, AuthError> {
     let conn = state.db.lock().map_err(|_| AuthError::Internal)?;
+    match membership(&conn, &user.id.to_string())? {
+        Some((family_id, _)) => Ok(Json(family_bundle(&conn, &family_id)?)),
+        None => Ok(Json(ExportBundle {
+            exported_at: Utc::now(),
+            family: None,
+            children: Vec::new(),
+            events: Vec::new(),
+            timers: Vec::new(),
+        })),
+    }
+}
 
+/// Everything one family has logged: children, events (tombstones included) and timers.
+pub(crate) fn family_bundle(
+    conn: &rusqlite::Connection,
+    family_id: &str,
+) -> Result<ExportBundle, AuthError> {
     let family = conn
         .query_row(
             "SELECT f.id, f.name, f.invite_code, f.created_at
              FROM families f
-             JOIN family_members fm ON fm.family_id = f.id
-             WHERE fm.user_id = ?1
-             LIMIT 1",
-            params![user.id.to_string()],
+             WHERE f.id = ?1",
+            params![family_id],
             |r| {
                 Ok(Family {
                     id: Uuid::parse_str(&r.get::<_, String>(0)?).map_err(|e| {
@@ -57,12 +72,11 @@ pub async fn export_json(
             .prepare(
                 "SELECT c.id, c.family_id, c.name, c.birthdate, c.sex, c.created_at
                  FROM children c
-                 JOIN family_members fm ON fm.family_id = c.family_id
-                 WHERE fm.user_id = ?1",
+                 WHERE c.family_id = ?1",
             )
             .map_err(|_| AuthError::Internal)?;
         let rows = stmt
-            .query_map(params![user.id.to_string()], |r| {
+            .query_map(params![family_id], |r| {
                 Ok(Child {
                     id: Uuid::parse_str(&r.get::<_, String>(0)?).map_err(|e| {
                         rusqlite::Error::FromSqlConversionFailure(
@@ -97,13 +111,12 @@ pub async fn export_json(
                 "SELECT e.id, e.child_id, e.type, e.subtype, e.started_at, e.ended_at, e.amount_value, e.amount_unit, e.side, e.notes, e.payload_json, e.created_by, e.created_at, e.updated_at, e.deleted_at
                  FROM events e
                  JOIN children c ON c.id = e.child_id
-                 JOIN family_members fm ON fm.family_id = c.family_id
-                 WHERE fm.user_id = ?1
+                 WHERE c.family_id = ?1
                  ORDER BY e.started_at ASC",
             )
             .map_err(|_| AuthError::Internal)?;
         let rows = stmt
-            .query_map(params![user.id.to_string()], |r| {
+            .query_map(params![family_id], |r| {
                 let payload: Option<String> = r.get(10)?;
                 Ok(Event {
                     id: Uuid::parse_str(&r.get::<_, String>(0)?).map_err(|e| {
@@ -160,12 +173,11 @@ pub async fn export_json(
                 "SELECT t.id, t.child_id, t.kind, t.started_at, t.started_by, t.state, t.stopped_at, t.updated_at, t.side, t.paused_at, t.paused_seconds
                  FROM timers t
                  JOIN children c ON c.id = t.child_id
-                 JOIN family_members fm ON fm.family_id = c.family_id
-                 WHERE fm.user_id = ?1",
+                 WHERE c.family_id = ?1",
             )
             .map_err(|_| AuthError::Internal)?;
         let rows = stmt
-            .query_map(params![user.id.to_string()], |r| {
+            .query_map(params![family_id], |r| {
                 Ok(Timer {
                     id: Uuid::parse_str(&r.get::<_, String>(0)?).map_err(|e| {
                         rusqlite::Error::FromSqlConversionFailure(
@@ -210,13 +222,24 @@ pub async fn export_json(
         }
     }
 
-    Ok(Json(ExportBundle {
+    Ok(ExportBundle {
         exported_at: Utc::now(),
         family,
         children,
         events,
         timers,
-    }))
+    })
+}
+
+const CSV_HEADER: &str =
+    "id,child_id,type,subtype,started_at,ended_at,amount_value,amount_unit,side,notes,created_by,created_at\n";
+
+/// Which events a CSV covers. `from` is inclusive and `to` exclusive, on the event's start.
+pub(crate) struct CsvScope<'a> {
+    pub family_id: &'a str,
+    pub child_id: Option<&'a str>,
+    pub from: Option<DateTime<Utc>>,
+    pub to: Option<DateTime<Utc>>,
 }
 
 /// Pediatrician-friendly CSV of non-deleted events (one row per event).
@@ -225,59 +248,84 @@ pub async fn export_csv(
     AuthUser(user): AuthUser,
 ) -> Result<impl IntoResponse, AuthError> {
     let conn = state.db.lock().map_err(|_| AuthError::Internal)?;
-    let mut wtr = String::from(
-        "id,child_id,type,subtype,started_at,ended_at,amount_value,amount_unit,side,notes,created_by,created_at\n",
-    );
-    {
-        let mut stmt = conn
-            .prepare(
-                "SELECT e.id, e.child_id, e.type, e.subtype, e.started_at, e.ended_at, e.amount_value, e.amount_unit, e.side, e.notes, e.created_by, e.created_at
-                 FROM events e
-                 JOIN children c ON c.id = e.child_id
-                 JOIN family_members fm ON fm.family_id = c.family_id
-                 WHERE fm.user_id = ?1 AND e.deleted_at IS NULL
-                 ORDER BY e.started_at ASC",
-            )
-            .map_err(|_| AuthError::Internal)?;
-        let rows = stmt
-            .query_map(params![user.id.to_string()], |r| {
-                Ok((
-                    r.get::<_, String>(0)?,
-                    r.get::<_, String>(1)?,
-                    r.get::<_, String>(2)?,
-                    r.get::<_, Option<String>>(3)?,
-                    r.get::<_, String>(4)?,
-                    r.get::<_, Option<String>>(5)?,
-                    r.get::<_, Option<f64>>(6)?,
-                    r.get::<_, Option<String>>(7)?,
-                    r.get::<_, Option<String>>(8)?,
-                    r.get::<_, Option<String>>(9)?,
-                    r.get::<_, String>(10)?,
-                    r.get::<_, String>(11)?,
-                ))
-            })
-            .map_err(|_| AuthError::Internal)?;
-        for row in rows {
-            let (id, child_id, ty, subtype, started, ended, amount, unit, side, notes, by, created) =
-                row.map_err(|_| AuthError::Internal)?;
-            wtr.push_str(&format!(
-                "{},{},{},{},{},{},{},{},{},{},{},{}\n",
-                csv_escape(&id),
-                csv_escape(&child_id),
-                csv_escape(&ty),
-                csv_escape(subtype.as_deref().unwrap_or("")),
-                csv_escape(&started),
-                csv_escape(ended.as_deref().unwrap_or("")),
-                amount.map(|v| format!("{v}")).unwrap_or_default(),
-                csv_escape(unit.as_deref().unwrap_or("")),
-                csv_escape(side.as_deref().unwrap_or("")),
-                csv_escape(notes.as_deref().unwrap_or("")),
-                csv_escape(&by),
-                csv_escape(&created),
-            ));
-        }
-    }
+    let body = match membership(&conn, &user.id.to_string())? {
+        Some((family_id, _)) => events_csv(
+            &conn,
+            &CsvScope {
+                family_id: &family_id,
+                child_id: None,
+                from: None,
+                to: None,
+            },
+        )?,
+        None => CSV_HEADER.to_string(),
+    };
+    Ok(csv_response(body))
+}
 
+pub(crate) fn events_csv(
+    conn: &rusqlite::Connection,
+    scope: &CsvScope<'_>,
+) -> Result<String, AuthError> {
+    let mut wtr = String::from(CSV_HEADER);
+    let mut stmt = conn
+        .prepare(
+            "SELECT e.id, e.child_id, e.type, e.subtype, e.started_at, e.ended_at, e.amount_value, e.amount_unit, e.side, e.notes, e.created_by, e.created_at
+             FROM events e
+             JOIN children c ON c.id = e.child_id
+             WHERE c.family_id = ?1 AND e.deleted_at IS NULL AND (?2 IS NULL OR e.child_id = ?2)
+             ORDER BY e.started_at ASC",
+        )
+        .map_err(|_| AuthError::Internal)?;
+    let rows = stmt
+        .query_map(params![scope.family_id, scope.child_id], |r| {
+            Ok((
+                r.get::<_, String>(0)?,
+                r.get::<_, String>(1)?,
+                r.get::<_, String>(2)?,
+                r.get::<_, Option<String>>(3)?,
+                r.get::<_, String>(4)?,
+                r.get::<_, Option<String>>(5)?,
+                r.get::<_, Option<f64>>(6)?,
+                r.get::<_, Option<String>>(7)?,
+                r.get::<_, Option<String>>(8)?,
+                r.get::<_, Option<String>>(9)?,
+                r.get::<_, String>(10)?,
+                r.get::<_, String>(11)?,
+            ))
+        })
+        .map_err(|_| AuthError::Internal)?;
+    for row in rows {
+        let (id, child_id, ty, subtype, started, ended, amount, unit, side, notes, by, created) =
+            row.map_err(|_| AuthError::Internal)?;
+        // Stored timestamps vary in fractional digits, so the range is checked on parsed
+        // times rather than in SQL text comparison.
+        if scope.from.is_some() || scope.to.is_some() {
+            let at = parse_dt(&started).map_err(|_| AuthError::Internal)?;
+            if scope.from.is_some_and(|from| at < from) || scope.to.is_some_and(|to| at >= to) {
+                continue;
+            }
+        }
+        wtr.push_str(&format!(
+            "{},{},{},{},{},{},{},{},{},{},{},{}\n",
+            csv_escape(&id),
+            csv_escape(&child_id),
+            csv_escape(&ty),
+            csv_escape(subtype.as_deref().unwrap_or("")),
+            csv_escape(&started),
+            csv_escape(ended.as_deref().unwrap_or("")),
+            amount.map(|v| format!("{v}")).unwrap_or_default(),
+            csv_escape(unit.as_deref().unwrap_or("")),
+            csv_escape(side.as_deref().unwrap_or("")),
+            csv_escape(notes.as_deref().unwrap_or("")),
+            csv_escape(&by),
+            csv_escape(&created),
+        ));
+    }
+    Ok(wtr)
+}
+
+pub(crate) fn csv_response(body: String) -> impl IntoResponse {
     let mut headers = HeaderMap::new();
     headers.insert(
         header::CONTENT_TYPE,
@@ -287,7 +335,7 @@ pub async fn export_csv(
         header::CONTENT_DISPOSITION,
         HeaderValue::from_static("attachment; filename=\"benito-events.csv\""),
     );
-    Ok((StatusCode::OK, headers, wtr))
+    (StatusCode::OK, headers, body)
 }
 
 fn csv_escape(s: &str) -> String {
@@ -295,5 +343,24 @@ fn csv_escape(s: &str) -> String {
         format!("\"{}\"", s.replace('"', "\"\""))
     } else {
         s.to_string()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::csv_escape;
+
+    #[test]
+    fn csv_escape_preserves_plain_and_empty_values() {
+        assert_eq!(csv_escape("plain value"), "plain value");
+        assert_eq!(csv_escape(""), "");
+    }
+
+    #[test]
+    fn csv_escape_quotes_delimiters_and_doubles_quotes() {
+        assert_eq!(csv_escape("a,b"), "\"a,b\"");
+        assert_eq!(csv_escape("a\"b"), "\"a\"\"b\"");
+        assert_eq!(csv_escape("a\nb"), "\"a\nb\"");
+        assert_eq!(csv_escape("a\rb"), "\"a\rb\"");
     }
 }

@@ -103,13 +103,21 @@ pub async fn baby_state(
     if ok.is_none() {
         return Err(AuthError::Unauthorized);
     }
+    Ok(Json(load_baby_state(&conn, q.child_id)?))
+}
 
+/// The home glance for one child: latest feed, diaper and medicine, plus any active timer.
+pub(crate) fn load_baby_state(
+    conn: &rusqlite::Connection,
+    child_id: Uuid,
+) -> Result<BabyState, AuthError> {
+    let id = child_id.to_string();
     let last_feed = conn
         .query_row(
             "SELECT id, child_id, type, subtype, started_at, ended_at, amount_value, amount_unit, side, notes, payload_json, created_by, created_at, updated_at, deleted_at
              FROM events WHERE child_id = ?1 AND deleted_at IS NULL AND type LIKE 'feed_%'
              ORDER BY started_at DESC LIMIT 1",
-            params![q.child_id.to_string()],
+            params![id],
             map_event,
         )
         .optional()
@@ -120,7 +128,7 @@ pub async fn baby_state(
             "SELECT id, child_id, type, subtype, started_at, ended_at, amount_value, amount_unit, side, notes, payload_json, created_by, created_at, updated_at, deleted_at
              FROM events WHERE child_id = ?1 AND deleted_at IS NULL AND type = 'diaper'
              ORDER BY started_at DESC LIMIT 1",
-            params![q.child_id.to_string()],
+            params![id],
             map_event,
         )
         .optional()
@@ -131,7 +139,7 @@ pub async fn baby_state(
             "SELECT id, child_id, type, subtype, started_at, ended_at, amount_value, amount_unit, side, notes, payload_json, created_by, created_at, updated_at, deleted_at
              FROM events WHERE child_id = ?1 AND deleted_at IS NULL AND type = 'medicine'
              ORDER BY started_at DESC LIMIT 1",
-            params![q.child_id.to_string()],
+            params![id],
             map_event,
         )
         .optional()
@@ -142,17 +150,17 @@ pub async fn baby_state(
             "SELECT id, child_id, kind, started_at, started_by, state, stopped_at, updated_at, side, paused_at, paused_seconds
              FROM timers WHERE child_id = ?1 AND state IN ('running','paused')
              ORDER BY started_at DESC LIMIT 1",
-            params![q.child_id.to_string()],
+            params![id],
             map_timer,
         )
         .optional()
         .map_err(|_| AuthError::Internal)?;
 
-    Ok(Json(BabyState {
-        child_id: q.child_id,
+    Ok(BabyState {
+        child_id,
         last_feed,
         last_diaper,
         active_timer,
         last_medicine,
-    }))
+    })
 }

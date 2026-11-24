@@ -1,0 +1,67 @@
+[gate]
+protected_paths = [
+  ".factory.toml",
+  "apps/Benito/Sources/Generated/GitSHA.swift",
+  "apps/Benito/Config/Base.xcconfig",
+  "apps/Benito/Config/Local.xcconfig.example",
+  "apps/Benito/Config/Local.xcconfig",
+  "apps/Benito/Resources/Benito.entitlements",
+  "apps/Benito/Resources/Benito-UniversalLinks.entitlements",
+  ".github/workflows/**",
+  "site/CNAME", "site/.nojekyll", "site/.well-known/apple-app-site-association",
+  "LICENSE",
+  "server/migrations/001_init.sql",
+  "server/migrations/002_timer_side.sql",
+  "server/migrations/003_timer_pause.sql",
+  "server/migrations/004_pairing_tokens.sql",
+  "server/migrations/005_live_activity_tokens.sql",
+  "server/migrations/006_devices_invites.sql",
+  "scripts/backup-db.sh", "scripts/macos-service.sh",
+  "scripts/gate-env.sh", "scripts/check-site-plumbing.sh",
+]
+# SPEC.md needs human review; factory has no nonblocking path-review setting.
+
+[[gate.check]]
+name = "server-tests"
+run = ["scripts/gate-env.sh", "server", "cargo", "test", "--locked"]
+
+[[gate.check]]
+name = "skill-helper-fixture"
+run = ["scripts/gate-env.sh", ".", "python3", "skills/benito/tests/test_benito_query.py"]
+
+[[gate.check]]
+name = "skill-helper-scratch-server"
+run = ["scripts/gate-env.sh", ".", "sh", "-c", "(cd server && cargo build --locked) && python3 skills/benito/tests/test_benito_query.py --server server/target/debug/benito-server"]
+
+[[gate.check]]
+name = "benitokit-tests"
+run = ["scripts/gate-env.sh", "packages/BenitoKit", "swift", "test"]
+
+[[gate.check]]
+name = "timer-chrome-lint"
+run = ["scripts/gate-env.sh", ".", "sh", "-c", "./scripts/check-timer-chrome.sh && ./scripts/check-timer-chrome.sh --self-test"]
+
+[[gate.check]]
+name = "xcodeproj-in-sync"
+run = ["scripts/gate-env.sh", "apps/Benito", "sh", "-c", "xcodegen generate && git diff --exit-code -- Benito.xcodeproj"]
+
+[[gate.check]]
+name = "ios-sim-build"
+run = ["scripts/gate-env.sh", "apps/Benito", "sh", "-c", "xcodebuild build -project Benito.xcodeproj -scheme Benito -destination 'generic/platform=iOS Simulator' -derivedDataPath \"$TMPDIR/benito-dd\" CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM="]
+
+[[gate.check]]
+name = "watch-sim-build"
+run = ["scripts/gate-env.sh", "apps/Benito", "sh", "-c", "xcodebuild build -project Benito.xcodeproj -scheme BenitoWatch -destination 'generic/platform=watchOS Simulator' -derivedDataPath \"$TMPDIR/benito-dd-watch\" CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM="]
+
+[[gate.check]]
+name = "site-join-test"
+run = ["scripts/gate-env.sh", "site", "node", "tests/join.test.mjs"]
+
+[[gate.check]]
+name = "site-plumbing"
+run = ["scripts/gate-env.sh", ".", "./scripts/check-site-plumbing.sh"]
+
+[[gate.check]]
+name = "ios-release-build"
+when = "release"
+run = ["scripts/gate-env.sh", "apps/Benito", "sh", "-c", "xcodebuild build -project Benito.xcodeproj -scheme Benito -configuration Release -destination 'generic/platform=iOS Simulator' -derivedDataPath \"$TMPDIR/benito-dd\" CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM="]

@@ -121,6 +121,12 @@ public actor APIClient {
         _ = try await postEmpty(path: "/families/leave")
     }
 
+    /// Deletes the caller's account on the server; the session token stops working.
+    /// Servers older than `DELETE /me` answer 404 or 405.
+    public func deleteAccount() async throws {
+        _ = try await delete(path: "/me")
+    }
+
     public func listChildren() async throws -> [ChildDTO] {
         try decode(await get(path: "/children"))
     }
@@ -190,9 +196,9 @@ public actor APIClient {
         return try decode(await post(path: "/timers", json: Body(child_id: childId, kind: kind, side: side, at: at)))
     }
 
-    public func setBaseURL(_ url: URL) {
+    /// Same server, another address (`ServerRoute`): the session token stays valid.
+    public func route(to url: URL) {
         baseURL = url
-        token = nil
     }
 
     public func stopTimer(id: UUID, at: Date = Date()) async throws -> TimerDTO {

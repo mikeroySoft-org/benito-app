@@ -27,8 +27,9 @@ scratch server. Where a path was not exercised, it says so.
    upload the database, CSVs, or query results to any web service, paste them into an issue, or
    send them anywhere the user did not ask for. Summarize in chat; write files only locally.
 5. **Never read secrets.** Skip the `sessions`, `pairing_tokens`, `live_activity_tokens`, and
-   `devices` tables, `users.password_hash`, and `benito.env` (it holds `SESSION_SECRET`). The
-   helper never touches them. A bearer token in a terminal is the same as a password.
+   `devices` tables, `users.password_hash`, `benito.env` (it holds `SESSION_SECRET`), and
+   `admin.json` (the local admin API's token). The helper never touches them. A bearer token
+   in a terminal is the same as a password.
 6. **You are not a doctor.** Report what was logged, plainly and without judgment. For anything
    medical (fever, too few wet diapers, weight, feeding or sleep worries, medicine doses) say
    so and point the parent to their pediatrician, or emergency services if it sounds urgent.
@@ -43,7 +44,7 @@ scratch server. Where a path was not exercised, it says so.
 | Database | `~/Library/Application Support/Benito/benito.db` | `/data/data.db` in volume `benito-data` | `DATABASE_PATH`, default `server/data.db` |
 | Config | `~/Library/Application Support/Benito/benito.env` (mode 600) | env vars in `docker-compose.yml` | repo `.env` / env vars |
 | Logs | `~/Library/Logs/Benito/server.log`, `backup.log` | `docker compose logs` | terminal |
-| Backups | `~/Backups/benito/benito-YYYYmmdd-HHMMSS.db` (nightly 03:30, keeps 30) | none built in | none built in |
+| Backups | `~/Backups/benito/benito-YYYYmmdd-HHMMSS.db` (nightly 03:30, keeps 30) | none unless `BENITO_BACKUP_DIR` is set | none unless `BENITO_BACKUP_DIR` is set |
 | Health | `curl -s http://127.0.0.1:8080/health` returns `{"service":"benito-server","status":"ok","version":"0.1.0"}` | same, on `BENITO_PORT` | same |
 
 If the user chose **on-device mode** in the app, there is no server: the data lives only on the

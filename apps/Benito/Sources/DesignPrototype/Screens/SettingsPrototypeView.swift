@@ -10,6 +10,12 @@ struct SettingsPrototypeView: View {
     @AppStorage(LiveActivitySettings.enabledKey) private var liveActivityEnabled = true
     @State private var confirmLeave = false
     @State private var confirmSignOut = false
+    @State private var confirmDeleteAccount = false
+    /// Whether deleting the account also deletes the family; nil when the member list didn't load.
+    @State private var deleteRemovesFamily: Bool?
+    @State private var confirmErase = false
+    /// A delete or erase is being prepared or is running.
+    @State private var removalInFlight = false
     @State private var tipsResetRequested = BenitoTips.resetPending
     /// `SIMCTL_CHILD_BENITO_PROTOTYPE_SHEET` = sharing | invite opens Account › Sharing (screenshots).
     @State private var showSharing = ["sharing", "invite"]
@@ -36,7 +42,7 @@ struct SettingsPrototypeView: View {
 
                 if model.isOnDevice {
                     Section {
-                        LabeledContent("Saved on", value: String(localized: "This iPhone only"))
+                        LabeledContent("Saved on", value: String(localized: "This \(BenitoDevice.name) only"))
                         NavigationLink {
                             ConnectServerView(model: model)
                         } label: {
@@ -49,6 +55,12 @@ struct SettingsPrototypeView: View {
                         Text("Storage")
                     } footer: {
                         Text("Works with no server or account. Connect one to share with a partner or caregiver; your history comes along.")
+                    }
+                    .listRowBackground(BenitoGlassListRowBackground())
+
+                    Section {
+                        Button("Erase all data…", role: .destructive) { confirmErase = true }
+                            .disabled(removalInFlight)
                     }
                     .listRowBackground(BenitoGlassListRowBackground())
                 } else {
@@ -66,7 +78,7 @@ struct SettingsPrototypeView: View {
 
                     Button("Probe /health") { Task { await model.probeHealth() } }
 
-                    LabeledContent("Sync", value: model.syncConnected ? "connected" : "offline")
+                    LabeledContent("Sync", value: model.syncRouteText)
                     Text(model.storeLabel)
                         .font(.caption2)
                         .foregroundStyle(.secondary)
@@ -156,6 +168,17 @@ struct SettingsPrototypeView: View {
                     }
                 }
 
+                if model.isSignedIn, !model.isOnDevice {
+                    Section {
+                        Button("Delete account…", role: .destructive) {
+                            Task { await requestDeleteAccount() }
+                        }
+                        .disabled(removalInFlight)
+                    } footer: {
+                        Text("Deletes your account from this server and signs this \(BenitoDevice.name) out.")
+                    }
+                }
+
                 Section {
                     Button(tipsResetRequested ? "Tips will show next launch" : "Show tips again") {
                         BenitoTips.requestReset()
@@ -177,7 +200,7 @@ struct SettingsPrototypeView: View {
                             .foregroundStyle(DesignTokens.textSecondary)
                     }
                     Text(model.isOnDevice
-                        ? "Writes this iPhone's log to a temp file, then opens the share sheet (Files, Mail, Messages…)."
+                        ? "Writes this \(BenitoDevice.name)'s log to a temp file, then opens the share sheet (Files, Mail, Messages…)."
                         : "Fetches from the server, writes a temp file, then opens the share sheet (Files, Mail, Messages…).")
                         .font(.caption)
                         .foregroundStyle(.secondary)
@@ -224,7 +247,39 @@ struct SettingsPrototypeView: View {
                 Button("Sign out", role: .destructive) { model.signOut() }
                 Button("Cancel", role: .cancel) {}
             } message: {
-                Text("This iPhone has no password. To come back, someone in the family sends you a new invite.")
+                Text("This \(BenitoDevice.name) has no password. To come back, someone in the family sends you a new invite.")
+            }
+            .confirmationDialog(
+                "Delete your account?",
+                isPresented: $confirmDeleteAccount,
+                titleVisibility: .visible
+            ) {
+                Button("Delete account", role: .destructive) {
+                    Task {
+                        removalInFlight = true
+                        await model.deleteAccount()
+                        removalInFlight = false
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text(deleteAccountMessage)
+            }
+            .confirmationDialog(
+                "Erase everything on this \(BenitoDevice.name)?",
+                isPresented: $confirmErase,
+                titleVisibility: .visible
+            ) {
+                Button("Erase all data", role: .destructive) {
+                    Task {
+                        removalInFlight = true
+                        await model.eraseOnDeviceData()
+                        removalInFlight = false
+                    }
+                }
+                Button("Cancel", role: .cancel) {}
+            } message: {
+                Text("Deletes the family, baby and every entry saved on this \(BenitoDevice.name). Export first if you want a copy. This can't be undone.")
             }
             .task {
                 for await enabled in ActivityAuthorizationInfo().activityEnablementUpdates {
@@ -250,11 +305,37 @@ extension SettingsPrototypeView {
         var parts: [String] = []
         if model.hasFamily { parts.append(model.isParent ? "Parent" : "Caregiver") }
         if model.isOnDevice {
-            parts.append(String(localized: "Saved on this iPhone"))
+            parts.append(String(localized: "Saved on this \(BenitoDevice.name)"))
         } else {
-            parts.append(model.isPasswordless ? "Signed in with this iPhone" : model.signedInEmail)
+            parts.append(model.isPasswordless ? "Signed in with this \(BenitoDevice.name)" : model.signedInEmail)
         }
         return parts.joined(separator: " · ")
+    }
+
+    /// The member list is only loaded by Sharing, so fetch it before saying what gets deleted.
+    fileprivate func requestDeleteAccount() async {
+        removalInFlight = true
+        defer { removalInFlight = false }
+        if model.hasFamily {
+            let loaded = (try? await model.refreshSharing()) != nil
+            // A rejected session signs the app out; there is nothing left to confirm.
+            guard model.isSignedIn else { return }
+            deleteRemovesFamily = loaded ? model.members.count <= 1 : nil
+        } else {
+            deleteRemovesFamily = false
+        }
+        confirmDeleteAccount = true
+    }
+
+    fileprivate var deleteAccountMessage: String {
+        switch deleteRemovesFamily {
+        case true?:
+            "You are the only person in \(model.familyName). The family and its whole history are deleted from the server. This can't be undone."
+        case false?:
+            "Your account, sign-in and devices are removed from the server. Entries you logged stay in the family's history for the other members. This can't be undone."
+        case nil:
+            "Your account, sign-in and devices are removed from the server. If you are the only person in \(model.familyName), the family and its whole history are deleted too; otherwise entries you logged stay for the other members. This can't be undone."
+        }
     }
 }
 
