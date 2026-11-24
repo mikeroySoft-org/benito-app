@@ -14,7 +14,9 @@ Product decisions live in [SPEC.md](./SPEC.md).
 
 ### 1. Run the server
 
-On a Mac (keeps running in the background, with nightly backups):
+On a Mac, download **[Benito Server](https://github.com/mikeroySoft-org/benito-app/releases/latest)**, drag it to Applications, open it and choose **Install Server**. It lives in the menu bar, keeps the server running, backs it up, makes invites and updates itself (macOS 14 or later).
+
+Or from the terminal on a Mac (keeps running in the background, with nightly backups):
 
 ```bash
 git clone https://github.com/mikeroysoft-org/benito-app && cd benito-app
@@ -71,7 +73,7 @@ Each invite works once and expires after three days.
 SPEC.md                 product and technical decisions
 server/                 Rust sync server (axum + SQLite)
 apps/Benito/            iPhone and iPad app (SwiftUI, XcodeGen)
-apps/BenitoServer/      Mac menubar app that looks after the server (in progress, see docs/plans/mac-server-app.md)
+apps/BenitoServer/      Mac menubar app that installs and looks after the server (releases: docs/release-mac.md)
 apps/BenitoWatch/       Apple Watch app
 apps/BenitoWidgets/     widgets and Live Activities
 packages/BenitoKit/     shared Swift package: models, API client, local store

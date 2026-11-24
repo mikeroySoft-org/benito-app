@@ -32,7 +32,7 @@
 </section>
 <section class="inner__body container" aria-label="Set up Benito">
   <ol class="rows">
-<li class="row" id="server"><h2>Run the server</h2><div class="row__body"><p>On a Mac it starts at login and backs up nightly:</p><pre class="code"><code>git clone https://github.com/mikeroysoft-org/benito-app
+<li class="row" id="server"><h2>Run the server</h2><div class="row__body"><p>On a Mac, <a href="https://github.com/mikeroysoft-org/benito-app/releases/latest">download Benito Server</a>, open it and choose <b>Install Server</b>. It starts at login, backs up, makes invites and updates itself.</p><p>Or from the terminal:</p><pre class="code"><code>git clone https://github.com/mikeroysoft-org/benito-app
 cd benito-app &amp;&amp; scripts/macos-service.sh install
 curl -s http://127.0.0.1:8080/health</code></pre><p>On Linux or a NAS, <a href="https://github.com/mikeroysoft-org/benito-app/blob/main/server/README.md">use Docker</a>.</p></div></li>
 <li class="row" id="reach"><h2>Reach it from phones</h2><div class="row__body"><ul><li><b>Tailscale</b>, recommended: an HTTPS address anywhere.</li><li><b>Home Wi-Fi</b>: a plain HTTP listener, for trusted networks only.</li><li><b>A VPS</b>, behind Caddy or nginx with TLS.</li></ul></div></li>
