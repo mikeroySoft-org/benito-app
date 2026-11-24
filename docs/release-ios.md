@@ -31,10 +31,13 @@ Do these in order. Steps 1 to 3 make the privacy and support pages reachable, wh
 
    ```bash
    brew install fastlane
-   fastlane deliver --api_key_path ~/.appstoreconnect/benito-api-key.json
+   key="$(mktemp)"   # fastlane wants the key's content in JSON; build it for one run, outside the repo
+   jq -n --rawfile key ~/.appstoreconnect/private_keys/AuthKey_<KEYID>.p8 \
+     '{key_id: "<KEYID>", issuer_id: "<ISSUER>", key: $key, in_house: false}' > "$key"
+   fastlane deliver --api_key_path "$key"; rm -f "$key"
    ```
 
-   The JSON file holds `key_id`, `issuer_id` and `key_filepath` for an App Store Connect API key with the App Manager role.
+   The key is an App Store Connect API team key with the App Manager role (Users and Access › Integrations). This uploads text, review notes and screenshots; it does not submit.
 8. **Answers App Store Connect asks for by hand:**
 
    | Page | Answer |
