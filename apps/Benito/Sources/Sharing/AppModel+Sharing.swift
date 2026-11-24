@@ -47,7 +47,7 @@ extension AppModel {
     /// Name for the account row: the person's name, or their email for password accounts.
     var accountDisplayName: String {
         if !signedInName.isEmpty { return signedInName }
-        return isPasswordless ? "This iPhone" : signedInEmail
+        return isPasswordless ? "This \(BenitoDevice.name)" : signedInEmail
     }
 
     static var deviceName: String { UIDevice.current.name }

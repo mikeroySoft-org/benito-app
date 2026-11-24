@@ -121,6 +121,12 @@ public actor APIClient {
         _ = try await postEmpty(path: "/families/leave")
     }
 
+    /// Deletes the caller's account on the server; the session token stops working.
+    /// Servers older than `DELETE /me` answer 404 or 405.
+    public func deleteAccount() async throws {
+        _ = try await delete(path: "/me")
+    }
+
     public func listChildren() async throws -> [ChildDTO] {
         try decode(await get(path: "/children"))
     }

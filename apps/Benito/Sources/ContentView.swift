@@ -439,6 +439,68 @@ final class AppModel {
         status = "Left family"
     }
 
+    /// Deletes the account on the server, then removes this install's traces of it: session,
+    /// device id and signing key, the cached family. The app returns to first-run onboarding.
+    func deleteAccount() async {
+        guard !isOnDevice else { return }
+        do {
+            BenitoLog.ui.notice("deleteAccount")
+            try await client().deleteAccount()
+        } catch {
+            if case .httpStatus(let code, _)? = error as? APIClientError, code == 404 || code == 405 {
+                BenitoLog.ui.notice("deleteAccount unsupported by server (\(code, privacy: .public))")
+                status = "This server is too old to delete accounts from the app. Update Benito on the server, then try again."
+                return
+            }
+            if handleUnauthorized(error) { return }
+            BenitoLog.ui.error("deleteAccount failed: \(String(describing: error), privacy: .public)")
+            status = "Delete account failed: \(Self.message(for: error))"
+            return
+        }
+        // The same account is reachable at every address of this server (LAN, Tailscale).
+        for url in knownEndpoints {
+            try? tokenStore.deleteToken(for: url)
+            storeDeviceId(nil, for: url)
+        }
+        deleteStoredToken()
+        forgetDeviceId()
+        do {
+            try (deviceIdentity as? KeychainDeviceIdentity)?.reset()
+        } catch {
+            BenitoLog.ui.error("device key reset failed: \(String(describing: error), privacy: .public)")
+        }
+        tearDownSession()
+        clearFamilyState()
+        do {
+            try await store.eraseAll()
+        } catch {
+            BenitoLog.ui.error("local store erase failed: \(String(describing: error), privacy: .public)")
+        }
+        outboxPending = 0
+        status = "Account deleted"
+    }
+
+    /// Forgets the family held in memory and the child cached for Siri / Live Activity buttons.
+    /// With `isSignedIn` false this leaves the app at first-run onboarding.
+    func clearFamilyState() {
+        inviteCode = ""
+        childId = nil
+        babyState = nil
+        timeline = []
+        dailySummary = nil
+        nursingLive = nil
+        nursingPreserveSession = false
+        familyName = "Our family"
+        childName = "Baby"
+        name = ""
+        email = ""
+        password = ""
+        lastExportSummary = ""
+        exportShareItem = nil
+        UserDefaults.standard.removeObject(forKey: BenitoIntentBackend.childIdKey)
+        UserDefaults.standard.removeObject(forKey: BenitoIntentBackend.childNameKey)
+    }
+
     func refreshMe() async {
         do {
             let c = try service()

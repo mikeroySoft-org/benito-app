@@ -115,7 +115,7 @@ private struct WelcomeStep: View {
                     ) { path.append(.join) }
 
                     ChoiceCard(
-                        title: "This iPhone only",
+                        title: "This \(BenitoDevice.name) only",
                         detail: "No server, no sharing. Connect a server any time later.",
                         systemImage: "iphone",
                         tint: DesignTokens.diaper
@@ -471,8 +471,8 @@ private struct FamilyDetailsStep: View {
 
     private var footnote: LocalizedStringKey {
         server == nil
-            ? "Everything stays on this iPhone. To share later, connect a server in Account."
-            : "No email or password. This iPhone gets its own private key, kept in the Secure Enclave."
+            ? "Everything stays on this \(BenitoDevice.name). To share later, connect a server in Account."
+            : "No email or password. This \(BenitoDevice.name) gets its own private key, kept in the Secure Enclave."
     }
 
     private func trimmed(_ value: String) -> String { value.trimmingCharacters(in: .whitespacesAndNewlines) }
