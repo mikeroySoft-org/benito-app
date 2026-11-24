@@ -196,7 +196,7 @@ struct HomeGlanceView: View {
                 StatusChip(text: "Demo", accent: DesignTokens.textSecondary, inverted: false)
             }
             if glance.isOnDevice {
-                StatusChip(text: String(localized: "This iPhone"), accent: DesignTokens.textSecondary, inverted: false)
+                StatusChip(text: String(localized: "This \(BenitoDevice.name)"), accent: DesignTokens.textSecondary, inverted: false)
             } else {
                 StatusChip(
                     text: glance.syncConnected ? "Sync" : "Offline",

@@ -213,4 +213,26 @@ final class LocalBenitoServiceTests: XCTestCase {
         XCTAssertTrue(lines[1].contains(",feed_bottle,,"))
         XCTAssertTrue(lines[1].contains(",4,oz,,\"said \"\"more\"\", then slept\","))
     }
+
+    func testEraseAllLeavesNoProfileOrHistory() async throws {
+        let (service, store) = try makeService(Clock(t0))
+        let child = try await service.createProfile(yourName: "M", familyName: "F", childName: "B").children[0].id
+        let event = try await service.createEvent(CreateEventRequestDTO(childId: child, type: "feed_bottle"))
+        let timer = try await service.startTimer(childId: child, kind: "sleep", side: nil, at: t0)
+        _ = try await store.enqueueOutbox(method: "POST", path: "/events", body: nil)
+
+        try await store.eraseAll()
+
+        let profile = try await LocalProfile.load(from: store)
+        XCTAssertNil(profile)
+        let children = try await store.children()
+        XCTAssertTrue(children.isEmpty)
+        let storedEvent = try await store.event(id: event.id)
+        XCTAssertNil(storedEvent)
+        let storedTimer = try await store.timer(id: timer.id)
+        XCTAssertNil(storedTimer)
+        let outbox = try await store.pendingOutbox()
+        XCTAssertTrue(outbox.isEmpty)
+        await assertStatus(404) { try await service.me() }
+    }
 }
