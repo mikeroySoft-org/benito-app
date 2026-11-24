@@ -29,7 +29,7 @@ const INVITE_MAX_HOURS: i64 = 24 * 7;
 /// Caregiver access cap (a long-term nanny can be re-invited).
 const ACCESS_MAX_HOURS: i64 = 24 * 365;
 
-fn parse_time(value: &str) -> Option<DateTime<Utc>> {
+pub(crate) fn parse_time(value: &str) -> Option<DateTime<Utc>> {
     DateTime::parse_from_rfc3339(value)
         .ok()
         .map(|d| d.with_timezone(&Utc))
@@ -66,7 +66,7 @@ pub fn require_parent(conn: &Connection, user_id: &str) -> Result<String, AuthEr
     }
 }
 
-fn server_id(conn: &Connection) -> String {
+pub(crate) fn server_id(conn: &Connection) -> String {
     conn.query_row(
         "SELECT value FROM server_meta WHERE key = 'server_id'",
         [],
@@ -377,6 +377,15 @@ pub async fn list_members(
     let me = user.id.to_string();
     let (family_id, _) =
         membership(&conn, &me)?.ok_or_else(|| AuthError::NotFound("no family".into()))?;
+    Ok(Json(members_of(&conn, &family_id, Some(&me))?))
+}
+
+/// Everyone in `family_id` with their live devices. `me` marks the caller's own row.
+pub(crate) fn members_of(
+    conn: &Connection,
+    family_id: &str,
+    me: Option<&str>,
+) -> Result<Vec<Member>, AuthError> {
     let mut stmt = conn
         .prepare(
             "SELECT u.id, u.name, u.email, fm.role, fm.joined_at, fm.expires_at
@@ -421,7 +430,7 @@ pub async fn list_members(
             .collect();
         let last_seen_at = devices.iter().filter_map(|d| d.last_seen_at.clone()).max();
         members.push(Member {
-            is_you: user_id == me,
+            is_you: me == Some(user_id.as_str()),
             email: (!crate::device_auth::is_synthetic_email(&email)).then_some(email),
             user_id,
             name,
@@ -432,7 +441,7 @@ pub async fn list_members(
             devices,
         });
     }
-    Ok(Json(members))
+    Ok(members)
 }
 
 /// `DELETE /families/members/{user_id}`: a parent removes someone (and all their devices).
@@ -448,6 +457,18 @@ pub async fn remove_member(
             "use Leave family to remove yourself".into(),
         ));
     }
+    drop(conn);
+    remove_family_member(&state, &family_id, &target)?;
+    Ok(Json(json!({ "removed": true })))
+}
+
+/// Ends `target`'s membership, sessions and device keys, and tells the family's live clients.
+pub(crate) fn remove_family_member(
+    state: &AppState,
+    family_id: &str,
+    target: &str,
+) -> Result<(), AuthError> {
+    let conn = state.db.lock().map_err(|_| AuthError::Internal)?;
     let is_member: Option<i64> = conn
         .query_row(
             "SELECT 1 FROM family_members WHERE family_id = ?1 AND user_id = ?2",
@@ -459,9 +480,9 @@ pub async fn remove_member(
     if is_member.is_none() {
         return Err(AuthError::NotFound("not a member of this family".into()));
     }
-    revoke_user_access(&conn, &target, Some(&family_id)).map_err(|_| AuthError::Internal)?;
+    revoke_user_access(&conn, target, Some(family_id)).map_err(|_| AuthError::Internal)?;
     drop(conn);
-    if let Ok(fid) = Uuid::parse_str(&family_id) {
+    if let Ok(fid) = Uuid::parse_str(family_id) {
         state.sync.publish_to_family(
             fid,
             SyncEnvelope::new(
@@ -470,7 +491,7 @@ pub async fn remove_member(
             ),
         );
     }
-    Ok(Json(json!({ "removed": true })))
+    Ok(())
 }
 
 // MARK: - Invites
@@ -507,47 +528,84 @@ pub struct InviteResponse {
     pub endpoints: Vec<String>,
 }
 
+/// A [`CreateInviteRequest`] with its limits checked.
+pub(crate) struct InviteTerms {
+    role: String,
+    expires_in_hours: i64,
+    access_hours: Option<i64>,
+    label: Option<String>,
+}
+
+impl InviteTerms {
+    pub(crate) fn parse(body: CreateInviteRequest) -> Result<Self, AuthError> {
+        let role = body.role.as_deref().unwrap_or(ROLE_PARENT).to_lowercase();
+        if role != ROLE_PARENT && role != ROLE_CAREGIVER {
+            return Err(AuthError::BadRequest(
+                "role must be parent or caregiver".into(),
+            ));
+        }
+        let expires_in_hours = body.expires_in_hours.unwrap_or(INVITE_DEFAULT_HOURS);
+        if !(1..=INVITE_MAX_HOURS).contains(&expires_in_hours) {
+            return Err(AuthError::BadRequest(format!(
+                "expires_in_hours must be 1–{INVITE_MAX_HOURS}"
+            )));
+        }
+        let access_hours = if role == ROLE_CAREGIVER {
+            body.access_hours
+        } else {
+            None
+        };
+        if let Some(h) = access_hours {
+            if !(1..=ACCESS_MAX_HOURS).contains(&h) {
+                return Err(AuthError::BadRequest(format!(
+                    "access_hours must be 1–{ACCESS_MAX_HOURS}"
+                )));
+            }
+        }
+        let label = body
+            .label
+            .map(|l| clean_name(&l, "", 60))
+            .filter(|l| !l.is_empty());
+        Ok(Self {
+            role,
+            expires_in_hours,
+            access_hours,
+            label,
+        })
+    }
+}
+
 pub async fn create_invite(
     State(state): State<AppState>,
     AuthUser(user): AuthUser,
     body: Option<Json<CreateInviteRequest>>,
 ) -> Result<Json<InviteResponse>, AuthError> {
-    let body = body.map(|Json(b)| b).unwrap_or_default();
-    let role = body.role.as_deref().unwrap_or(ROLE_PARENT).to_lowercase();
-    if role != ROLE_PARENT && role != ROLE_CAREGIVER {
-        return Err(AuthError::BadRequest(
-            "role must be parent or caregiver".into(),
-        ));
-    }
-    let hours = body.expires_in_hours.unwrap_or(INVITE_DEFAULT_HOURS);
-    if !(1..=INVITE_MAX_HOURS).contains(&hours) {
-        return Err(AuthError::BadRequest(format!(
-            "expires_in_hours must be 1–{INVITE_MAX_HOURS}"
-        )));
-    }
-    let access_hours = if role == ROLE_CAREGIVER {
-        body.access_hours
-    } else {
-        None
-    };
-    if let Some(h) = access_hours {
-        if !(1..=ACCESS_MAX_HOURS).contains(&h) {
-            return Err(AuthError::BadRequest(format!(
-                "access_hours must be 1–{ACCESS_MAX_HOURS}"
-            )));
-        }
-    }
+    let terms = InviteTerms::parse(body.map(|Json(b)| b).unwrap_or_default())?;
     let conn = state.db.lock().map_err(|_| AuthError::Internal)?;
     let family_id = require_parent(&conn, &user.id.to_string())?;
-    let family = load_family(&conn, &family_id)?;
+    Ok(Json(insert_invite(
+        &conn,
+        &family_id,
+        &user.id.to_string(),
+        &user.name,
+        terms,
+    )?))
+}
+
+/// Stores a new invite for `family_id`, attributed to `creator_id`, and returns it with its
+/// one-time secret.
+pub(crate) fn insert_invite(
+    conn: &Connection,
+    family_id: &str,
+    creator_id: &str,
+    creator_name: &str,
+    terms: InviteTerms,
+) -> Result<InviteResponse, AuthError> {
+    let family = load_family(conn, family_id)?;
     let id = Uuid::new_v4().to_string();
     let secret = new_invite_secret();
     let now = Utc::now();
-    let expires = now + Duration::hours(hours);
-    let label = body
-        .label
-        .map(|l| clean_name(&l, "", 60))
-        .filter(|l| !l.is_empty());
+    let expires = now + Duration::hours(terms.expires_in_hours);
     conn.execute(
         "INSERT INTO family_invites
          (id, family_id, secret_hash, role, access_hours, label, created_by, created_at, expires_at)
@@ -556,29 +614,29 @@ pub async fn create_invite(
             id,
             family_id,
             hash_secret(&secret),
-            role,
-            access_hours,
-            label,
-            user.id.to_string(),
+            terms.role,
+            terms.access_hours,
+            terms.label,
+            creator_id,
             now.to_rfc3339(),
             expires.to_rfc3339()
         ],
     )
     .map_err(|_| AuthError::Internal)?;
-    Ok(Json(InviteResponse {
+    Ok(InviteResponse {
         id,
         secret: Some(secret),
-        family_id,
+        family_id: family_id.to_string(),
         family_name: family.name,
-        inviter_name: user.name,
-        role,
-        access_hours,
-        label,
+        inviter_name: creator_name.to_string(),
+        role: terms.role,
+        access_hours: terms.access_hours,
+        label: terms.label,
         created_at: now.to_rfc3339(),
         expires_at: expires.to_rfc3339(),
-        server_id: server_id(&conn),
+        server_id: server_id(conn),
         endpoints: advertised_urls(),
-    }))
+    })
 }
 
 /// Pending (unused, unexpired, unrevoked) invites for the caller's family.
@@ -588,8 +646,16 @@ pub async fn list_invites(
 ) -> Result<Json<Vec<InviteResponse>>, AuthError> {
     let conn = state.db.lock().map_err(|_| AuthError::Internal)?;
     let family_id = require_parent(&conn, &user.id.to_string())?;
-    let family = load_family(&conn, &family_id)?;
-    let sid = server_id(&conn);
+    Ok(Json(pending_invites(&conn, &family_id)?))
+}
+
+/// Unused, unexpired, unrevoked invites for `family_id`, newest first (no secrets).
+pub(crate) fn pending_invites(
+    conn: &Connection,
+    family_id: &str,
+) -> Result<Vec<InviteResponse>, AuthError> {
+    let family = load_family(conn, family_id)?;
+    let sid = server_id(conn);
     let mut stmt = conn
         .prepare(
             "SELECT i.id, i.role, i.access_hours, i.label, i.created_at, i.expires_at, u.name
@@ -603,7 +669,7 @@ pub async fn list_invites(
             Ok(InviteResponse {
                 id: r.get(0)?,
                 secret: None,
-                family_id: family_id.clone(),
+                family_id: family_id.to_string(),
                 family_name: family.name.clone(),
                 role: r.get(1)?,
                 access_hours: r.get(2)?,
@@ -618,7 +684,7 @@ pub async fn list_invites(
         .map_err(|_| AuthError::Internal)?
         .filter_map(Result::ok)
         .collect();
-    Ok(Json(invites))
+    Ok(invites)
 }
 
 pub async fn revoke_invite(

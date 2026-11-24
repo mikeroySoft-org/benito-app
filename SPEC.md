@@ -24,7 +24,7 @@
 | 1 | Server stack | **Rust (axum) + SQLite** — one binary, one DB file |
 | 2 | v1 reminders | **Local notifications only**; APNs partner pings in v1.1 |
 | 3 | Local store | **GRDB** (explicit SQL, sync-queue friendly) |
-| 4 | Distribution | **Source-only for now**; TestFlight/App Store later if needed for installs |
+| 4 | Distribution | ~~Source-only for now~~ **Revised 2026-11-17 (Revision 2):** signed, notarized binaries for the Mac server app; source is MIT licensed, and the repository goes public before the first release. iPhone app: build from source until TestFlight/App Store |
 | 5 | Exposure | **Document both** home Tailscale and public HTTPS |
 | 6 | License | **MIT** |
 
@@ -84,6 +84,13 @@ Target: feed, diaper, sleep, and “how many wet diapers?” for pediatrician vi
 - PWA / Android / web clients: out for now. API stays platform-agnostic.
 - Unlocks: Live Activities, Watch + complications, widgets, App Intents / Shortcuts, APNs in v1.1+.
 
+### Mac server app (Revision 2, 2026-11-17)
+
+- **Benito Server** for Mac: a menubar app that installs, runs and looks after `benito-server` (status, backups and restore, people and devices, invites by QR, logs, updates). Plan: [`docs/plans/mac-server-app.md`](./docs/plans/mac-server-app.md).
+- It is an admin tool, not a client. Baby data appears only as a read-only glance; logging stays on iPhone, iPad and Watch.
+- No separate native Mac client. The iPhone/iPad app runs on Apple Silicon Macs as "Designed for iPad".
+- Shipped as a Developer ID signed, notarized DMG with Sparkle updates. Building from source stays supported; Docker and `scripts/macos-service.sh` remain for Linux, NAS and headless hosts.
+
 ### v1.1
 
 - APNs partner-activity pings
@@ -104,7 +111,7 @@ Target: feed, diaper, sleep, and “how many wet diapers?” for pediatrician vi
 ### Non-goals
 
 - Sleep-training plans, expert consults, medical-adjacent advice
-- App Store as a **business**; free TestFlight/App Store install path can come later (distribution is source-only for now)
+- App Store as a **business**; a free TestFlight/App Store install path for the iPhone app can come later (the Mac server app ships as a signed download, see Revision 2)
 - Social/community features, growth-percentile medical claims
 - CloudKit as primary sync (rejected: Apple cloud custody, paid-dev friction for OSS users, no server-side reminders / future non-Apple clients)
 
@@ -115,7 +122,8 @@ Target: feed, diaper, sleep, and “how many wet diapers?” for pediatrician vi
 ### Backend
 
 - Self-hosted **one small service** in Docker.
-- **Rust (axum) + SQLite** — one binary, one DB file, backup = file copy.
+- **Rust (axum) + SQLite** — one binary, one DB file. Backups are built into the server (SQLite online backup, integrity-checked, pruned); restore is a server subcommand.
+- A loopback-only **admin API** on its own port (off by default) serves the Mac server app: status, people and devices, invites, backups. It is never reachable through Tailscale Serve, the LAN listener or a reverse proxy.
 - Sync: WebSocket (or equivalent) for live events/timers; append-oriented events; edits last-writer-wins on `updated_at`.
 - Auth: two users + invite code; session tokens. Sign in with Apple optional polish, not required.
 - Notifications: local on-device for v1 reminders; APNs for partner pings in v1.1+.

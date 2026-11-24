@@ -62,5 +62,8 @@ apps/Benito/Config/Local.xcconfig
 # Written by the "Embed Git SHA" pre-build script
 apps/Benito/Sources/Generated/GitSHA.swift
 
+# Sparkle release fetched by apps/BenitoServer/Scripts/fetch-sparkle.sh
+apps/BenitoServer/Vendor/
+
 # Python bytecode (skills/benito helper and tests)
 __pycache__/

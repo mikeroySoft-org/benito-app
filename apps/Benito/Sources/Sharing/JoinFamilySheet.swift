@@ -93,14 +93,14 @@ struct JoinFamilySheet: View {
                 .padding(.horizontal, 16)
                 .frame(minHeight: DesignTokens.thumbMin)
                 .background(DesignTokens.bgCard, in: RoundedRectangle(cornerRadius: DesignTokens.cardRadius, style: .continuous))
-            Text("Shown next to what you log. No email or password: this iPhone gets its own private key.")
+            Text("Shown next to what you log. No email or password: this \(BenitoDevice.name) gets its own private key.")
                 .font(.footnote)
                 .foregroundStyle(DesignTokens.textSecondary)
         }
 
         if model.hasFamily {
             Label(
-                "This iPhone is already part of \(model.familyName). Sign out under Account first to join another family.",
+                "This \(BenitoDevice.name) is already part of \(model.familyName). Sign out under Account first to join another family.",
                 systemImage: "exclamationmark.triangle.fill"
             )
             .font(.footnote)

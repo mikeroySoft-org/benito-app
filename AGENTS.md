@@ -25,5 +25,12 @@ that agent's skills folder.
 - Never run `scripts/macos-service.sh install|uninstall|restart` on a machine whose Benito service
   holds real family data unless that is the task; it replaces the running service.
 - Use a scratch database (`DATABASE_PATH=/tmp/...`) and a free loopback port for experiments.
+- Mac server app (`apps/BenitoServer`, plan in `docs/plans/mac-server-app.md`):
+  `scripts/dev-server-app.sh` builds it and runs it against a scratch server with demo data under
+  `$TMPDIR`; it never touches the real install. Build check: `cd apps/BenitoServer && xcodegen
+  generate && xcodebuild build -project BenitoServer.xcodeproj -scheme BenitoServer
+  CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM=`.
+- `admin.json` next to a database holds the local admin API token. Never read the one in
+  `~/Library/Application Support/Benito`.
 - `apps/Benito/Sources/Generated/GitSHA.swift` is generated at build time; never commit it.
 - Deployment guides: `docs/deploy-macos.md`, `docs/deploy-tailscale.md`, `docs/deploy-vps.md`.

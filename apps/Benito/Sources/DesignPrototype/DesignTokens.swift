@@ -33,7 +33,7 @@ enum DesignTokens {
 
     // Layout (match OpenBBQ Cook HUD)
     static let thumbMin: CGFloat = 52
-    /// Taller thumb when a label carries a detail line (e.g. Feed side · ago).
+    /// Taller tap target for two-line choice rows (onboarding).
     static let thumbMinTall: CGFloat = 72
     static let gutter: CGFloat = 16
     static let cardRadius: CGFloat = 14

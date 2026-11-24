@@ -1,0 +1,22 @@
+Benito is a free, open-source baby tracker (MIT, https://github.com/mikeroysoft-org/benito-app). No sign-in is needed to review it.
+
+HOW TO TEST WITHOUT A SERVER OR ACCOUNT
+1. Launch the app and tap "Get started".
+2. Choose "This iPhone only" (on iPad: "This iPad only").
+3. Enter any names and continue. Every logging feature now works: Home, Log, Timeline, timers, Live Activity, export.
+
+SHARING AND THE SERVER
+Sharing between family members uses a sync server that each family runs on its own hardware (source in the same repository, setup at https://benito.mikeroysoft.com/self-host/). The developer operates no server and receives no data, so there is no demo account. "Start a family" and "Join a family" ask for the address of the family's own server.
+
+LOCAL NETWORK PERMISSION
+During "Start a family" the app looks for a Benito server on the local Wi-Fi (Bonjour, _benito._tcp) and connects to it. That is the only use of the local network.
+
+ACCOUNT DELETION
+When connected to a server: Account tab > "Delete account…". It removes the account, its sign-in and its devices from the family's server.
+In "This iPhone only" mode there is no account: Account tab > "Erase all data…" removes everything stored on the device.
+
+PUSH NOTIFICATIONS
+Used only for Live Activity updates (a timer stopped on another family member's phone). They are sent by the family's own server with its own APNs key.
+
+HEALTH
+The app records what the parent enters. It gives no medical advice, predictions or diagnoses.
