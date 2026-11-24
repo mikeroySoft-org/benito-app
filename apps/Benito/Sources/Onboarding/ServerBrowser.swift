@@ -38,6 +38,15 @@ final class ServerBrowser {
         self.browser = browser
     }
 
+    /// Browses briefly and returns what resolved in time (empty when nothing answers).
+    static func discover(for duration: Duration = .seconds(1.5)) async -> [URL] {
+        let browser = ServerBrowser()
+        browser.start()
+        try? await Task.sleep(for: duration)
+        browser.stop()
+        return browser.found.map(\.url)
+    }
+
     func stop() {
         browser?.cancel()
         browser = nil
