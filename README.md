@@ -1,3 +1,5 @@
+<img src="site/assets/benito-icon.png" width="96" height="96" alt="Benito app icon: a swaddled capybara">
+
 # Benito
 
 A free, open-source baby tracker for iPhone, iPad and Apple Watch, with a small sync server you run yourself. Log feeds, sleep and diapers, share live timers, and invite your partner, grandparents or a babysitter without anyone making an account.
