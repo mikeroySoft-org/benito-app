@@ -65,3 +65,7 @@ run = ["scripts/gate-env.sh", ".", "./scripts/check-site-plumbing.sh"]
 name = "ios-release-build"
 when = "release"
 run = ["scripts/gate-env.sh", "apps/Benito", "sh", "-c", "xcodebuild build -project Benito.xcodeproj -scheme Benito -configuration Release -destination 'generic/platform=iOS Simulator' -derivedDataPath \"$TMPDIR/benito-dd\" CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM="]
+
+[[gate.check]]
+name = "mac-server-app-build"
+run = ["scripts/gate-env.sh", "apps/BenitoServer", "sh", "-c", "xcodegen generate && xcodebuild build -project BenitoServer.xcodeproj -scheme BenitoServer -derivedDataPath \"$TMPDIR/benito-dd-server-app\" CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM="]
