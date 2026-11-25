@@ -66,6 +66,7 @@
 		4AB39521846B9B601162CD17 /* BackupActionRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77DD42B05BF78784D0C19F1A /* BackupActionRow.swift */; };
 		4D2A3D671733EAE8EC3B5E9C /* ExportFileName.swift in Sources */ = {isa = PBXBuildFile; fileRef = 811976D1450D5D9F37517A01 /* ExportFileName.swift */; };
 		4EDA77E0ED31FD90F9A7E7E1 /* TailscaleSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6239B89DE497B3CA019348A /* TailscaleSnapshot.swift */; };
+		5109B3C3D28A84A1053656B7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2EBE5EB5AB473A597A7D891 /* Assets.xcassets */; };
 		51E457D361E6BE71AF16D43D /* BackupBrowser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6BC0D13C129CA6FD8C71799 /* BackupBrowser.swift */; };
 		5709D74575D495E520FDF4D9 /* FamilyRole+Title.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A57C5A54AB6513AA8E78531 /* FamilyRole+Title.swift */; };
 		59CDE0ABEDE18A4BED509C04 /* AdminHandoff.swift in Sources */ = {isa = PBXBuildFile; fileRef = EBD021398F969C1B647C2B5B /* AdminHandoff.swift */; };
@@ -345,6 +346,7 @@
 		E12E019813E055F29ED5A246 /* ReliabilityModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReliabilityModel.swift; sourceTree = "<group>"; };
 		E1C71F3AE31F07E6B6293A33 /* ProblemNotifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProblemNotifier.swift; sourceTree = "<group>"; };
 		E2DB1668B99876FEDAADABEF /* ConnectionsCurrentSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectionsCurrentSection.swift; sourceTree = "<group>"; };
+		E2EBE5EB5AB473A597A7D891 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E378662EECF35728DAF9E17E /* AdminClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminClient.swift; sourceTree = "<group>"; };
 		E477DFAE4452F95754ADDB45 /* OverviewGlanceSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverviewGlanceSection.swift; sourceTree = "<group>"; };
 		E54A16DF36B7D90992347D2F /* MainWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainWindow.swift; sourceTree = "<group>"; };
@@ -413,6 +415,14 @@
 				C7F073B616789CB87001BD95 /* TailscaleStatus.swift */,
 			);
 			path = Connections;
+			sourceTree = "<group>";
+		};
+		191745CAC9CD4CB6F6010AFE /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				E2EBE5EB5AB473A597A7D891 /* Assets.xcassets */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		19D40E61A76EE54212D201E2 /* Views */ = {
@@ -661,6 +671,7 @@
 			children = (
 				F54C0BEC2A1C19BDB00BF3B7 /* apps */,
 				F0E45667C08470765C62655A /* Packages */,
+				191745CAC9CD4CB6F6010AFE /* Resources */,
 				95157C8BE55BC1C0858337AE /* Sources */,
 				9D1810EB843A6DE1B3579F33 /* Frameworks */,
 				9785B82627AD67E61CA9CCB1 /* Products */,
@@ -751,6 +762,7 @@
 				5E29276B30E8847E974D5B68 /* Fetch Sparkle */,
 				F136588B8A577B8015EB07B8 /* Sources */,
 				FB835A0A36EA05A445F64AF3 /* Embed benito-server */,
+				765CC0E70F7C3A03F0C31488 /* Resources */,
 				B05300ED08E628C0F3385A3B /* Frameworks */,
 				51C2A3B6E82F62DB8F3AA8C0 /* Embed Frameworks */,
 			);
@@ -802,6 +814,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		765CC0E70F7C3A03F0C31488 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5109B3C3D28A84A1053656B7 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
 		5E29276B30E8847E974D5B68 /* Fetch Sparkle */ = {

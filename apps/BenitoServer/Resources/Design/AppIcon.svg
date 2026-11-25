@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Benito Server app icon: the iPhone app's icon in the macOS icon shape, with a small Mac in the corner.
+     Render: apps/BenitoServer/Scripts/render-icons.sh -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <clipPath id="shape"><rect x="100" y="100" width="824" height="824" rx="185" ry="185"/></clipPath>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="10"/><feOffset dy="10"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.3"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="badgeShadow" x="-30%" y="-30%" width="160%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="12"/><feOffset dy="12"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.45"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <linearGradient id="top" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F7F7F9"/><stop offset="1" stop-color="#DCDDE2"/></linearGradient>
+    <linearGradient id="front" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D3D4DA"/><stop offset="1" stop-color="#A9ABB3"/></linearGradient>
+  </defs>
+  <g filter="url(#shadow)">
+    <rect x="100" y="100" width="824" height="824" rx="185" ry="185" fill="#1B1C2B"/>
+    <image xlink:href="benito-ios-icon.png" x="100" y="100" width="824" height="824" clip-path="url(#shape)"/>
+  </g>
+  <!-- A small Mac (mini/Studio shape): top face, front face, two ports and a status light. -->
+  <g filter="url(#badgeShadow)">
+    <path d="M610 706 h268 a22 22 0 0 1 21 15 l17 51 h-344 l17 -51 a22 22 0 0 1 21 -15 z" fill="url(#top)"/>
+    <path d="M572 772 h344 v82 a30 30 0 0 1 -30 30 h-284 a30 30 0 0 1 -30 -30 z" fill="url(#front)"/>
+    <rect x="572" y="772" width="344" height="5" fill="#FFFFFF" opacity="0.7"/>
+    <rect x="612" y="816" width="34" height="18" rx="9" fill="#5B5D66"/>
+    <rect x="660" y="816" width="34" height="18" rx="9" fill="#5B5D66"/>
+    <circle cx="872" cy="825" r="9" fill="#3DDC84"/>
+  </g>
+</svg>
