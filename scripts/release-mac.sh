@@ -205,6 +205,9 @@ parse_args() {
 
   server_version="$(cargo_version)"
   [[ -n "$server_version" ]] || die "could not read the server version from $SERVER_DIR/Cargo.toml"
+  # The app and the server it carries share one version, so the Overview pane shows one number.
+  [[ "$server_version" == "$version" ]] \
+    || die "server version $server_version (server/Cargo.toml) differs from app version $version; set both to the same value"
 
   DMG="$DIST/Benito-Server-$version.dmg"
   APPCAST="$DIST/appcast.xml"

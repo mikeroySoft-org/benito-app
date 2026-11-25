@@ -55,7 +55,7 @@ Do this once on the Mac that cuts releases.
 1. Set the versions and commit:
    - `MARKETING_VERSION` in `apps/BenitoServer/project.yml`: the version people see (`0.2.0`).
    - `CURRENT_PROJECT_VERSION` in the same file: a whole number that goes up by at least one every release. Sparkle compares this number, not the visible version.
-   - `version` in `server/Cargo.toml` when the server changed. The app compares it with the installed server (see below).
+   - `version` in `server/Cargo.toml`: always the same value as `MARKETING_VERSION`, so the app and the server it installs show one version. The script refuses to build when they differ. Run `cargo build` in `server/` afterwards so `Cargo.lock` follows.
 2. Run the script from a clean tree:
 
    ```bash
