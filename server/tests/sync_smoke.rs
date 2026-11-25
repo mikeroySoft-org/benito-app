@@ -499,10 +499,10 @@ async fn daily_summary_and_invite_rotate() {
     let child_id = fam_body["child"]["id"].as_str().unwrap().to_string();
     let old_invite = fam_body["invite_code"].as_str().unwrap().to_string();
 
-    // Noon UTC keeps every fixture (incl. the sleep 2h→1h ago) inside the UTC `day` window,
-    // whatever time the suite runs.
-    let now = chrono::Utc::now()
-        .date_naive()
+    // Noon UTC keeps every fixture (incl. the sleep 2h→1h ago) inside the UTC `day` window.
+    // Yesterday's noon, because the server rejects events that start in the future and today's
+    // noon is in the future for half of every UTC day.
+    let now = (chrono::Utc::now().date_naive() - chrono::Days::new(1))
         .and_hms_opt(12, 0, 0)
         .unwrap()
         .and_utc();
