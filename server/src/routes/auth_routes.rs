@@ -555,6 +555,27 @@ pub async fn delete_account(
             )
             .map_err(|_| AuthError::Internal)?;
         if has_others {
+            // Caregivers can't invite or remove anyone, so a family must not be left to them.
+            // Same rule as the admin API's member removal.
+            let strands_caregivers: bool = tx
+                .query_row(
+                    "SELECT EXISTS(
+                         SELECT 1 FROM family_members
+                         WHERE family_id = ?1 AND user_id = ?2 AND role = 'parent')
+                       AND NOT EXISTS(
+                         SELECT 1 FROM family_members
+                         WHERE family_id = ?1 AND user_id <> ?2 AND role = 'parent'
+                           AND (expires_at IS NULL OR expires_at > ?3))",
+                    params![family_id, uid, now],
+                    |r| r.get(0),
+                )
+                .map_err(|_| AuthError::Internal)?;
+            if strands_caregivers {
+                // Returning drops the transaction, so nothing above is kept.
+                return Err(AuthError::Conflict(
+                    "You are this family's only parent. Invite another parent or remove the caregivers in Sharing, then delete your account.".into(),
+                ));
+            }
             remaining_families.push(family_id);
         } else {
             // Cascades members, children (events, timers, reminders), invites, pairing tokens

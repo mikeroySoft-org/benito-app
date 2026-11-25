@@ -253,6 +253,49 @@ async fn member_delete_keeps_family_and_shared_history() {
 }
 
 #[tokio::test]
+async fn only_parent_cannot_delete_while_caregivers_remain() {
+    let (base, dir) = spawn_server().await;
+    let parent = register(&base, "Parent", "parent@example.com").await;
+    let (invite_code, child_id) = create_family(&base, &parent).await;
+    let sitter = register(&base, "Sitter", "sitter@example.com").await;
+    let (status, body) = http_json(
+        "POST",
+        &format!("{base}/families/join"),
+        Some(&sitter),
+        Some(json!({ "invite_code": invite_code })),
+    )
+    .await
+    .unwrap();
+    assert_eq!(status, 200, "join: {body}");
+    // Invite codes make parents; caregivers come from device invites. Set the role directly.
+    let (_, sitter_me) = get(&base, &sitter, "/me").await;
+    let sitter_id = sitter_me["user"]["id"].as_str().unwrap().to_string();
+    rusqlite::Connection::open(dir.join("test.db"))
+        .unwrap()
+        .execute(
+            "UPDATE family_members SET role = 'caregiver' WHERE user_id = ?1",
+            [&sitter_id],
+        )
+        .unwrap();
+    log_event(&base, &parent, &child_id, 30).await;
+
+    let (status, body) = delete_account(&base, Some(&parent)).await;
+    assert_eq!(status, 409, "{body}");
+    let (status, body) = get(&base, &parent, "/me").await;
+    assert_eq!(status, 200, "refused delete changes nothing: {body}");
+    assert_eq!(db_count(&dir, "SELECT COUNT(*) FROM families"), 1);
+    assert_eq!(db_count(&dir, "SELECT COUNT(*) FROM family_members"), 2);
+    assert_eq!(db_count(&dir, "SELECT COUNT(*) FROM events"), 1);
+
+    // The caregiver can go, and then the parent is the last member and can too.
+    let (status, body) = delete_account(&base, Some(&sitter)).await;
+    assert_eq!(status, 200, "{body}");
+    let (status, body) = delete_account(&base, Some(&parent)).await;
+    assert_eq!(status, 200, "{body}");
+    assert_eq!(db_count(&dir, "SELECT COUNT(*) FROM families"), 0);
+}
+
+#[tokio::test]
 async fn user_without_family_is_deleted() {
     let (base, dir) = spawn_server().await;
     let token = register(&base, "Alone", "alone@example.com").await;
