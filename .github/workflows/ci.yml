@@ -49,11 +49,17 @@ jobs:
         run: swift test
       - name: Timer chrome lint
         run: ./scripts/check-timer-chrome.sh
+      - name: Install XcodeGen 2.46.0
+        run: |
+          set -euo pipefail
+          curl -sL "https://github.com/yonaskolb/XcodeGen/releases/download/2.46.0/xcodegen.zip" -o /tmp/xcodegen.zip
+          rm -rf /tmp/xcodegen
+          unzip -q /tmp/xcodegen.zip -d /tmp
+          sudo env PREFIX=/usr/local /tmp/xcodegen/install.sh
+          xcodegen --version
       - name: Generate project
         working-directory: apps/Benito
-        run: |
-          brew install xcodegen
-          xcodegen generate
+        run: xcodegen generate
       - name: xcodeproj in sync
         working-directory: apps/Benito
         run: git diff --exit-code -- Benito.xcodeproj
@@ -87,8 +93,14 @@ jobs:
             ~/.cargo/git
             server/target
           key: cargo-${{ runner.os }}-${{ hashFiles('server/Cargo.lock') }}
-      - name: Install xcodegen
-        run: brew install xcodegen
+      - name: Install XcodeGen 2.46.0
+        run: |
+          set -euo pipefail
+          curl -sL "https://github.com/yonaskolb/XcodeGen/releases/download/2.46.0/xcodegen.zip" -o /tmp/xcodegen.zip
+          rm -rf /tmp/xcodegen
+          unzip -q /tmp/xcodegen.zip -d /tmp
+          sudo env PREFIX=/usr/local /tmp/xcodegen/install.sh
+          xcodegen --version
       - name: Build Benito Server Mac app (unsigned)
         working-directory: apps/BenitoServer
         env:
