@@ -3,14 +3,14 @@
     <channel>
         <title>Benito Server</title>
         <item>
-            <title>1.0.0</title>
-            <pubDate>Tue, 24 Nov 2026 16:07:51 -0800</pubDate>
+            <title>1.0.1</title>
+            <pubDate>Tue, 24 Nov 2026 17:14:28 -0800</pubDate>
             <link>https://benito.mikeroysoft.com/</link>
-            <sparkle:fullReleaseNotesLink>https://github.com/mikeroySoft-org/benito-app/releases/tag/mac-v1.0.0</sparkle:fullReleaseNotesLink>
-            <sparkle:version>1</sparkle:version>
-            <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
+            <sparkle:fullReleaseNotesLink>https://github.com/mikeroySoft-org/benito-app/releases/tag/mac-v1.0.1</sparkle:fullReleaseNotesLink>
+            <sparkle:version>2</sparkle:version>
+            <sparkle:shortVersionString>1.0.1</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>14.0</sparkle:minimumSystemVersion>
-            <enclosure url="https://github.com/mikeroySoft-org/benito-app/releases/download/mac-v1.0.0/Benito-Server-1.0.0.dmg" length="17466381" type="application/octet-stream" sparkle:edSignature="8GGmhpHr/KbmpA/Pr06MQX7FjJJGoTdv7yIPXR5V/K4DO4AtGZ+ZPiLnrUtogH0lT24ndM1iBW+zHEunvZMOAw=="/>
+            <enclosure url="https://github.com/mikeroySoft-org/benito-app/releases/download/mac-v1.0.1/Benito-Server-1.0.1.dmg" length="18552394" type="application/octet-stream" sparkle:edSignature="sl9zF9PGxMTeohhLJiMhhsdu6nUZYlt+n4gzifKmwdKv51xeAH2gkHoesmXgeC/usRFaAvniem+nPDCLHS5vBA=="/>
         </item>
     </channel>
 </rss>
