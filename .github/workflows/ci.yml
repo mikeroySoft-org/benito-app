@@ -49,11 +49,20 @@ jobs:
         run: swift test
       - name: Timer chrome lint
         run: ./scripts/check-timer-chrome.sh
+      - name: Install XcodeGen 2.46.0
+        run: |
+          set -euo pipefail
+          curl -sL "https://github.com/yonaskolb/XcodeGen/releases/download/2.46.0/xcodegen.zip" -o /tmp/xcodegen.zip
+          rm -rf /tmp/xcodegen
+          unzip -q /tmp/xcodegen.zip -d /tmp
+          sudo env PREFIX=/usr/local /tmp/xcodegen/install.sh
+          xcodegen --version
       - name: Generate project
         working-directory: apps/Benito
-        run: |
-          brew install xcodegen
-          xcodegen generate
+        run: xcodegen generate
+      - name: xcodeproj in sync
+        working-directory: apps/Benito
+        run: git diff --exit-code -- Benito.xcodeproj
       - name: Build for Simulator (no signing team)
         working-directory: apps/Benito
         run: |
@@ -62,3 +71,43 @@ jobs:
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM= \
             | tail -n 50
+      - name: Build Watch for Simulator (no signing team)
+        working-directory: apps/Benito
+        run: |
+          xcodebuild build \
+            -project Benito.xcodeproj -scheme BenitoWatch \
+            -destination 'generic/platform=watchOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/benito-dd-watch" \
+            CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM=
+
+  mac-server-app:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Select Xcode
+        run: sudo xcode-select -s "$(ls -d /Applications/Xcode_16*.app | sort -V | tail -1)"
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            server/target
+          key: cargo-${{ runner.os }}-${{ hashFiles('server/Cargo.lock') }}
+      - name: Install XcodeGen 2.46.0
+        run: |
+          set -euo pipefail
+          curl -sL "https://github.com/yonaskolb/XcodeGen/releases/download/2.46.0/xcodegen.zip" -o /tmp/xcodegen.zip
+          rm -rf /tmp/xcodegen
+          unzip -q /tmp/xcodegen.zip -d /tmp
+          sudo env PREFIX=/usr/local /tmp/xcodegen/install.sh
+          xcodegen --version
+      - name: Build Benito Server Mac app (unsigned)
+        working-directory: apps/BenitoServer
+        env:
+          BENITO_BONJOUR: "0"
+        run: |
+          xcodegen generate
+          xcodebuild build \
+            -project BenitoServer.xcodeproj -scheme BenitoServer \
+            -derivedDataPath "$RUNNER_TEMP/benito-dd-server-app" \
+            CODE_SIGNING_ALLOWED=NO DEVELOPMENT_TEAM=
