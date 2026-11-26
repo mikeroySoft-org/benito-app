@@ -78,7 +78,7 @@ APNS_TEAM_ID=ABCDE12345
 APNS_TOPIC=com.example.benito.push-type.liveactivity
 ```
 
-Xcode builds use the **sandbox** APNs environment (`aps-environment` = development). The app registers tokens with `apns_env=sandbox`; the server posts to `api.sandbox.push.apple.com`. Production / TestFlight tokens are a later phase.
+The app registers each token with the APNs environment its binary is signed for: **sandbox** for Xcode development builds (`aps-environment` = development), **production** for App Store and TestFlight. The server posts to `api.sandbox.push.apple.com` or `api.push.apple.com` from the stored `apns_env`, so both can be registered at once.
 
 With the key unset the server logs that push is disabled and `timer.stop` only fans out over WebSocket (unchanged).
 

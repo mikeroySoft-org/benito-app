@@ -107,8 +107,8 @@ final class LiveActivityController {
 
     private func start(name: String, content: ContentState) {
         do {
-            // `.token` opts into ActivityKit push updates / end (sandbox tokens while
-            // developing; server stores apns_env and no-ops until the .p8 is configured).
+            // `.token` opts into ActivityKit push updates / end. The token's APNs
+            // environment is read from this binary's provisioning profile.
             let started = try Activity.request(
                 attributes: BenitoActivityAttributes(childName: name),
                 content: ActivityContent(state: content, staleDate: nil),
