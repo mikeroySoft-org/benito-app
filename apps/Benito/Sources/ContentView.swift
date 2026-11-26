@@ -245,6 +245,7 @@ final class AppModel {
         deleteStoredToken()
         forgetDeviceId()
         tearDownSession()
+        BenitoShortcutRefresh.publish(id: nil, name: nil)
         childId = nil
         babyState = nil
         timeline = []
@@ -371,6 +372,7 @@ final class AppModel {
             hasFamily = true
             inviteCode = res.inviteCode
             try await store.upsertChild(res.child)
+            BenitoShortcutRefresh.publish(id: res.child.id, name: res.child.name)
             status = "Family created. Invite: \(res.inviteCode)"
             await refreshState()
             connectSync()
@@ -436,6 +438,7 @@ final class AppModel {
         dailySummary = nil
         nursingLive = nil
         try? await store.replaceChildren([])
+        BenitoShortcutRefresh.publish(id: nil, name: nil)
         status = "Left family"
     }
 
@@ -497,8 +500,7 @@ final class AppModel {
         password = ""
         lastExportSummary = ""
         exportShareItem = nil
-        UserDefaults.standard.removeObject(forKey: BenitoIntentBackend.childIdKey)
-        UserDefaults.standard.removeObject(forKey: BenitoIntentBackend.childNameKey)
+        BenitoShortcutRefresh.publish(id: nil, name: nil)
     }
 
     func refreshMe() async {
@@ -511,6 +513,9 @@ final class AppModel {
             if let first = me.children.first {
                 childId = first.id
                 childName = first.name
+                BenitoShortcutRefresh.publish(id: first.id, name: first.name)
+            } else {
+                BenitoShortcutRefresh.publish(id: nil, name: nil)
             }
             hasFamily = me.family != nil
             role = me.role

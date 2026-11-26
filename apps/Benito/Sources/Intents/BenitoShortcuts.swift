@@ -1,51 +1,47 @@
 import AppIntents
+import BenitoKit
+import Foundation
 
-/// Siri phrases. Every phrase must contain `.applicationName`; the `INAlternativeAppNames`
-/// entry (`BENITO_SIRI_NAME` in `Config/Local.xcconfig`) makes the child's name ("Sam") count as the app
-/// name, so "Siri, Sam started a nap" works. Phrases without the app or child name are not
-/// valid App Shortcuts and usually fall through to web search.
+/// Siri phrases. Every App Shortcut phrase must include the app name
+/// (`\(.applicationName)`). App Store builds accept "Benito", "Baby Tracker", and
+/// "Benito Baby Tracker". Source builds can also add `BENITO_SIRI_NAME` in
+/// Local.xcconfig as an extra alternative app name.
 ///
-/// Outing phrases: "Start a walk with Sam", "Sam is going for a car ride", "Stop Sam's walk".
-/// Bare "start a walk" can't work: App Shortcut phrases must name the app or child.
+/// Key phrases also include the donated child (`\(\.$child)`), so after sign-in
+/// you can say "Sam started a nap with Benito". A phrase can only bind one
+/// parameter, so left/right/bottle and wet/dirty stay on the app-name forms.
+/// The child list is refreshed with `BenitoShortcuts.updateAppShortcutParameters()`
+/// on sign-in, a child-name change, and sign-out.
 ///
-/// Crying phrases: "Start crying timer with Benito", "Sam is crying", "Stop crying timer with
-/// Benito". This is the 10th App Shortcut — the system maximum — so new intents must merge
+/// Phrases lead with the app or child name where they can, and prefer "nap",
+/// "feed", and "crying" over generic "sleep" or "timer" wording so they don't
+/// collide with system Sleep or Timer commands.
+///
+/// There are ten App Shortcuts — the system maximum — so new intents must merge
 /// into an existing shortcut.
 ///
-/// Stop phrases cover "done feeding" / "we're done feeding" / "done nursing" with the
-/// app or child name. `StopTimerIntent` takes no side, so Siri speaks the stop dialog
-/// instead of asking left, right, or bottle.
+/// Nursing / feeding phrases omit `\(\.$choice)` unless the phrase is meant to
+/// bind left, right, or bottle. `StartFeedIntent.choice` is required and has a
+/// request dialog, so "Benito is nursing" starts a feed and Siri asks
+/// "Left, right, or bottle?".
 ///
-/// Nursing / feeding phrases omit `\(\.$choice)` on purpose. `StartFeedIntent.choice` is
-/// required and has a request dialog, so "Sam's nursing" starts a feed and Siri asks
-/// "Left, right, or bottle?". Phrases that include `\(\.$choice)` bind left/right/bottle
-/// when that word is spoken.
+/// `StopTimerIntent` takes no side, so "done feeding" doesn't prompt for one.
 struct BenitoShortcuts: AppShortcutsProvider {
     static var appShortcuts: [AppShortcut] {
         AppShortcut(
             intent: StartFeedIntent(),
             phrases: [
                 "\(.applicationName) started a feed",
-                "\(.applicationName) is feeding",
-                "\(.applicationName) is eating",
-                "Start a feed for \(.applicationName)",
                 "\(.applicationName) started a \(\.$choice) feed",
-                "\(.applicationName)'s nursing",
+                "\(.applicationName) is feeding",
                 "\(.applicationName) is nursing",
-                "\(.applicationName) started nursing",
-                "started nursing \(.applicationName)",
-                "Start nursing \(.applicationName)",
-                "nursing \(.applicationName)",
-                "\(.applicationName) is being nursed",
+                "Start a feed for \(.applicationName)",
                 "I'm feeding \(.applicationName)",
-                "I'm feeding \(.applicationName) right now",
-                "feeding \(.applicationName)",
-                "\(.applicationName) is feeding right now",
-                "started feeding \(.applicationName)",
-                "\(.applicationName) started feeding",
-                "\(.applicationName) is nursing \(\.$choice)",
-                "\(.applicationName) had a \(\.$choice)",
-                "Log a \(\.$choice) for \(.applicationName)",
+                "\(\.$child) started a feed with \(.applicationName)",
+                "\(\.$child) is feeding with \(.applicationName)",
+                "\(\.$child) is nursing with \(.applicationName)",
+                "Start a feed for \(\.$child) with \(.applicationName)",
+                "I'm feeding \(\.$child) with \(.applicationName)",
             ],
             shortTitle: "Start Feed",
             systemImageName: "drop.fill"
@@ -55,21 +51,12 @@ struct BenitoShortcuts: AppShortcutsProvider {
             phrases: [
                 "\(.applicationName) started a nap",
                 "\(.applicationName) is napping",
-                "\(.applicationName) went to sleep",
-                "\(.applicationName) is sleeping",
-                "\(.applicationName) is started a nap",
-                "put \(.applicationName) to sleep",
-                "just put \(.applicationName) to sleep",
-                "we just put \(.applicationName) to sleep",
-                "we put \(.applicationName) to sleep",
-                "\(.applicationName) just went to sleep",
-                "\(.applicationName) is going to sleep",
-                "\(.applicationName) started sleeping",
-                "start a nap for \(.applicationName)",
-                "started a nap for \(.applicationName)",
-                "\(.applicationName) is taking a nap",
+                "Start a nap for \(.applicationName)",
                 "put \(.applicationName) down for a nap",
-                "\(.applicationName) went down for a nap",
+                "\(\.$child) started a nap with \(.applicationName)",
+                "\(\.$child) is napping with \(.applicationName)",
+                "Start a nap for \(\.$child) with \(.applicationName)",
+                "put \(\.$child) down for a nap with \(.applicationName)",
             ],
             shortTitle: "Start Nap",
             systemImageName: "bed.double.fill"
@@ -78,16 +65,11 @@ struct BenitoShortcuts: AppShortcutsProvider {
             intent: StartOutingIntent(),
             phrases: [
                 "Start a \(\.$choice) with \(.applicationName)",
-                "Start a \(\.$choice) for \(.applicationName)",
                 "\(.applicationName) is going on a \(\.$choice)",
-                "\(.applicationName) started a \(\.$choice)",
                 "Start a walk with \(.applicationName)",
                 "\(.applicationName) is going for a walk",
-                "take \(.applicationName) for a walk",
                 "Start a car ride with \(.applicationName)",
                 "\(.applicationName) is going for a car ride",
-                "take \(.applicationName) for a drive",
-                "Start an outing for \(.applicationName)",
             ],
             shortTitle: "Start Walk or Ride",
             systemImageName: "figure.walk"
@@ -95,9 +77,7 @@ struct BenitoShortcuts: AppShortcutsProvider {
         AppShortcut(
             intent: StartCryingIntent(),
             phrases: [
-                "Start crying timer with \(.applicationName)",
-                "Start a crying timer with \(.applicationName)",
-                "Start a crying timer for \(.applicationName)",
+                "Start crying with \(.applicationName)",
                 "\(.applicationName) is crying",
                 "\(.applicationName) started crying",
                 "\(.applicationName) is fussy",
@@ -108,8 +88,9 @@ struct BenitoShortcuts: AppShortcutsProvider {
         AppShortcut(
             intent: PauseTimerIntent(),
             phrases: [
-                "Pause \(.applicationName)",
-                "Pause \(.applicationName)'s timer",
+                "Pause \(.applicationName)'s feed",
+                "Pause \(.applicationName)'s nap",
+                "Pause \(.applicationName)'s crying",
             ],
             shortTitle: "Pause Timer",
             systemImageName: "pause.fill"
@@ -117,8 +98,9 @@ struct BenitoShortcuts: AppShortcutsProvider {
         AppShortcut(
             intent: ResumeTimerIntent(),
             phrases: [
-                "Resume \(.applicationName)",
-                "Resume \(.applicationName)'s timer",
+                "Resume \(.applicationName)'s feed",
+                "Resume \(.applicationName)'s nap",
+                "Resume \(.applicationName)'s crying",
             ],
             shortTitle: "Resume Timer",
             systemImageName: "play.fill"
@@ -126,28 +108,19 @@ struct BenitoShortcuts: AppShortcutsProvider {
         AppShortcut(
             intent: StopTimerIntent(),
             phrases: [
-                "\(.applicationName) is done",
                 "\(.applicationName) woke up",
-                "Stop \(.applicationName)'s timer",
-                "done feeding \(.applicationName)",
-                "we're done feeding \(.applicationName)",
-                "we are done feeding \(.applicationName)",
+                "\(\.$child) woke up in \(.applicationName)",
                 "\(.applicationName) is done feeding",
-                "finished feeding \(.applicationName)",
-                "I'm done feeding \(.applicationName)",
+                "\(\.$child) is done feeding in \(.applicationName)",
+                "done feeding \(.applicationName)",
+                "done feeding \(\.$child) with \(.applicationName)",
+                "we're done feeding \(.applicationName)",
+                "we're done feeding \(\.$child) with \(.applicationName)",
                 "done nursing \(.applicationName)",
-                "we're done nursing \(.applicationName)",
-                "\(.applicationName) is done nursing",
-                "stopped feeding \(.applicationName)",
-                "\(.applicationName) finished eating",
-                "Stop the walk for \(.applicationName)",
+                "done nursing \(\.$child) with \(.applicationName)",
                 "Stop \(.applicationName)'s walk",
-                "\(.applicationName) is back from the walk",
-                "Stop the car ride for \(.applicationName)",
                 "Stop \(.applicationName)'s car ride",
-                "\(.applicationName) is out of the car",
-                "Stop crying timer with \(.applicationName)",
-                "Stop the crying timer for \(.applicationName)",
+                "Stop \(.applicationName)'s crying",
                 "\(.applicationName) stopped crying",
             ],
             shortTitle: "Stop Timer",
@@ -157,16 +130,12 @@ struct BenitoShortcuts: AppShortcutsProvider {
             intent: LogDiaperIntent(),
             phrases: [
                 "\(.applicationName) had a diaper change",
-                "\(.applicationName) has a \(\.$kind) diaper",
                 "Log a diaper for \(.applicationName)",
+                "\(.applicationName) has a \(\.$kind) diaper",
                 "change \(.applicationName)'s diaper",
-                "changed \(.applicationName)'s diaper",
-                "\(.applicationName) needs a diaper change",
-                "\(.applicationName) had a diaper",
-                "diaper change for \(.applicationName)",
-                "\(.applicationName) got a diaper change",
-                "log \(.applicationName)'s diaper",
-                "\(.applicationName) had a \(\.$kind) diaper",
+                "\(\.$child) had a diaper change in \(.applicationName)",
+                "Log a diaper for \(\.$child) with \(.applicationName)",
+                "change \(\.$child)'s diaper with \(.applicationName)",
             ],
             shortTitle: "Log Diaper",
             systemImageName: "circle.grid.cross.fill"
@@ -176,14 +145,8 @@ struct BenitoShortcuts: AppShortcutsProvider {
             phrases: [
                 "\(.applicationName) took medicine",
                 "Log medicine for \(.applicationName)",
-                "\(.applicationName) had medicine",
-                "\(.applicationName) took meds",
-                "\(.applicationName) had meds",
                 "give \(.applicationName) medicine",
-                "gave \(.applicationName) medicine",
-                "\(.applicationName) got medicine",
-                "medicine for \(.applicationName)",
-                "log meds for \(.applicationName)",
+                "\(.applicationName) took meds",
             ],
             shortTitle: "Log Medicine",
             systemImageName: "pills.fill"
@@ -193,16 +156,26 @@ struct BenitoShortcuts: AppShortcutsProvider {
             phrases: [
                 "\(.applicationName) pumped",
                 "Log a pump for \(.applicationName)",
-                "\(.applicationName) finished pumping",
-                "pumped for \(.applicationName)",
                 "I pumped for \(.applicationName)",
-                "log pumping for \(.applicationName)",
-                "\(.applicationName) had a pump",
-                "finished pumping for \(.applicationName)",
-                "\(.applicationName) was pumped",
             ],
             shortTitle: "Log Pump",
             systemImageName: "drop.halffull"
         )
+    }
+}
+
+/// Writes the selected child for `ChildEntityQuery` and tells Siri to pick up the new name.
+enum BenitoShortcutRefresh {
+    static func publish(id: UUID?, name: String?) {
+        if let id {
+            let trimmed = (name ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            if !trimmed.isEmpty {
+                ShortcutChildStore.save([ShortcutChild(id: id, name: trimmed)])
+                BenitoShortcuts.updateAppShortcutParameters()
+                return
+            }
+        }
+        ShortcutChildStore.clear()
+        BenitoShortcuts.updateAppShortcutParameters()
     }
 }

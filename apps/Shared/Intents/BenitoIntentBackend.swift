@@ -31,7 +31,7 @@ enum IntentError: Error, LocalizedError, CustomLocalizedStringResourceConvertibl
         case .noActiveTimer(let name):
             return "\(name) doesn't have a timer running."
         case .timerAlreadyRunning(let name, let label):
-            return "\(name) already has a \(label) timer running — say '\(name) is done' or 'done feeding \(name)' to stop it."
+            return "\(name) already has a \(label) timer running — say 'done feeding \(name)' or '\(name) woke up' to stop it."
         case .timerChanged:
             return "That timer just changed on another device. Try again."
         case .invalidAmount:
@@ -63,8 +63,8 @@ enum IntentError: Error, LocalizedError, CustomLocalizedStringResourceConvertibl
 /// every mutation it re-reads `/state` and refreshes the Live Activity.
 struct BenitoIntentBackend: Sendable {
     static let serverURLKey = "serverURL"
-    static let childIdKey = "benito.intent.childId"
-    static let childNameKey = "benito.intent.childName"
+    static let childIdKey = ShortcutChildStore.idKey
+    static let childNameKey = ShortcutChildStore.nameKey
 
     let client: any BenitoService
     let childId: UUID
@@ -127,15 +127,11 @@ struct BenitoIntentBackend: Sendable {
     }
 
     private static func cachedChild() -> (id: UUID, name: String)? {
-        let defaults = UserDefaults.standard
-        guard let raw = defaults.string(forKey: childIdKey), let id = UUID(uuidString: raw) else { return nil }
-        let name = defaults.string(forKey: childNameKey).flatMap(displayName) ?? "Baby"
-        return (id, name)
+        ShortcutChildStore.load().first.map { ($0.id, $0.name) }
     }
 
-    private static func clearCachedChild() {
-        UserDefaults.standard.removeObject(forKey: childIdKey)
-        UserDefaults.standard.removeObject(forKey: childNameKey)
+    static func clearCachedChild() {
+        ShortcutChildStore.clear()
     }
 
     /// Same pick as the app: the family's first child.
@@ -143,8 +139,7 @@ struct BenitoIntentBackend: Sendable {
         let me = try await perform { try await client.me() }
         guard let child = me.children.first else { throw IntentError.noChild }
         let name = displayName(child.name) ?? "Baby"
-        UserDefaults.standard.set(child.id.uuidString, forKey: childIdKey)
-        UserDefaults.standard.set(name, forKey: childNameKey)
+        ShortcutChildStore.save([ShortcutChild(id: child.id, name: name)])
         BenitoLog.api.notice("intent resolved child \(child.id.uuidString, privacy: .public)")
         return (child.id, name)
     }

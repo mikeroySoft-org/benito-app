@@ -53,7 +53,7 @@ struct LogDiaperTip: Tip {
 struct SiriLoggingTip: Tip {
     var title: Text { Text("Hands full? Ask Siri") }
     var message: Text? {
-        Text("Say “Siri, Benito started a feed” or “Siri, Benito is napping”. No need to unlock your phone.")
+        Text("Say “Siri, Benito started a feed” or “Siri, start a nap for Sam with Benito”. No need to unlock your phone.")
     }
     var image: Image? { Image(systemName: "mic.fill") }
 }

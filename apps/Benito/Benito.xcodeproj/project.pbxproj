@@ -51,6 +51,7 @@
 		77E5DBE2B32E1038190A1624 /* RunningTimerBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39953A71634BF830630202F2 /* RunningTimerBar.swift */; };
 		78BDA149752E9123F30ECD62 /* AdaptiveColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76DC9031238FE56CF448BE61 /* AdaptiveColor.swift */; };
 		7A4F096C7171E691561DE9D4 /* TimelineWeekView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8C13084C838DEB6CCB3C6F1 /* TimelineWeekView.swift */; };
+		7CD1205827AA347F24EC4D15 /* ChildEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ADA9036E49EB8D1D9033F4 /* ChildEntity.swift */; };
 		7E2D09E4EA5C21BFAA358B3D /* ActiveTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B15D6E3DC7BBE835BB2A7AE /* ActiveTimerView.swift */; };
 		7E6706C019F6644CCD0AFFBF /* BenitoShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 666246C21B7E5308F92ADC72 /* BenitoShortcuts.swift */; };
 		880E9470483D7612E01CC331 /* SettingsPrototypeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 067B7AE557310B4A330A4222 /* SettingsPrototypeView.swift */; };
@@ -65,6 +66,7 @@
 		A4BCFE708E429E58D2AC46C5 /* BenitoActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AB1E990795059BA4ACA4584 /* BenitoActivityAttributes.swift */; };
 		A6109E949356F40DC2780E65 /* JoinFamilyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7724B6648D85BE6565091680 /* JoinFamilyView.swift */; };
 		A67E91F0291F1A5F53F42CF2 /* BenitoIntentBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 305BB4071E1BFF84FB322527 /* BenitoIntentBackend.swift */; };
+		AA860316421FE95EFEBFB397 /* ChildEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1ADA9036E49EB8D1D9033F4 /* ChildEntity.swift */; };
 		AC639A7E552174B3448201EF /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 28D75CCA90B6F33FA9A2EF3C /* OnboardingView.swift */; };
 		B38320EBF9502F0552B1CC0B /* BenitoTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = E406E2BC134D2CA277F5A82F /* BenitoTips.swift */; };
 		B4D4C7C39D7CC23E087E9867 /* GitSHA.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1649BA8861CBC14E75077907 /* GitSHA.swift */; };
@@ -166,6 +168,7 @@
 		C445C015D7B3E0D74A4B8FBE /* PairingCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PairingCoordinator.swift; sourceTree = "<group>"; };
 		C96014CE3DBE7F21096A1204 /* LogSheets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogSheets.swift; sourceTree = "<group>"; };
 		C9FF368C6EFA50E3FE69BBA6 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		D1ADA9036E49EB8D1D9033F4 /* ChildEntity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildEntity.swift; sourceTree = "<group>"; };
 		D2393C23A435CB8346828CB2 /* SheetDetents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SheetDetents.swift; sourceTree = "<group>"; };
 		DA336E1335D5B0C74FAFC9AE /* LogActionsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogActionsView.swift; sourceTree = "<group>"; };
 		DB86EC0FBEE38D566731D624 /* BenitoWidgetsBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BenitoWidgetsBundle.swift; sourceTree = "<group>"; };
@@ -263,6 +266,7 @@
 			isa = PBXGroup;
 			children = (
 				305BB4071E1BFF84FB322527 /* BenitoIntentBackend.swift */,
+				D1ADA9036E49EB8D1D9033F4 /* ChildEntity.swift */,
 				9FBF088E66076D69803A90A9 /* LogIntents.swift */,
 				76B7E4473D4D181F72E53661 /* OutingIntents.swift */,
 				3154AB17B06FE3AA29124B95 /* StartCryingIntent.swift */,
@@ -502,6 +506,7 @@
 				1112F0221999A24A7B6CB990 /* Embed Git SHA */,
 				958320046839C29F47B9628C /* Check TimelineView chrome */,
 				984E68DEED4506B78C46E956 /* Sources */,
+				3E9B0E6B4BA786EC2B054DDA /* Add source-build Siri alternative name */,
 				9F30E164EF3F9FED6EB3937B /* Resources */,
 				A03F324EFD89A7DEEF4A9AE2 /* Frameworks */,
 				AB941470C54563AD8AC180FC /* Embed Foundation Extensions */,
@@ -607,6 +612,25 @@
 			shellPath = /bin/sh;
 			shellScript = "set -euo pipefail\nROOT=\"${SRCROOT}/../..\"\nSHA=\"$(git -C \"$ROOT\" rev-parse --short HEAD 2>/dev/null || echo unknown)\"\nOUT=\"${SRCROOT}/Sources/Generated/GitSHA.swift\"\nmkdir -p \"$(dirname \"$OUT\")\"\nprintf '%s\\n' \\\n  \"/// Short git SHA embedded at build time (see project.yml pre-build script).\" \\\n  \"enum BenitoGitSHA {\" \\\n  \"    static let short = \\\"${SHA}\\\"\" \\\n  \"}\" > \"$OUT\"\n";
 		};
+		3E9B0E6B4BA786EC2B054DDA /* Add source-build Siri alternative name */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Add source-build Siri alternative name";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -euo pipefail\nplist=\"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\n[ -f \"$plist\" ] || exit 0\nname=\"$(printf '%s' \"${BENITO_SIRI_NAME:-}\" | tr -d '\\r')\"\nNAME=\"$name\" PLIST=\"$plist\" python3 -c '\nimport os, plistlib\npath = os.environ[\"PLIST\"]\nname = os.environ.get(\"NAME\", \"\").strip()\nwith open(path, \"rb\") as f:\n    data = plistlib.load(f)\nnames = data.get(\"INAlternativeAppNames\") or []\nexisting = []\nkept = []\nfor item in names:\n    if isinstance(item, dict):\n        value = (item.get(\"INAlternativeAppName\") or \"\").strip()\n        if not value:\n            continue\n        existing.append(value)\n        kept.append(item)\n    else:\n        kept.append(item)\nchanged = kept != names\nif name and name not in existing:\n    kept.append({\"INAlternativeAppName\": name})\n    changed = True\nif changed:\n    data[\"INAlternativeAppNames\"] = kept\n    with open(path, \"wb\") as f:\n        plistlib.dump(data, f)\n'\n";
+		};
 		958320046839C29F47B9628C /* Check TimelineView chrome */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -639,6 +663,7 @@
 				A67E91F0291F1A5F53F42CF2 /* BenitoIntentBackend.swift in Sources */,
 				688B29531C85C6F555401BF4 /* BenitoLiveActivity.swift in Sources */,
 				EB3355FBEEEE6387067F780F /* BenitoWidgetsBundle.swift in Sources */,
+				AA860316421FE95EFEBFB397 /* ChildEntity.swift in Sources */,
 				92783354A584261A842903DA /* LiveActivityContent.swift in Sources */,
 				1805B7321B8378D06BBACB49 /* LogIntents.swift in Sources */,
 				5BB38CFF37AD92BF6E85B67A /* NursingLabels.swift in Sources */,
@@ -674,6 +699,7 @@
 				8D128AA17F077E86CE8B653E /* BenitoIntentBackend.swift in Sources */,
 				7E6706C019F6644CCD0AFFBF /* BenitoShortcuts.swift in Sources */,
 				B38320EBF9502F0552B1CC0B /* BenitoTips.swift in Sources */,
+				7CD1205827AA347F24EC4D15 /* ChildEntity.swift in Sources */,
 				344A71007189469318702434 /* ConnectServerView.swift in Sources */,
 				2A085C4885F1E18CC4056079 /* ContentView.swift in Sources */,
 				FCD0D258E85BC51AD33DDECA /* ContinuousCornerCard.swift in Sources */,

@@ -74,10 +74,11 @@ targets:
           - UIInterfaceOrientationLandscapeRight
         # HTTPS and CryptoKit signing only (exempt), so App Store Connect skips the export question.
         ITSAppUsesNonExemptEncryption: false
-        # Lets Siri accept the child's name in place of "Benito" in App Shortcut phrases
-        # ("Siri, Sam started a nap"). Set BENITO_SIRI_NAME in Config/Local.xcconfig.
+        # App Store builds accept these as the app name in Siri phrases. Source builds can
+        # also add BENITO_SIRI_NAME (Local.xcconfig) via the "Siri alternative names" script.
         INAlternativeAppNames:
-          - INAlternativeAppName: $(BENITO_SIRI_NAME)
+          - INAlternativeAppName: Baby Tracker
+          - INAlternativeAppName: Benito Baby Tracker
     # SharePlay (Group Activities): Invite to Family over FaceTime / Messages / nearby iPhones.
     # Entitlements file comes from BENITO_ENTITLEMENTS (Config/*.xcconfig): the default has push +
     # SharePlay; Resources/Benito-UniversalLinks.entitlements adds applinks:benito.mikeroysoft.com,
@@ -109,6 +110,41 @@ targets:
         script: |
           set -euo pipefail
           "${SRCROOT}/../../scripts/check-timer-chrome.sh"
+    postCompileScripts:
+      - name: Add source-build Siri alternative name
+        basedOnDependencyAnalysis: false
+        script: |
+          set -euo pipefail
+          plist="${TARGET_BUILD_DIR}/${INFOPLIST_PATH}"
+          [ -f "$plist" ] || exit 0
+          name="$(printf '%s' "${BENITO_SIRI_NAME:-}" | tr -d '\r')"
+          NAME="$name" PLIST="$plist" python3 -c '
+          import os, plistlib
+          path = os.environ["PLIST"]
+          name = os.environ.get("NAME", "").strip()
+          with open(path, "rb") as f:
+              data = plistlib.load(f)
+          names = data.get("INAlternativeAppNames") or []
+          existing = []
+          kept = []
+          for item in names:
+              if isinstance(item, dict):
+                  value = (item.get("INAlternativeAppName") or "").strip()
+                  if not value:
+                      continue
+                  existing.append(value)
+                  kept.append(item)
+              else:
+                  kept.append(item)
+          changed = kept != names
+          if name and name not in existing:
+              kept.append({"INAlternativeAppName": name})
+              changed = True
+          if changed:
+              data["INAlternativeAppNames"] = kept
+              with open(path, "wb") as f:
+                  plistlib.dump(data, f)
+          '
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(BENITO_BUNDLE_PREFIX).benito

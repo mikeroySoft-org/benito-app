@@ -52,6 +52,10 @@ struct LogDiaperIntent: AppIntent {
     @Parameter(title: "Diaper", requestValueDialog: IntentDialog("Wet, dirty, or both?"))
     var kind: DiaperKind
 
+    /// Donated to Siri for "log a diaper for Sam". The family's child is used when this is nil.
+    @Parameter(title: "Child")
+    var child: ChildEntity?
+
     init() {}
 
     func perform() async throws -> some IntentResult & ProvidesDialog {
