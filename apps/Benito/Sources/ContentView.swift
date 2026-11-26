@@ -300,14 +300,15 @@ final class AppModel {
             Task { await mem.setRefetcher(refetcher) }
         }
         #endif
-        // Phase 1: sandbox ActivityKit update tokens → server (APNs send stays off until .p8 env).
+        // Register the APNs environment this binary is signed for (sandbox for Xcode
+        // development, production for App Store / TestFlight).
         LiveActivityController.shared.setPushTokenHandler { [weak self] token, activityId in
             guard let self, let api = self.api else { return }
             Task {
                 do {
                     try await api.registerLiveActivityToken(
                         token: token,
-                        apnsEnv: "sandbox",
+                        apnsEnv: ApnsEnvironment.current.tokenEnvironment,
                         activityId: activityId
                     )
                     BenitoLog.ui.notice("liveActivity token registered activity=\(activityId, privacy: .public)")

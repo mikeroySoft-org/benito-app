@@ -1,1 +1,6 @@
-First release.
+This update keeps your family’s phones in sync when you’re away from home, and it tidies a few everyday details:
+
+• If the saved server address can’t be reached, Benito automatically tries the same server on your home network.
+• The Apple Watch Smart Stack timer looks right, with controls that stay readable on the plate.
+• The Home activity bar no longer repeats the last-feed line already shown above it.
+• When someone else stops a running timer, the Live Activity on your Lock Screen, Dynamic Island, and Watch Smart Stack ends even if the app isn’t open.

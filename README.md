@@ -50,7 +50,7 @@ The LAN listener is plain HTTP, so only enable it on a network you trust (see [S
 
 ### 3. Install the app
 
-Benito isn't on the App Store yet, so build it with Xcode 16 or later:
+Get **[Benito: Baby Tracker](https://apps.apple.com/app/id6838921745)** free on the App Store, or build it yourself with Xcode 16 or later:
 
 ```bash
 brew install xcodegen

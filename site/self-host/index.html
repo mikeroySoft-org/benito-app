@@ -36,7 +36,7 @@
 cd benito-app &amp;&amp; scripts/macos-service.sh install
 curl -s http://127.0.0.1:8080/health</code></pre><p>On Linux or a NAS, <a href="https://github.com/mikeroysoft-org/benito-app/blob/main/server/README.md">use Docker</a>.</p></div></li>
 <li class="row" id="reach"><h2>Reach it from phones</h2><div class="row__body"><ul><li><b>Tailscale</b>, recommended: an HTTPS address anywhere.</li><li><b>Home Wi-Fi</b>: a plain HTTP listener, for trusted networks only.</li><li><b>A VPS</b>, behind Caddy or nginx with TLS.</li></ul></div></li>
-<li class="row" id="install"><h2>Install the app</h2><div class="row__body"><p>Not on the App Store yet, so build it with Xcode 16 or later:</p><pre class="code"><code>brew install xcodegen
+<li class="row" id="install"><h2>Install the app</h2><div class="row__body"><p>Get <a href="https://apps.apple.com/app/id6838921745">Benito: Baby Tracker</a> free on the App Store, or build it with Xcode 16 or later:</p><pre class="code"><code>brew install xcodegen
 cd apps/Benito &amp;&amp; xcodegen generate
 open Benito.xcodeproj</code></pre><p>First copy <code>Local.xcconfig.example</code> to <code>Local.xcconfig</code> and set your team.</p></div></li>
 <li class="row" id="invite"><h2>Invite your family</h2><div class="row__body"><p>Account, Sharing, <b>Invite to Family</b>. Send it by Messages, AirDrop, QR or SharePlay. Each works once, for three days.</p></div></li>

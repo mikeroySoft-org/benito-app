@@ -742,7 +742,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Benito;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(BENITO_BUNDLE_PREFIX).benito";
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BENITO_BUNDLE_PREFIX).benito.watchkitapp";
 				PRODUCT_NAME = BenitoWatch;
 				SDKROOT = watchos;
@@ -762,7 +762,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = Benito;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(BENITO_BUNDLE_PREFIX).benito";
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BENITO_BUNDLE_PREFIX).benito.watchkitapp";
 				PRODUCT_NAME = BenitoWatch;
 				SDKROOT = watchos;
@@ -786,7 +786,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BENITO_BUNDLE_PREFIX).benito";
 				PRODUCT_NAME = Benito;
 				SDKROOT = iphoneos;
@@ -869,7 +869,7 @@
 				INFOPLIST_FILE = ../BenitoWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BENITO_BUNDLE_PREFIX).benito.widgets";
 				PRODUCT_NAME = BenitoWidgets;
 				SDKROOT = iphoneos;
@@ -889,7 +889,7 @@
 				INFOPLIST_FILE = ../BenitoWidgets/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BENITO_BUNDLE_PREFIX).benito.widgets";
 				PRODUCT_NAME = BenitoWidgets;
 				SDKROOT = iphoneos;
@@ -913,7 +913,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BENITO_BUNDLE_PREFIX).benito";
 				PRODUCT_NAME = Benito;
 				SDKROOT = iphoneos;

@@ -24,7 +24,7 @@
 | 1 | Server stack | **Rust (axum) + SQLite** — one binary, one DB file |
 | 2 | v1 reminders | **Local notifications only**; APNs partner pings in v1.1 |
 | 3 | Local store | **GRDB** (explicit SQL, sync-queue friendly) |
-| 4 | Distribution | ~~Source-only for now~~ **Revised 2026-11-17 (Revision 2):** signed, notarized binaries for the Mac server app; source is MIT licensed, and the repository goes public before the first release. iPhone app: build from source until TestFlight/App Store |
+| 4 | Distribution | ~~Source-only for now~~ **Revised 2026-11-17 (Revision 2):** signed, notarized binaries for the Mac server app; source is MIT licensed, and the repository goes public before the first release. ~~iPhone app: build from source until TestFlight/App Store~~ **Revised 2026-11-25:** iPhone app is free on the [App Store](https://apps.apple.com/app/id6838921745) |
 | 5 | Exposure | **Document both** home Tailscale and public HTTPS |
 | 6 | License | **MIT** |
 

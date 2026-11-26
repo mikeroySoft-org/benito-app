@@ -261,7 +261,7 @@ public actor APIClient {
     // MARK: - Live Activity push tokens (ActivityKit update tokens)
 
     /// Registers this device's ActivityKit update push token for family `end` fan-out.
-    /// Phase 1: pass `apnsEnv: "sandbox"` for Xcode / development builds.
+    /// Pass `apnsEnv` from `ApnsEnvironment.current` (sandbox or production).
     public func registerLiveActivityToken(
         token: String,
         apnsEnv: String,
