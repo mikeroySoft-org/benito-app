@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-# Archive the iPhone/iPad app and send it to App Store Connect (TestFlight / App Store review).
-# Steps around it (app record, metadata, submitting): docs/release-ios.md.
+# Archive the iPhone/iPad app and upload it to App Store Connect (TestFlight).
+# This never submits the app for App Store review. Submitting is a later, manual
+# step in App Store Connect (docs/release-ios.md).
 #
 #   scripts/release-ios.sh              archive, then upload to App Store Connect
 #   scripts/release-ios.sh --no-upload  archive, then write a signed .ipa under build/release-ios/export
@@ -10,6 +11,7 @@
 # It uses the Apple ID signed in to Xcode, or an App Store Connect API key when all three are set:
 #   ASC_KEY_ID, ASC_ISSUER_ID, ASC_KEY_PATH (path to AuthKey_<id>.p8; keep it outside the repo)
 # BUILD_NUMBER overrides the build number (default: UTC timestamp, always increasing).
+# GitHub Actions runs this on ios-v* tags (.github/workflows/release-ios.yml).
 set -euo pipefail
 
 MODE=upload

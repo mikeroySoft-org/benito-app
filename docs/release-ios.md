@@ -4,7 +4,7 @@ How the official build (`com.mikeroysoft.benito`, team `PVF5R8D8Q2`) gets to Tes
 
 | Piece | Where |
 |---|---|
-| Archive and upload | `scripts/release-ios.sh` |
+| Archive and upload | `scripts/release-ios.sh` (GitHub Actions on `ios-v*` tags: `.github/workflows/release-ios.yml`) |
 | Website and repository switches | `scripts/go-public.sh` (`check`, `site`, `repo`) |
 | App Store text | `fastlane/metadata/` (plain text files in the layout `fastlane deliver` reads) |
 | App Store screenshots | `fastlane/screenshots/en-US/` |
@@ -60,11 +60,52 @@ Do these in order. Steps 1 to 3 make the privacy and support pages reachable, wh
 
 ## Later releases
 
-1. Raise `MARKETING_VERSION` for all three targets in `apps/Benito/project.yml`, run `xcodegen generate` in `apps/Benito`, and commit.
-2. Write `fastlane/metadata/en-US/release_notes.txt`.
-3. `scripts/release-ios.sh`, then submit the new version in App Store Connect.
-
 The server must stay compatible with the App Store build people already have, so deploy server changes before an app release that needs them (see CONTRIBUTING.md).
+
+1. Raise `MARKETING_VERSION` for all three targets in `apps/Benito/project.yml`, run `xcodegen generate` in `apps/Benito` (XcodeGen 2.46.0), write `fastlane/metadata/en-US/release_notes.txt`, and merge that pull request.
+2. Push a tag named `ios-v` plus the version, from the merge commit on `main`. Only you can create, move, or delete these tags:
+
+   ```bash
+   git checkout main && git pull
+   git tag ios-v1.0.1
+   git push origin ios-v1.0.1
+   ```
+
+3. Approve the `release` environment when GitHub asks. The workflow archives a Release build (build number `YYYYMMDDHHMM` UTC) and uploads it to App Store Connect. It does **not** submit the app for review.
+4. After processing (10 to 30 minutes), install the build from TestFlight on the test phone and check it.
+5. In [App Store Connect](https://appstoreconnect.apple.com/apps), create the new version if needed, paste the release notes, pick the processed build, and submit for review. People on the App Store build get the update once Apple approves it.
+
+To upload from your Mac instead of GitHub (a clean tree, Xcode signed in, or the API key in the environment): `scripts/release-ios.sh`. That also uploads only; you still submit in App Store Connect.
+
+### GitHub secrets and variables
+
+The workflow runs on a GitHub-hosted macOS runner, in the existing `release` environment (you are the reviewer). It signs with Xcode's automatic signing and the App Store Connect API key, and prefers Apple's cloud-managed certificates so the key is the only signing secret. Official team and bundle values come from repository variables already used by the Mac release workflow.
+
+Add these secrets on the **release** environment (Settings › Environments › release). Do not commit them, and do not paste them into chat.
+
+| Name | Kind | What to put there |
+|---|---|---|
+| `ASC_KEY_ID` | secret | Key ID of an App Store Connect API **team** key with the App Manager role (Users and Access › Integrations). The same key used for `fastlane deliver` is fine. |
+| `ASC_ISSUER_ID` | secret | Issuer ID shown on that Integrations page (a UUID). |
+| `ASC_KEY_P8` | secret | Base64 of the key file (`AuthKey_<KEYID>.p8`). Encode it on your Mac with `base64 -i AuthKey_<KEYID>.p8 \| pbcopy` and paste the single line. Keep the `.p8` outside the repo. |
+
+The workflow already reads these repository variables (Settings › Variables); they are not secrets:
+
+| Name | Typical official value |
+|---|---|
+| `APPLE_TEAM_ID` | `PVF5R8D8Q2` |
+| `BENITO_BUNDLE_PREFIX` | `com.mikeroysoft` |
+
+The workflow writes a throwaway `apps/Benito/Config/Local.xcconfig` from those variables (including `BENITO_ENTITLEMENTS = Resources/Benito-UniversalLinks.entitlements`) and sets `ASC_KEY_PATH` to a temp copy of the decoded `.p8`. `scripts/release-ios.sh` then archives and uploads.
+
+If a run fails because Xcode cannot find an iOS Distribution certificate, export one from Keychain Access (or Apple Developer › Certificates) as a `.p12` and add these optional secrets to the same environment, then re-run:
+
+| Name | Kind | What to put there |
+|---|---|---|
+| `IOS_DISTRIBUTION_P12` | secret | Base64 of the `.p12` (`base64 -i Certificates.p12 \| pbcopy`). |
+| `IOS_DISTRIBUTION_P12_PASSWORD` | secret | The password you set when exporting the `.p12`. |
+
+A Developer ID certificate (the Mac server one) will not work here. This must be an **iOS Distribution** (Apple Distribution) certificate for team `PVF5R8D8Q2`.
 
 ## Screenshots
 
