@@ -55,7 +55,7 @@ Benito isn't on the App Store yet, so build it with Xcode 16 or later:
 ```bash
 brew install xcodegen
 cp apps/Benito/Config/Local.xcconfig.example apps/Benito/Config/Local.xcconfig
-# edit Local.xcconfig: your Apple Developer team id, a bundle prefix you own, your child's name for Siri
+# edit Local.xcconfig: your Apple Developer team id and a bundle prefix you own; optionally BENITO_SIRI_NAME as an extra Siri app name
 cd apps/Benito && xcodegen generate && open Benito.xcodeproj
 ```
 

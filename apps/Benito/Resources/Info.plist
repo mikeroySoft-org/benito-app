@@ -35,7 +35,11 @@
 	<array>
 		<dict>
 			<key>INAlternativeAppName</key>
-			<string>$(BENITO_SIRI_NAME)</string>
+			<string>Baby Tracker</string>
+		</dict>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>Benito Baby Tracker</string>
 		</dict>
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>

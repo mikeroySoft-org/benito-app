@@ -7,8 +7,10 @@ DEVELOPMENT_TEAM =
 // Reverse-DNS prefix for every bundle id: <prefix>.benito, <prefix>.benito.widgets, ...
 BENITO_BUNDLE_PREFIX = org.example
 
-// Your child's name; Siri accepts it in place of "Benito" ("Siri, Sam started a feed").
-BENITO_SIRI_NAME = Baby
+// Optional extra Siri app name for source builds ("Siri, Sam started a feed" as the app
+// name). Official / App Store builds leave this empty and donate the child's name as a
+// Child entity instead; they already accept "Baby Tracker" and "Benito Baby Tracker".
+BENITO_SIRI_NAME =
 
 // App entitlements. The default works for any team (and for unsigned simulator builds).
 // Resources/Benito-UniversalLinks.entitlements also opens https://benito.mikeroysoft.com/join

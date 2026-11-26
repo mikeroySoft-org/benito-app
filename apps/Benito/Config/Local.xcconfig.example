@@ -1,6 +1,7 @@
 // Copy to Local.xcconfig (same folder) and fill in. Local.xcconfig is gitignored.
 DEVELOPMENT_TEAM = ABCDE12345
 BENITO_BUNDLE_PREFIX = com.yourname
+// Optional extra Siri app name for source builds only; App Store builds don't use this.
 BENITO_SIRI_NAME = Sam
 // Official builds only (team in site/.well-known/apple-app-site-association):
 // BENITO_ENTITLEMENTS = Resources/Benito-UniversalLinks.entitlements

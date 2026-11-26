@@ -32,6 +32,10 @@ struct StartFeedIntent: AppIntent {
     @Parameter(title: "Feed", requestValueDialog: IntentDialog("Left, right, or bottle?"))
     var choice: FeedChoice
 
+    /// Donated to Siri for "Sam started a feed". The family's child is used when this is nil.
+    @Parameter(title: "Child")
+    var child: ChildEntity?
+
     @Parameter(title: "Ounces", requestValueDialog: IntentDialog("How many ounces?"))
     var ounces: Double?
 
@@ -86,9 +90,13 @@ struct StartFeedIntent: AppIntent {
 
 struct StartNapIntent: AppIntent {
     static let title: LocalizedStringResource = "Start a nap"
-    static let description: IntentDescription? = IntentDescription("Starts the sleep timer.")
+    static let description: IntentDescription? = IntentDescription("Starts the nap timer.")
     static let openAppWhenRun = false
     static let authenticationPolicy: IntentAuthenticationPolicy = .alwaysAllowed
+
+    /// Donated to Siri for "Sam started a nap". The family's child is used when this is nil.
+    @Parameter(title: "Child")
+    var child: ChildEntity?
 
     init() {}
 
@@ -153,6 +161,10 @@ struct StopTimerIntent: LiveActivityIntent {
     )
     static let openAppWhenRun = false
     static let authenticationPolicy: IntentAuthenticationPolicy = .alwaysAllowed
+
+    /// Donated to Siri for "done feeding Sam" / "Sam woke up". Ignored when nil.
+    @Parameter(title: "Child")
+    var child: ChildEntity?
 
     init() {}
 
