@@ -34,13 +34,18 @@ jobs:
         env:
           APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
           BENITO_BUNDLE_PREFIX: ${{ vars.BENITO_BUNDLE_PREFIX }}
+          BENITO_BUNDLE_ID: ${{ vars.BENITO_BUNDLE_ID }}
         run: |
           set -euo pipefail
           test -n "${APPLE_TEAM_ID}" || { echo "Set repository variable APPLE_TEAM_ID." >&2; exit 1; }
-          test -n "${BENITO_BUNDLE_PREFIX}" || { echo "Set repository variable BENITO_BUNDLE_PREFIX." >&2; exit 1; }
+          prefix="${BENITO_BUNDLE_PREFIX:-}"
+          if [[ -z "$prefix" && "${BENITO_BUNDLE_ID:-}" == *.benito ]]; then
+            prefix="${BENITO_BUNDLE_ID%.benito}"
+          fi
+          test -n "$prefix" || { echo "Set repository variable BENITO_BUNDLE_PREFIX, or BENITO_BUNDLE_ID ending in .benito." >&2; exit 1; }
           printf '%s\n' \
             "DEVELOPMENT_TEAM = ${APPLE_TEAM_ID}" \
-            "BENITO_BUNDLE_PREFIX = ${BENITO_BUNDLE_PREFIX}" \
+            "BENITO_BUNDLE_PREFIX = ${prefix}" \
             "BENITO_ENTITLEMENTS = Resources/Benito-UniversalLinks.entitlements" \
             > apps/Benito/Config/Local.xcconfig
 

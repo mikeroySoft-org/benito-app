@@ -93,8 +93,11 @@ The workflow already reads these repository variables (Settings › Variables); 
 
 | Name | Typical official value |
 |---|---|
-| `APPLE_TEAM_ID` | `PVF5R8D8Q2` |
-| `BENITO_BUNDLE_PREFIX` | `com.mikeroysoft` |
+| `APPLE_TEAM_ID` | `PVF5R8D8Q2` (already set) |
+| `BENITO_BUNDLE_PREFIX` | `com.mikeroysoft` (optional if `BENITO_BUNDLE_ID` is set) |
+| `BENITO_BUNDLE_ID` | `com.mikeroysoft.benito` (already set) |
+
+If `BENITO_BUNDLE_PREFIX` is unset, the workflow uses `BENITO_BUNDLE_ID` with a trailing `.benito` removed. Setting the prefix variable is still a good idea: the Mac release workflow reads it too.
 
 The workflow writes a throwaway `apps/Benito/Config/Local.xcconfig` from those variables (including `BENITO_ENTITLEMENTS = Resources/Benito-UniversalLinks.entitlements`) and sets `ASC_KEY_PATH` to a temp copy of the decoded `.p8`. `scripts/release-ios.sh` then archives and uploads.
 
