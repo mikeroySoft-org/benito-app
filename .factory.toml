@@ -16,7 +16,7 @@ protected_paths = [
   "server/migrations/004_pairing_tokens.sql",
   "server/migrations/005_live_activity_tokens.sql",
   "server/migrations/006_devices_invites.sql",
-  "scripts/backup-db.sh", "scripts/macos-service.sh", "scripts/release-mac.sh",
+  "scripts/backup-db.sh", "scripts/macos-service.sh", "scripts/release-mac.sh", "scripts/release-ios.sh",
   "scripts/gate-env.sh", "scripts/check-site-plumbing.sh",
 ]
 # SPEC.md needs human review; factory has no nonblocking path-review setting.
